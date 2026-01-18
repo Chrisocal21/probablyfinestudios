@@ -1,0 +1,5 @@
+// Wrangler configuration for Cloudflare Pages deployment
+export default {
+	name: 'probablyfinestudios',
+	pages_build_output_dir: './dist',
+};

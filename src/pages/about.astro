@@ -1,0 +1,102 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="About - Probably Fine Studios">
+	<Nav />
+	
+	<section class="py-20 bg-black">
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+			<h1 class="text-5xl font-bold mb-8 text-center text-white">About Us</h1>
+			
+			<div class="prose prose-lg max-w-none">
+				<div class="bg-gray-900 rounded-xl shadow-lg p-8 mb-8 border border-gray-800">
+					<h2 class="text-3xl font-bold mb-4 text-white">Who We Are</h2>
+					<p class="text-gray-300 mb-4">
+						Probably Fine Studios is a digital studio founded by Chris, specializing in creating 
+						web applications that solve real problems. From recipe management to travel planning, 
+						CRM systems to weather alerts, each project combines modern technology with 
+						thoughtful design.
+					</p>
+					<p class="text-gray-300">
+						The name reflects our philosophy: we don't claim perfection, but we strive 
+						to create solutions that work well, look good, and get the job done. Built with 
+						Next.js, React, TypeScript, and modern web technologies, every project showcases 
+						a commitment to clean code and user experience.
+					</p>
+				</div>
+
+				<div class="bg-gray-900 rounded-xl shadow-lg p-8 mb-8 border border-gray-800">
+					<h2 class="text-3xl font-bold mb-4 text-white">What We Focus On</h2>
+					<ul class="space-y-4">
+						<li class="flex items-start">
+							<svg class="w-6 h-6 text-indigo-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+							</svg>
+							<div>
+								<strong class="text-white">Modern web technologies</strong>
+								<p class="text-gray-400">Building with Next.js, React, TypeScript, and the latest frameworks.</p>
+							</div>
+						</li>
+						<li class="flex items-start">
+							<svg class="w-6 h-6 text-indigo-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+							</svg>
+							<div>
+								<strong class="text-white">User-first design</strong>
+								<p class="text-gray-400">Creating intuitive interfaces that people enjoy using.</p>
+							</div>
+						</li>
+						<li class="flex items-start">
+							<svg class="w-6 h-6 text-indigo-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+							</svg>
+							<div>
+								<strong class="text-white">Real-world solutions</strong>
+								<p class="text-gray-400">From CRM systems to weather apps, building tools that solve actual problems.</p>
+							</div>
+						</li>
+						<li class="flex items-start">
+							<svg class="w-6 h-6 text-indigo-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+							</svg>
+							<div>
+								<strong class="text-white">Continuous improvement</strong>
+								<p class="text-gray-400">Every project is an opportunity to learn and refine our craft.</p>
+							</div>
+						</li>
+					</ul>
+				</div>
+
+				<div class="bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-800">
+					<h2 class="text-3xl font-bold mb-4 text-white">The Portfolio</h2>
+					<p class="text-gray-300 mb-6">
+						Each project in our portfolio represents a unique challenge and solution:
+					</p>
+					<div class="space-y-4">
+						<div class="border-l-4 border-indigo-400 pl-4">
+							<strong class="text-white text-lg">Cookbookverse & TripFldr</strong>
+							<p class="text-gray-400">Full-featured platforms for recipe management and travel planning</p>
+						</div>
+						<div class="border-l-4 border-indigo-400 pl-4">
+							<strong class="text-white text-lg">Anchor CRM & Prodrdy</strong>
+							<p class="text-gray-400">Business tools for customer management and product readiness tracking</p>
+						</div>
+						<div class="border-l-4 border-indigo-400 pl-4">
+							<strong class="text-white text-lg">Mapit & URBN Weather</strong>
+							<p class="text-gray-400">Location-based applications with mapping and real-time weather alerts</p>
+						</div>
+						<div class="border-l-4 border-indigo-400 pl-4">
+							<strong class="text-white text-lg">Editly & MerchMaker</strong>
+							<p class="text-gray-400">Content collaboration and custom merchandise design platforms</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<Footer />
+</Layout>

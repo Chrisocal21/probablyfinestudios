@@ -1,0 +1,52 @@
+---
+interface Props {
+	name: string;
+	role: string;
+	bio: string;
+	image: string;
+	memberId: string;
+}
+
+const { name, role, bio, image, memberId } = Astro.props;
+---
+
+<button 
+	class="team-card-btn w-full text-left bg-gray-900 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300 border border-gray-800 hover:border-gray-600 cursor-pointer"
+	data-modal={`modal-${memberId}`}
+	aria-label={`View ${name}'s profile`}
+>
+	<div class="aspect-square bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden">
+		<img src={image} alt={name} class="w-full h-full object-cover object-top" />
+	</div>
+	<div class="p-6">
+		<h3 class="text-xl font-bold mb-1 text-white">{name}</h3>
+		<p class="text-indigo-400 font-medium mb-3">{role}</p>
+		<p class="text-gray-300 mb-4">{bio}</p>
+		
+		<div class="flex items-center text-gray-400 text-sm hover:text-white transition">
+			<span>View Full Profile</span>
+			<svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+			</svg>
+		</div>
+	</div>
+</button>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const cards = document.querySelectorAll('.team-card-btn');
+		
+		cards.forEach(card => {
+			card.addEventListener('click', () => {
+				const modalId = card.getAttribute('data-modal');
+				const modal = document.getElementById(modalId as string);
+				
+				if (modal) {
+					modal.classList.remove('hidden');
+					modal.classList.add('flex');
+				}
+			});
+		});
+	});
+</script>
+

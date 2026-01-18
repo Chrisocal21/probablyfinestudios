@@ -1,0 +1,234 @@
+---
+import { projects } from '../data/projects';
+
+interface Props {
+	autoplay?: boolean;
+}
+
+const { autoplay = false } = Astro.props;
+---
+
+<div class="slider-container relative h-screen w-full overflow-hidden">
+	<!-- Background gradient -->
+	<div class="absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-black"></div>
+	
+	<!-- Slider wrapper -->
+	<div class="slider-wrapper relative h-full">
+		<div class="slider flex h-full transition-transform duration-500 ease-out">
+			{projects.map((project, index) => (
+				<div class="slide flex-shrink-0 w-full h-full relative" data-index={index}>
+					<!-- Project background image with overlay -->
+					<div class="absolute inset-0">
+						<img 
+							src={project.image} 
+							alt={project.title}
+							class="w-full h-full object-cover opacity-40"
+						/>
+						<div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+					</div>
+					
+					<!-- Project content -->
+					<div class="relative h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
+						<div class="max-w-4xl text-center">
+							<h2 class="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
+								{project.title}
+							</h2>
+							<p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
+								{project.description}
+							</p>
+							
+							<!-- Tags -->
+							<div class="flex flex-wrap gap-3 justify-center mb-8">
+								{project.tags.map(tag => (
+									<span class="bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm border border-white/20">
+										{tag}
+									</span>
+								))}
+							</div>
+							
+							<!-- Action buttons -->
+							<div class="flex gap-4 justify-center">
+								{project.liveUrl && (
+									<a 
+										href={project.liveUrl} 
+										target="_blank" 
+										rel="noopener noreferrer"
+									class="group bg-white text-black px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition duration-300 transform hover:scale-105"
+									>
+										<span class="flex items-center gap-2">
+											View Project
+											<svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+											</svg>
+										</span>
+									</a>
+								)}
+								{project.githubUrl && (
+									<a 
+										href={project.githubUrl} 
+										target="_blank" 
+										rel="noopener noreferrer"
+										class="bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/20 transition border border-white/20"
+									>
+										View Code
+									</a>
+								)}
+							</div>
+							
+							<!-- Collaborators -->
+							{project.collaborators && project.collaborators.length > 0 && (
+								<div class="mt-8 text-gray-400">
+									<p class="text-sm mb-2">Collaboration with:</p>
+									<div class="flex flex-wrap gap-3 justify-center">
+										{project.collaborators.map(collab => (
+											<a 
+												href={collab.url} 
+												target="_blank" 
+												rel="noopener noreferrer"
+												class="text-sm text-white hover:text-indigo-400 transition underline"
+											>
+												{collab.name}
+											</a>
+										))}
+									</div>
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
+			))}
+		</div>
+	</div>
+	
+	<!-- Navigation arrows -->
+	<button 
+		class="nav-btn prev absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white p-4 rounded-full transition border border-white/20"
+		aria-label="Previous project"
+	>
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+		</svg>
+	</button>
+	<button 
+		class="nav-btn next absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white p-4 rounded-full transition border border-white/20"
+		aria-label="Next project"
+	>
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+		</svg>
+	</button>
+	
+	<!-- Slide indicators -->
+	<div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-3">
+		{projects.map((_, index) => (
+			<button 
+				class="indicator w-3 h-3 rounded-full bg-white/30 hover:bg-white/50 transition"
+				data-slide={index}
+				aria-label={`Go to slide ${index + 1}`}
+			></button>
+		))}
+	</div>
+	
+	<!-- Project counter -->
+	<div class="absolute bottom-16 right-8 text-white text-lg font-medium">
+		<span class="current-slide">1</span> / <span>{projects.length}</span>
+	</div>
+</div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', () => {
+		const slider = document.querySelector('.slider') as HTMLElement;
+		const slides = document.querySelectorAll('.slide');
+		const prevBtn = document.querySelector('.nav-btn.prev') as HTMLButtonElement;
+		const nextBtn = document.querySelector('.nav-btn.next') as HTMLButtonElement;
+		const indicators = document.querySelectorAll('.indicator');
+		const currentSlideEl = document.querySelector('.current-slide') as HTMLElement;
+		
+		let currentIndex = 0;
+		const totalSlides = slides.length;
+		
+		function updateSlider() {
+			slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+			
+			// Update indicators
+			indicators.forEach((indicator, index) => {
+				if (index === currentIndex) {
+					indicator.classList.add('!bg-white');
+				} else {
+					indicator.classList.remove('!bg-white');
+				}
+			});
+			
+			// Update counter
+			currentSlideEl.textContent = (currentIndex + 1).toString();
+		}
+		
+		function nextSlide() {
+			currentIndex = (currentIndex + 1) % totalSlides;
+			updateSlider();
+		}
+		
+		function prevSlide() {
+			currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+			updateSlider();
+		}
+		
+		function goToSlide(index: number) {
+			currentIndex = index;
+			updateSlider();
+		}
+		
+		// Navigation buttons
+		prevBtn?.addEventListener('click', prevSlide);
+		nextBtn?.addEventListener('click', nextSlide);
+		
+		// Indicators
+		indicators.forEach((indicator, index) => {
+			indicator.addEventListener('click', () => goToSlide(index));
+		});
+		
+		// Keyboard navigation
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'ArrowLeft') prevSlide();
+			if (e.key === 'ArrowRight') nextSlide();
+		});
+		
+		// Touch/swipe support
+		let touchStartX = 0;
+		let touchEndX = 0;
+		
+		slider?.addEventListener('touchstart', (e) => {
+			touchStartX = e.changedTouches[0].screenX;
+		});
+		
+		slider?.addEventListener('touchend', (e) => {
+			touchEndX = e.changedTouches[0].screenX;
+			handleSwipe();
+		});
+		
+		function handleSwipe() {
+			if (touchEndX < touchStartX - 50) nextSlide();
+			if (touchEndX > touchStartX + 50) prevSlide();
+		}
+		
+		// Initialize
+		updateSlider();
+	});
+</script>
+
+<style>
+	@keyframes fade-in {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+	
+	.animate-fade-in {
+		animation: fade-in 0.8s ease-out;
+	}
+</style>

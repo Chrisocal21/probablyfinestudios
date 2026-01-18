@@ -1,0 +1,46 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import TeamCard from '../components/TeamCard.astro';
+import TeamMemberModal from '../components/TeamMemberModal.astro';
+import { teamMembers } from '../data/team';
+---
+
+<Layout title="Team - Probably Fine Studios">
+	<Nav />
+	
+	<section class="py-20 bg-black">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="text-center mb-12">
+				<h1 class="text-5xl font-bold mb-4 text-white">Meet the Team</h1>
+				<p class="text-xl text-gray-400">
+					The talented people behind Probably Fine Studios
+				</p>
+			</div>
+
+			<div class="flex justify-center">
+				<div class="grid grid-cols-1 gap-8 max-w-md">
+					{teamMembers.map(member => (
+						<>
+							<TeamCard
+								name={member.name}
+								role={member.role}
+								bio={member.bio}
+								image={member.image}
+								memberId={member.id}
+							/>
+							<TeamMemberModal 
+								member={member}
+								modalId={`modal-${member.id}`}
+								isOpen={false}
+							/>
+						</>
+					))}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<Footer />
+</Layout>

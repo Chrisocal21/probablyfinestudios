@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { projects } from '../data/projects';
+---
+
+<Layout title="Portfolio - Probably Fine Studios">
+	<Nav />
+	
+	<section class="py-20 bg-black">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="text-center mb-12">
+				<h1 class="text-5xl font-bold mb-4 text-white">Our Portfolio</h1>
+				<p class="text-xl text-gray-400">
+					A showcase of projects we've built and shipped
+				</p>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+				{projects.map(project => (
+					<ProjectCard
+						title={project.title}
+						description={project.description}
+						image={project.image}
+						tags={project.tags}
+						liveUrl={project.liveUrl}
+						githubUrl={project.githubUrl}
+						collaborators={project.collaborators}
+					/>
+				))}
+			</div>
+		</div>
+	</section>
+
+	<Footer />
+</Layout>
