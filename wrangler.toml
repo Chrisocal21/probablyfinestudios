@@ -1,5 +1,4 @@
-// Wrangler configuration for Cloudflare Pages deployment
-export default {
-	name: 'probablyfinestudios',
-	pages_build_output_dir: './dist',
-};
+# Wrangler configuration for Cloudflare Pages deployment
+name = "probablyfinestudios"
+pages_build_output_dir = "./dist"
+compatibility_date = "2024-01-01"
