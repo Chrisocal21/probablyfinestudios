@@ -15,8 +15,8 @@ const { name, role, bio, image, memberId } = Astro.props;
 	data-modal={`modal-${memberId}`}
 	aria-label={`View ${name}'s profile`}
 >
-	<div class="aspect-square bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden">
-		<img src={image} alt={name} class="w-full h-full object-cover object-top" />
+	<div class="aspect-square bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden flex items-center justify-center">
+		<span class="text-white font-bold text-6xl select-none">{name.charAt(0)}</span>
 	</div>
 	<div class="p-6">
 		<h3 class="text-xl font-bold mb-1 text-white">{name}</h3>

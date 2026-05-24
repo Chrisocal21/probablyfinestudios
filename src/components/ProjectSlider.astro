@@ -9,30 +9,83 @@ const { autoplay = false } = Astro.props;
 ---
 
 <div class="slider-container relative h-screen w-full overflow-hidden">
-	<!-- Background gradient -->
-	<div class="absolute inset-0 bg-gradient-to-br from-indigo-900 via-purple-900 to-black"></div>
 	
 	<!-- Slider wrapper -->
 	<div class="slider-wrapper relative h-full">
 		<div class="slider flex h-full transition-transform duration-500 ease-out">
-			{projects.map((project, index) => (
-				<div class="slide flex-shrink-0 w-full h-full relative" data-index={index}>
-					<!-- Project background image with overlay -->
-					<div class="absolute inset-0">
-						<img 
-							src={project.image} 
-							alt={project.title}
-							class="w-full h-full object-cover opacity-40"
-						/>
-						<div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+			<!-- PFS Hero Slide -->
+			<div class="slide flex-shrink-0 w-full h-full relative" data-index="0">
+				<!-- Background -->
+				<div class="absolute inset-0" style="background: linear-gradient(135deg, #0a0a0f 0%, #0f0a1a 40%, #0a0f1a 100%)"></div>
+				<!-- Pattern: fine diagonal grid -->
+				<div class="absolute inset-0" style="background-image: linear-gradient(rgba(139,92,246,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.06) 1px, transparent 1px); background-size: 40px 40px"></div>
+				<!-- Radial glow -->
+				<div class="absolute inset-0" style="background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(99,59,200,0.18) 0%, transparent 70%)"></div>
+				<!-- Bottom fade -->
+				<div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+
+				<!-- Content -->
+				<div class="relative h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
+					<div class="max-w-4xl text-center">
+						<!-- Wordmark -->
+						<div class="w-16 h-1 mx-auto mb-8 rounded-full" style="background: linear-gradient(90deg, #8b5cf6, #6366f1)"></div>
+						<h1 class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
+							Probably Fine <span style="background: linear-gradient(90deg, #8b5cf6, #6366f1, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text">Studios</span>
+						</h1>
+						<p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
+							One developer, a handful of good ideas, and AI doing the heavy lifting. Real products, shipped — photography tools, recipe apps, maps, dashboards, games. And honestly? They're probably fine.
+						</p>
+						<div class="flex gap-4 justify-center">
+							<button
+								id="pfs-view-work"
+								class="group px-8 py-4 rounded-lg font-semibold transition duration-300 transform hover:scale-105"
+								style="background: linear-gradient(90deg, #8b5cf6, #6366f1); color: #fff"
+							>
+								<span class="flex items-center gap-2">
+									View Our Work
+									<svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+									</svg>
+								</span>
+							</button>
+							<a
+								href="/team"
+								class="px-8 py-4 rounded-lg font-semibold transition border text-white hover:bg-white/10"
+								style="border-color: rgba(139,92,246,0.4)"
+							>
+								Meet the Team
+							</a>
+						</div>
 					</div>
-					
-					<!-- Project content -->
-					<div class="relative h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
+				</div>
+			</div>
+			{projects.map((project, index) => (
+			<div class="slide flex-shrink-0 w-full h-full relative" data-index={index + 1}>
+				<!-- Per-project themed background -->
+				<div class="absolute inset-0 transition-all duration-500" style={`background: ${project.theme?.gradient ?? 'linear-gradient(135deg, #312e81, #1e1b4b, #000)'}`}></div>
+				<!-- CSS pattern overlay -->
+				{project.theme?.pattern && (
+					<div
+						class="absolute inset-0"
+						style={`background-image: ${project.theme.pattern}; background-size: ${project.theme.patternSize ?? 'auto'}`}
+					></div>
+				)}
+				<!-- Bottom fade for content legibility -->
+				<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+				
+				<!-- Project content -->
+				<div class="relative h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
 						<div class="max-w-4xl text-center">
+							<!-- Accent bar -->
+							<div class="w-12 h-1 mx-auto mb-6 rounded-full" style={`background: ${project.theme?.accent ?? '#818cf8'}`}></div>
 							<h2 class="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
 								{project.title}
 							</h2>
+							{project.wip && (
+								<span class="inline-block mb-4 text-xs font-medium tracking-widest uppercase px-3 py-1 rounded-full" style={`background: ${project.theme?.accent ?? '#fbbf24'}18; color: ${project.theme?.accent ?? '#fbbf24'}; border: 1px solid ${project.theme?.accent ?? '#fbbf24'}40`}>
+									In Development — may not reflect latest updates
+								</span>
+							)}
 							<p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
 								{project.description}
 							</p>
@@ -40,7 +93,7 @@ const { autoplay = false } = Astro.props;
 							<!-- Tags -->
 							<div class="flex flex-wrap gap-3 justify-center mb-8">
 								{project.tags.map(tag => (
-									<span class="bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm border border-white/20">
+									<span class="bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm" style={`border: 1px solid ${project.theme?.accent ?? '#ffffff'}40`}>
 										{tag}
 									</span>
 								))}
@@ -53,7 +106,8 @@ const { autoplay = false } = Astro.props;
 										href={project.liveUrl} 
 										target="_blank" 
 										rel="noopener noreferrer"
-									class="group bg-white text-black px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition duration-300 transform hover:scale-105"
+										class="group px-8 py-4 rounded-lg font-semibold transition duration-300 transform hover:scale-105"
+										style={`background: ${project.theme?.accent ?? '#ffffff'}; color: #000`}
 									>
 										<span class="flex items-center gap-2">
 											View Project
@@ -120,18 +174,23 @@ const { autoplay = false } = Astro.props;
 	
 	<!-- Slide indicators -->
 	<div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-3">
+		<button
+			class="indicator w-3 h-3 rounded-full bg-white/30 hover:bg-white/50 transition"
+			data-slide="0"
+			aria-label="Go to slide 1"
+		></button>
 		{projects.map((_, index) => (
 			<button 
 				class="indicator w-3 h-3 rounded-full bg-white/30 hover:bg-white/50 transition"
-				data-slide={index}
-				aria-label={`Go to slide ${index + 1}`}
+				data-slide={index + 1}
+				aria-label={`Go to slide ${index + 2}`}
 			></button>
 		))}
 	</div>
-	
+
 	<!-- Project counter -->
 	<div class="absolute bottom-16 right-8 text-white text-lg font-medium">
-		<span class="current-slide">1</span> / <span>{projects.length}</span>
+		<span class="current-slide">1</span> / <span>{projects.length + 1}</span>
 	</div>
 </div>
 
@@ -178,6 +237,9 @@ const { autoplay = false } = Astro.props;
 			updateSlider();
 		}
 		
+		// PFS hero CTA
+		document.getElementById('pfs-view-work')?.addEventListener('click', () => goToSlide(1));
+
 		// Navigation buttons
 		prevBtn?.addEventListener('click', prevSlide);
 		nextBtn?.addEventListener('click', nextSlide);

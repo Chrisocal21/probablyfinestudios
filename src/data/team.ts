@@ -41,14 +41,15 @@ export const teamMembers: TeamMember[] = [
 			digital: 'https://chrisocdigital.com'
 		},
 		projects: [
-			{ name: 'Cookbookverse', contribution: 'Full-stack Development & Design' },
-			{ name: 'TripFldr', contribution: 'Full-stack Development & UX Design' },
-			{ name: 'Editly', contribution: 'Full-stack Development & Real-time Collaboration' },
-			{ name: 'Anchor CRM', contribution: 'Full-stack Development & Database Architecture' },
-			{ name: 'Prodrdy', contribution: 'Full-stack Development & Firebase Integration' },
+			{ name: 'CookBookVerse', contribution: 'Full-stack Development & Design' },
+			{ name: 'Editly', contribution: 'Full-stack Development & AI Integration' },
+			{ name: 'FieldKit', contribution: 'Full-stack Development & Platform Architecture' },
+			{ name: 'ChrisOCPhoto', contribution: 'Full-stack Development & Photography Portfolio' },
+			{ name: 'ChrisOCDigital', contribution: 'Full-stack Development & Digital Creative Portfolio' },
+			{ name: 'Wandr', contribution: 'Full-stack Development & Location API Integration' },
 			{ name: 'Mapit', contribution: 'Full-stack Development & Mapping Integration' },
-			{ name: 'URBN Weather', contribution: 'Full-stack Development & Weather API Integration' },
-			{ name: 'MerchMaker', contribution: 'Full-stack Development & Stripe Integration' }
+			{ name: 'URBN Weather', contribution: 'Full-stack Development & Real-time Data Integration' },
+			{ name: 'Scramble', contribution: 'Game Development & Phaser Engine' },
 		],
 		tools: {
 			frontend: ['Next.js', 'React', 'TypeScript', 'JavaScript', 'Tailwind CSS', 'Material UI', 'Astro', 'HTML/CSS'],
