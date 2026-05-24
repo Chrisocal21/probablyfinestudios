@@ -9,88 +9,67 @@ import Footer from '../components/Footer.astro';
 	
 	<section class="py-20 bg-black">
 		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-			<h1 class="text-5xl font-bold mb-8 text-center text-white">About Us</h1>
-			
-			<div class="prose prose-lg max-w-none">
-				<div class="bg-gray-900 rounded-xl shadow-lg p-8 mb-8 border border-gray-800">
-					<h2 class="text-3xl font-bold mb-4 text-white">Who We Are</h2>
+			<h1 class="text-5xl font-bold mb-8 text-center text-white">About</h1>
+
+			<div class="space-y-8">
+				<!-- Who We Are -->
+				<div class="bg-gray-900 rounded-xl p-8 border border-gray-800">
+					<h2 class="text-2xl font-bold mb-4 text-white">Who We Are</h2>
 					<p class="text-gray-300 mb-4">
-						Probably Fine Studios is a digital studio founded by Chris, specializing in creating 
-						web applications that solve real problems. From recipe management to travel planning, 
-						CRM systems to weather alerts, each project combines modern technology with 
-						thoughtful design.
+						Probably Fine Studios is a one-person digital studio — Chris at the helm, building apps, tools, and products around ideas that feel worth building, using whatever combination of code, AI, and stubbornness gets the job done.
 					</p>
 					<p class="text-gray-300">
-						The name reflects our philosophy: we don't claim perfection, but we strive 
-						to create solutions that work well, look good, and get the job done. Built with 
-						Next.js, React, TypeScript, and modern web technologies, every project showcases 
-						a commitment to clean code and user experience.
+						The name is honest. Nothing here claims to be perfect — but the work ships, the products are real, and they're probably fine.
 					</p>
 				</div>
 
-				<div class="bg-gray-900 rounded-xl shadow-lg p-8 mb-8 border border-gray-800">
-					<h2 class="text-3xl font-bold mb-4 text-white">What We Focus On</h2>
-					<ul class="space-y-4">
-						<li class="flex items-start">
-							<svg class="w-6 h-6 text-indigo-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-							</svg>
+				<!-- The Origin -->
+				<div class="bg-gray-900 rounded-xl p-8 border border-gray-800">
+					<h2 class="text-2xl font-bold mb-6 text-white">How We Got Here</h2>
+					<div class="space-y-6">
+						<div class="flex gap-4">
+							<div class="flex-shrink-0 w-2 rounded-full" style="background: #d6d3d1"></div>
 							<div>
-								<strong class="text-white">Modern web technologies</strong>
-								<p class="text-gray-400">Building with Next.js, React, TypeScript, and the latest frameworks.</p>
+								<strong class="text-white text-lg block mb-1">ChrisOCPhoto — The Original</strong>
+								<p class="text-gray-400">It started with photography. ChrisOCPhoto has been the home base for a long time — a personal portfolio built from scratch because nothing else felt right for the work. It's still going, still the OG.</p>
 							</div>
-						</li>
-						<li class="flex items-start">
-							<svg class="w-6 h-6 text-indigo-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-							</svg>
+						</div>
+						<div class="flex gap-4">
+							<div class="flex-shrink-0 w-2 rounded-full" style="background: #e879f9"></div>
 							<div>
-								<strong class="text-white">User-first design</strong>
-								<p class="text-gray-400">Creating intuitive interfaces that people enjoy using.</p>
+								<strong class="text-white text-lg block mb-1">ChrisOCDigital — Where the Code Started</strong>
+								<p class="text-gray-400">ChrisOCDigital grew out of that same creative energy, born when the code side kicked in. What started as building a better photography site turned into tools, scripts, programs, and experiments — a whole body of work taking shape under one roof. It was the pre-rebuild of ChrisOCPhoto and the stepping stone before Probably Fine Studios existed.</p>
 							</div>
-						</li>
-						<li class="flex items-start">
-							<svg class="w-6 h-6 text-indigo-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-							</svg>
+						</div>
+						<div class="flex gap-4">
+							<div class="flex-shrink-0 w-2 rounded-full" style="background: #8b5cf6"></div>
 							<div>
-								<strong class="text-white">Real-world solutions</strong>
-								<p class="text-gray-400">From CRM systems to weather apps, building tools that solve actual problems.</p>
+								<strong class="text-white text-lg block mb-1">Probably Fine Studios — The Next Step</strong>
+								<p class="text-gray-400">When the projects needed a proper home, Probably Fine Studios became that. A studio name for a body of work that had quietly grown into something real — recipe apps, maps, weather dashboards, field tools, a browser game, and more. Built with AI, shipped with care.</p>
 							</div>
-						</li>
-						<li class="flex items-start">
-							<svg class="w-6 h-6 text-indigo-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-							</svg>
-							<div>
-								<strong class="text-white">Continuous improvement</strong>
-								<p class="text-gray-400">Every project is an opportunity to learn and refine our craft.</p>
-							</div>
-						</li>
-					</ul>
+						</div>
+					</div>
 				</div>
 
-				<div class="bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-800">
-					<h2 class="text-3xl font-bold mb-4 text-white">The Portfolio</h2>
-					<p class="text-gray-300 mb-6">
-						Each project in our portfolio represents a unique challenge and solution:
-					</p>
+				<!-- The Work -->
+				<div class="bg-gray-900 rounded-xl p-8 border border-gray-800">
+					<h2 class="text-2xl font-bold mb-6 text-white">The Work</h2>
 					<div class="space-y-4">
-						<div class="border-l-4 border-indigo-400 pl-4">
-						<strong class="text-white text-lg">CookBookVerse & Editly</strong>
-						<p class="text-gray-400">Recipe management platform and AI-powered photo editing tools</p>
+						<div class="border-l-2 border-indigo-500 pl-4">
+							<strong class="text-white">ChrisOCPhoto & ChrisOCDigital</strong>
+							<p class="text-gray-400 text-sm mt-1">The originals — a photography portfolio and the creative digital space where the code journey began.</p>
 						</div>
-						<div class="border-l-4 border-indigo-400 pl-4">
-						<strong class="text-white text-lg">FieldKit & Wandr</strong>
-						<p class="text-gray-400">Field data collection platform and location-based discovery app</p>
+						<div class="border-l-2 border-indigo-500 pl-4">
+							<strong class="text-white">CookBookVerse & Editly</strong>
+							<p class="text-gray-400 text-sm mt-1">A recipe platform that feels like a real cookbook, and an AI photo editing tool built around the photographer's workflow.</p>
 						</div>
-						<div class="border-l-4 border-indigo-400 pl-4">
-							<strong class="text-white text-lg">Mapit, URBN Weather & Scramble</strong>
-						<p class="text-gray-400">Mapping tool, real-time urban safety dashboard, and a Phaser-built browser platformer</p>
+						<div class="border-l-2 border-indigo-500 pl-4">
+							<strong class="text-white">FieldKit & Wandr</strong>
+							<p class="text-gray-400 text-sm mt-1">Sharp field data collection tools and a location discovery app for when you're somewhere new and actually want to explore.</p>
 						</div>
-						<div class="border-l-4 border-indigo-400 pl-4">
-						<strong class="text-white text-lg">ChrisOCPhoto</strong>
-						<p class="text-gray-400">A handcrafted photography portfolio — built from scratch using dev and creative skills to bring a personal, niche idea to life</p>
+						<div class="border-l-2 border-indigo-500 pl-4">
+							<strong class="text-white">Mapit, URBN Weather & Scramble</strong>
+							<p class="text-gray-400 text-sm mt-1">Location data visualisation, an urban real-time safety dashboard, and a browser platformer built in Phaser with a very opinionated egg.</p>
 						</div>
 					</div>
 				</div>

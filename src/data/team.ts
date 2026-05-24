@@ -31,7 +31,7 @@ export const teamMembers: TeamMember[] = [
 		id: 'member-1',
 		name: 'Chris',
 		role: 'Founder & Lead Developer',
-		bio: 'Full-stack developer with a passion for creating elegant solutions to complex problems. Photography enthusiast and digital creative.',
+		bio: 'Started with a camera, ended up writing code. ChrisOCPhoto has been home base for years — a photography portfolio built from scratch. ChrisOCDigital grew out of that when the dev side took hold: tools, scripts, sites, programs, experiments. Probably Fine Studios is what it all became. Still one person, still building things that actually interest me.',
 		image: '/images/Chris.png',
 		links: {
 			github: 'https://github.com/Chrisocal21',

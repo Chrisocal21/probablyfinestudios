@@ -74,82 +74,105 @@ const { autoplay = false } = Astro.props;
 				<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 				
 				<!-- Project content -->
-				<div class="relative h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
-						<div class="max-w-4xl text-center">
-							<!-- Accent bar -->
-							<div class="w-12 h-1 mx-auto mb-6 rounded-full" style={`background: ${project.theme?.accent ?? '#818cf8'}`}></div>
-							<h2 class="text-5xl md:text-7xl font-bold text-white mb-6 animate-fade-in">
+				<div class="relative h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 py-6">
+					<div class="w-full max-w-3xl flex flex-col items-center text-center gap-2">
+
+						<!-- Title block -->
+						<div class="mb-1">
+							<div class="w-8 h-1 mb-2 rounded-full mx-auto" style={`background: ${project.theme?.accent ?? '#818cf8'}`}></div>
+							<h2 class="text-3xl md:text-4xl font-bold text-white mb-1">
 								{project.title}
 							</h2>
 							{project.wip && (
-								<span class="inline-block mb-4 text-xs font-medium tracking-widest uppercase px-3 py-1 rounded-full" style={`background: ${project.theme?.accent ?? '#fbbf24'}18; color: ${project.theme?.accent ?? '#fbbf24'}; border: 1px solid ${project.theme?.accent ?? '#fbbf24'}40`}>
-									In Development — may not reflect latest updates
+								<span class="inline-block text-xs font-medium tracking-widest uppercase px-3 py-0.5 rounded-full" style={`background: ${project.theme?.accent ?? '#fbbf24'}18; color: ${project.theme?.accent ?? '#fbbf24'}; border: 1px solid ${project.theme?.accent ?? '#fbbf24'}40`}>
+									In Development
 								</span>
 							)}
-							<p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
-								{project.description}
-							</p>
-							
-							<!-- Tags -->
-							<div class="flex flex-wrap gap-3 justify-center mb-8">
-								{project.tags.map(tag => (
-									<span class="bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm" style={`border: 1px solid ${project.theme?.accent ?? '#ffffff'}40`}>
-										{tag}
-									</span>
-								))}
-							</div>
-							
-							<!-- Action buttons -->
-							<div class="flex gap-4 justify-center">
-								{project.liveUrl && (
-									<a 
-										href={project.liveUrl} 
-										target="_blank" 
-										rel="noopener noreferrer"
-										class="group px-8 py-4 rounded-lg font-semibold transition duration-300 transform hover:scale-105"
-										style={`background: ${project.theme?.accent ?? '#ffffff'}; color: #000`}
-									>
-										<span class="flex items-center gap-2">
-											View Project
-											<svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-											</svg>
-										</span>
-									</a>
-								)}
-								{project.githubUrl && (
-									<a 
-										href={project.githubUrl} 
-										target="_blank" 
-										rel="noopener noreferrer"
-										class="bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/20 transition border border-white/20"
-									>
-										View Code
-									</a>
-								)}
-							</div>
-							
-							<!-- Collaborators -->
-							{project.collaborators && project.collaborators.length > 0 && (
-								<div class="mt-8 text-gray-400">
-									<p class="text-sm mb-2">Collaboration with:</p>
-									<div class="flex flex-wrap gap-3 justify-center">
-										{project.collaborators.map(collab => (
-											<a 
-												href={collab.url} 
-												target="_blank" 
-												rel="noopener noreferrer"
-												class="text-sm text-white hover:text-indigo-400 transition underline"
-											>
-												{collab.name}
-											</a>
-										))}
-									</div>
+						</div>
+
+						<!-- Browser preview -->
+						{project.liveUrl && (
+						<div class="w-full max-w-sm mx-auto rounded-lg overflow-hidden border border-white/10 shadow-xl" style={`box-shadow: 0 0 30px ${project.theme?.accent ?? '#818cf8'}25`}>
+							<div class="flex items-center gap-2 px-3 py-2 bg-black/60 border-b border-white/10">
+								<div class="flex gap-1.5">
+									<div class="w-2.5 h-2.5 rounded-full bg-red-500/70"></div>
+									<div class="w-2.5 h-2.5 rounded-full bg-yellow-500/70"></div>
+									<div class="w-2.5 h-2.5 rounded-full bg-green-500/70"></div>
 								</div>
+								<div class="flex-1 mx-2 bg-white/10 rounded px-2 py-0.5 text-xs text-gray-400 truncate">
+									{project.liveUrl.replace('https://', '')}
+								</div>
+							</div>
+							<div class="aspect-video bg-gray-900">
+								<img
+									src={`https://s0.wordpress.com/mshots/v1/${encodeURIComponent(project.liveUrl)}?w=900&h=506`}
+									alt={`${project.title} preview`}
+									class="w-full h-full object-contain"
+									/>
+								</div>
+							</div>
+						)}
+
+						<!-- Description -->
+						<p class="text-base md:text-lg text-gray-300 max-w-xl">
+							{project.description}
+						</p>
+
+						<!-- Tags + buttons -->
+						<div class="flex flex-wrap gap-2 justify-center">
+							{project.tags.map(tag => (
+								<span class="bg-white/10 text-white px-3 py-1 rounded-full text-sm" style={`border: 1px solid ${project.theme?.accent ?? '#ffffff'}40`}>
+									{tag}
+								</span>
+							))}
+						</div>
+						<div class="flex gap-3">
+							{project.liveUrl && (
+								<a
+									href={project.liveUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="group px-5 py-2.5 rounded-lg font-semibold text-sm transition hover:scale-105 flex items-center gap-2"
+									style={`background: ${project.theme?.accent ?? '#ffffff'}; color: #000`}
+								>
+									View Project
+									<svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+									</svg>
+								</a>
+							)}
+							{project.githubUrl && (
+								<a
+									href={project.githubUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="bg-white/10 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-white/20 transition border border-white/20"
+								>
+									View Code
+								</a>
 							)}
 						</div>
+
+						<!-- Collaborators -->
+						{project.collaborators && project.collaborators.length > 0 && (
+							<div class="text-gray-500 text-xs">
+								<span class="uppercase tracking-widest mr-2">With:</span>
+								{project.collaborators.map(collab => (
+									<a
+										href={collab.url}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="text-white hover:text-indigo-400 transition underline mr-2"
+									>
+										{collab.name}
+									</a>
+								))}
+							</div>
+						)}
+
 					</div>
 				</div>
+			</div>
 			))}
 		</div>
 	</div>
