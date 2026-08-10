@@ -27,7 +27,7 @@ interface StoredMessage {
 }
 
 const ALLOWED_SITES = new Set(['cookbookverse', 'fieldkit', 'chrisocphoto', 'probablyfinestudios', 'davapalooza', 'trvlplay', 'scramble', 'wx', 'hang']);
-const PUBLIC_SUBMIT_SITES = new Set(['probablyfinestudios', 'fieldkit']);
+const PUBLIC_SUBMIT_SITES = new Set(['probablyfinestudios', 'fieldkit', 'chrisocphoto']);
 const ALLOWED_STATUSES = new Set(['unread', 'read', 'archived']);
 const MAX_MESSAGE_LENGTH = 5000;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -46,6 +46,11 @@ const SITE_ALLOWED_ORIGINS: Record<string, string[]> = {
     'https://www.fieldkit.vercel.app',
     'https://get-fieldkit.com',
     'https://www.get-fieldkit.com',
+  ],
+  chrisocphoto: [
+    'http://localhost:3000',
+    'https://chrisocphoto.com',
+    'https://www.chrisocphoto.com',
   ],
 };
 
