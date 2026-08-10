@@ -58,7 +58,7 @@ npm install
 ### Development
 
 ```bash
-# Start dev server at http://localhost:4321
+# Start dev server at http://localhost:3000
 npm run dev
 ```
 
@@ -126,6 +126,11 @@ The site uses a indigo/purple color scheme. To change it, update the Tailwind cl
 
 See [CLOUDFLARE_DEPLOYMENT.md](CLOUDFLARE_DEPLOYMENT.md) for detailed deployment instructions.
 
+## Roadmap Documents
+
+- [PHASES.md](PHASES.md) - Main website development phases
+- [MESSAGE_HUB_PHASE1.md](MESSAGE_HUB_PHASE1.md) - Standalone Cloudflare Worker + D1 message hub plan
+
 ### Quick Deploy
 
 1. Push to GitHub
@@ -139,7 +144,7 @@ See [CLOUDFLARE_DEPLOYMENT.md](CLOUDFLARE_DEPLOYMENT.md) for detailed deployment
 | Command                | Action                                           |
 | :--------------------- | :----------------------------------------------- |
 | `npm install`          | Install dependencies                             |
-| `npm run dev`          | Start dev server at `localhost:4321`             |
+| `npm run dev`          | Start dev server at `localhost:3000`             |
 | `npm run build`        | Build production site to `./dist/`               |
 | `npm run preview`      | Preview production build locally                 |
 | `npm run astro ...`    | Run Astro CLI commands                           |

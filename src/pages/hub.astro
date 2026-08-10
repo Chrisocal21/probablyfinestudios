@@ -1,0 +1,634 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { projects } from '../data/projects';
+
+const adminEndpoint = 'https://mail.probablyfinestudios.com/api/admin/messages';
+const knownSites = [
+	{
+		slug: 'probablyfinestudios',
+		name: 'Probably Fine Studios',
+		url: 'https://probablyfinestudios.com',
+		integration: 'pending',
+		note: 'Primary studio site. Hub UI lives here.',
+	},
+	...projects.map(project => ({
+		slug: project.id,
+		name: project.title,
+		url: project.liveUrl ?? 'No live URL set',
+		integration: project.id === 'cookbookverse' || project.id === 'fieldkit' ? 'ready' : 'pending',
+		note:
+			project.id === 'cookbookverse' || project.id === 'fieldkit'
+				? 'Allowed in Hub API and ready for form wiring.'
+				: 'Tracked in portfolio. Add to Hub allow-list when ready.',
+	})),
+];
+---
+
+<Layout title="Message Inbox - Probably Fine Studios" description="Live inbox for messages collected from all Probably Fine Studios properties.">
+	<Nav />
+
+	<section class="bg-black">
+		<div class="w-full">
+			<div class="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-0 min-h-[calc(100vh-4rem)]">
+				<div class="border-r border-zinc-800 bg-zinc-950">
+					<div class="px-4 py-5 border-b border-zinc-800">
+						<p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Mailboxes</p>
+					</div>
+					<div class="mb-6">
+						<button id="mailboxAllBtn" type="button" class="mailbox-btn w-full border-b border-zinc-800 bg-zinc-900 px-4 py-3 text-left hover:bg-zinc-800 transition" data-site="all">
+							<span class="flex items-center justify-between gap-3">
+								<span>
+									<span class="block text-sm font-semibold text-white">All Inboxes</span>
+									<span class="block text-xs text-zinc-500">Combined view across all sites</span>
+								</span>
+								<span id="mailboxCountAll" class="rounded-full bg-zinc-800 px-2.5 py-1 text-xs text-zinc-300">0</span>
+							</span>
+						</button>
+						{knownSites.map((site) => (
+							<button type="button" class="mailbox-btn w-full border-b border-zinc-800 bg-zinc-900 px-4 py-3 text-left hover:bg-zinc-800 transition" data-site={site.slug} data-site-url={site.url}>
+								<span class="flex items-start justify-between gap-3">
+									<span>
+										<span class="block text-sm font-semibold text-white">{site.name}</span>
+										<span class="block text-xs text-zinc-500">{site.slug}</span>
+									</span>
+									<span class="mailbox-count rounded-full bg-zinc-800 px-2.5 py-1 text-xs text-zinc-300" data-count-site={site.slug}>0</span>
+								</span>
+							</button>
+						))}
+					</div>
+
+					<div class="px-4 mb-3">
+						<p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Views</p>
+					</div>
+					<div class="mb-6">
+						<button type="button" class="folder-btn w-full border-b border-zinc-800 bg-zinc-900 px-4 py-2.5 text-left hover:bg-zinc-800 transition" data-status="all">
+							<span class="flex items-center justify-between gap-3">
+								<span class="text-sm text-zinc-200">All Mail</span>
+								<span id="countAll" class="text-xs text-zinc-500">0</span>
+							</span>
+						</button>
+						<button type="button" class="folder-btn w-full border-b border-zinc-800 bg-zinc-900 px-4 py-2.5 text-left hover:bg-zinc-800 transition" data-status="unread">
+							<span class="flex items-center justify-between gap-3">
+								<span class="text-sm text-zinc-200">Unread</span>
+								<span id="countUnread" class="text-xs text-emerald-300">0</span>
+							</span>
+						</button>
+						<button type="button" class="folder-btn w-full border-b border-zinc-800 bg-zinc-900 px-4 py-2.5 text-left hover:bg-zinc-800 transition" data-status="read">
+							<span class="flex items-center justify-between gap-3">
+								<span class="text-sm text-zinc-200">Read</span>
+								<span id="countRead" class="text-xs text-sky-300">0</span>
+							</span>
+						</button>
+						<button type="button" class="folder-btn w-full border-b border-zinc-800 bg-zinc-900 px-4 py-2.5 text-left hover:bg-zinc-800 transition" data-status="archived">
+							<span class="flex items-center justify-between gap-3">
+								<span class="text-sm text-zinc-200">Archived</span>
+								<span id="countArchived" class="text-xs text-amber-300">0</span>
+							</span>
+						</button>
+					</div>
+
+					<div class="mx-4 rounded-xl border border-zinc-800 bg-zinc-900 p-4">
+						<p class="text-xs uppercase tracking-[0.18em] text-zinc-500 mb-2">Selected Mailbox</p>
+						<p id="mailboxLabel" class="text-white font-semibold">All Inboxes</p>
+						<p id="mailboxSubLabel" class="text-xs text-zinc-500 mt-1">Combined view across every site.</p>
+					</div>
+				</div>
+
+				<div class="bg-black p-4 sm:p-5 lg:p-6 xl:p-8">
+					<div id="hubLoginPanel" class="space-y-4">
+						<p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Hub Login</p>
+						<h1 class="text-3xl sm:text-4xl font-bold text-white">Cross-Site Inbox</h1>
+						<p class="text-zinc-400 max-w-2xl">Sign in once with the dashboard password to access every site inbox from one workspace.</p>
+						<div>
+							<label for="dashboardPassword" class="block text-sm text-zinc-300 mb-1">Dashboard Password</label>
+							<input id="dashboardPassword" type="password" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-white" />
+						</div>
+						<div class="flex items-center gap-3">
+							<button id="loginBtn" type="button" class="px-5 py-2.5 rounded-lg font-semibold text-black bg-emerald-300 hover:bg-emerald-200 transition">Sign In</button>
+							<span id="loginState" class="text-sm text-zinc-400">Enter the dashboard password to unlock the inbox.</span>
+						</div>
+					</div>
+
+					<div id="hubAppPanel" class="hidden space-y-6">
+						<div class="flex flex-wrap items-start justify-between gap-4">
+							<div>
+								<p class="text-xs uppercase tracking-[0.2em] text-zinc-500 mb-1">Message Hub</p>
+								<h1 class="text-3xl sm:text-4xl font-bold text-white">Cross-Site Inbox</h1>
+								<p class="text-zinc-400 mt-2">Review mail by site, manage status, and keep each property separated like its own inbox.</p>
+							</div>
+							<div class="flex items-center gap-2">
+								<button id="logoutBtn" type="button" class="px-3 py-1.5 rounded-lg text-sm font-semibold bg-zinc-800 text-zinc-100 hover:bg-zinc-700 transition">Log Out</button>
+							</div>
+						</div>
+
+						<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
+						<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+							<p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Inbox Workspace</p>
+							<div class="flex flex-wrap items-center gap-2">
+								<label for="messageLimit" class="text-xs text-zinc-500 uppercase tracking-[0.14em]">Limit</label>
+								<select id="messageLimit" class="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs text-white">
+									<option value="25">25</option>
+									<option value="50" selected>50</option>
+									<option value="100">100</option>
+								</select>
+								<button id="loadInboxBtn" type="button" class="px-3 py-1.5 rounded-lg font-semibold text-black bg-sky-300 hover:bg-sky-200 transition text-sm">Load Inbox</button>
+							</div>
+						</div>
+
+						<div class="grid grid-cols-1 xl:grid-cols-[minmax(0,0.95fr)_minmax(340px,1.05fr)] gap-4">
+							<div>
+								<div id="inboxState" class="text-sm text-zinc-400 mb-3">Inbox is ready. Click Load Inbox to fetch the latest messages.</div>
+								<div id="inboxList" class="space-y-2"></div>
+							</div>
+							<div class="rounded-xl border border-zinc-800 bg-zinc-900 p-4 min-h-[320px]">
+								<div class="flex items-center justify-between gap-3 mb-4">
+									<p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Message Detail</p>
+									<div class="flex flex-wrap gap-2">
+										<a id="replyLink" href="mailto:" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-100 hover:bg-zinc-700 transition pointer-events-none opacity-50">Reply</a>
+										<a id="openSiteLink" href="#" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 text-zinc-100 hover:bg-zinc-700 transition pointer-events-none opacity-50">Open Site</a>
+										<button id="markReadBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-300 text-black hover:bg-sky-200 transition disabled:opacity-40">Mark Read</button>
+										<button id="markUnreadBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-300 text-black hover:bg-emerald-200 transition disabled:opacity-40">Mark Unread</button>
+										<button id="archiveBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-300 text-black hover:bg-amber-200 transition disabled:opacity-40">Archive</button>
+									</div>
+								</div>
+								<div id="detailState" class="text-sm text-zinc-500">Select a message to inspect it here.</div>
+								<div id="detailPanel" class="hidden space-y-4">
+									<div>
+										<p id="detailName" class="text-xl font-semibold text-white"></p>
+										<p id="detailEmail" class="text-sm text-zinc-400"></p>
+									</div>
+									<div class="flex flex-wrap gap-2">
+										<span id="detailSite" class="px-2.5 py-1 rounded-full text-xs border border-sky-500/30 text-sky-300 bg-sky-500/10"></span>
+										<span id="detailStatus" class="px-2.5 py-1 rounded-full text-xs border border-zinc-700 text-zinc-300 bg-zinc-800"></span>
+										<span id="detailDate" class="px-2.5 py-1 rounded-full text-xs border border-zinc-700 text-zinc-400 bg-zinc-800"></span>
+									</div>
+									<p id="detailMessage" class="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed"></p>
+								</div>
+							</div>
+						</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script>
+		// @ts-nocheck
+		const loginPanel = document.getElementById('hubLoginPanel');
+		const appPanel = document.getElementById('hubAppPanel');
+		const loginBtn = document.getElementById('loginBtn');
+		const logoutBtn = document.getElementById('logoutBtn');
+		const loginState = document.getElementById('loginState');
+		const passwordInput = document.getElementById('dashboardPassword');
+		const inboxState = document.getElementById('inboxState');
+		const inboxList = document.getElementById('inboxList');
+		const loadInboxBtn = document.getElementById('loadInboxBtn');
+		const messageLimitEl = document.getElementById('messageLimit');
+		const mailboxButtons = Array.from(document.querySelectorAll('.mailbox-btn'));
+		const folderButtons = Array.from(document.querySelectorAll('.folder-btn'));
+		const mailboxLabel = document.getElementById('mailboxLabel');
+		const mailboxSubLabel = document.getElementById('mailboxSubLabel');
+		const mailboxCountAll = document.getElementById('mailboxCountAll');
+		const countAllEl = document.getElementById('countAll');
+		const countUnreadEl = document.getElementById('countUnread');
+		const countReadEl = document.getElementById('countRead');
+		const countArchivedEl = document.getElementById('countArchived');
+		const detailState = document.getElementById('detailState');
+		const detailPanel = document.getElementById('detailPanel');
+		const detailName = document.getElementById('detailName');
+		const detailEmail = document.getElementById('detailEmail');
+		const detailSite = document.getElementById('detailSite');
+		const detailStatus = document.getElementById('detailStatus');
+		const detailDate = document.getElementById('detailDate');
+		const detailMessage = document.getElementById('detailMessage');
+		const replyLink = document.getElementById('replyLink');
+		const openSiteLink = document.getElementById('openSiteLink');
+		const markReadBtn = document.getElementById('markReadBtn');
+		const markUnreadBtn = document.getElementById('markUnreadBtn');
+		const archiveBtn = document.getElementById('archiveBtn');
+		const loginEndpoint = 'https://mail.probablyfinestudios.com/api/admin/login';
+		const messageEndpoint = 'https://mail.probablyfinestudios.com/api/admin/messages';
+		const storageKey = 'pfs_hub_admin_token';
+		const siteDirectory = {
+			probablyfinestudios: { name: 'Probably Fine Studios', url: 'https://probablyfinestudios.com', note: 'Primary studio inbox.' },
+			chrisocphoto: { name: 'ChrisOCPhoto', url: 'https://www.chrisocphoto.com', note: 'Photography portfolio inbox.' },
+			fieldkit: { name: 'FieldKit', url: 'https://www.get-fieldkit.com', note: 'Field product inbox.' },
+			cookbookverse: { name: 'CookBookVerse', url: 'https://www.cookbookverse.com', note: 'Recipe platform inbox.' },
+		};
+		let allMessages = [];
+		let selectedMessageId = null;
+		let activeSite = 'all';
+		let activeStatus = 'all';
+
+		/**
+		 * @typedef {Object} InboxMessage
+		 * @property {number} id
+		 * @property {string} source_site
+		 * @property {string} name
+		 * @property {string} email
+		 * @property {string} message
+		 * @property {string} status
+		 * @property {string} created_at
+		 */
+
+		/** @param {InboxMessage} item */
+		function renderMessageRow(item) {
+			const card = document.createElement('div');
+			const isSelected = selectedMessageId === item.id;
+			card.className = `rounded-xl border p-4 cursor-pointer transition ${isSelected ? 'border-sky-400 bg-zinc-800/90' : 'border-zinc-800 bg-zinc-900 hover:border-zinc-600'} ${item.status === 'unread' ? 'shadow-[inset_3px_0_0_0_rgba(52,211,153,0.9)]' : ''}`;
+			card.addEventListener('click', () => {
+				selectedMessageId = item.id;
+				renderInbox();
+				renderDetail();
+			});
+			const initials = item.name.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
+
+			const meta = document.createElement('div');
+			meta.className = 'flex items-start justify-between gap-3 mb-2';
+			meta.innerHTML = `<div class="flex items-start gap-3 min-w-0"><span class="w-10 h-10 rounded-full bg-zinc-800 text-zinc-100 text-xs font-semibold inline-flex items-center justify-center shrink-0">${initials}</span><div class="min-w-0"><p class="text-zinc-100 font-semibold truncate">${item.name}</p><p class="text-xs text-zinc-500 truncate">${item.email}</p></div></div><span class="text-[11px] text-zinc-500 shrink-0">${item.created_at}</span>`;
+
+			const badges = document.createElement('div');
+			badges.className = 'flex flex-wrap gap-2 mb-2 ml-[3.25rem]';
+			badges.innerHTML = `<span class="text-xs uppercase tracking-[0.14em] text-sky-300">${item.source_site}</span><span class="text-[10px] uppercase tracking-[0.18em] px-2 py-0.5 rounded-full ${item.status === 'unread' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : item.status === 'archived' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'}">${item.status}</span>`;
+
+			const message = document.createElement('p');
+			message.className = 'text-sm text-zinc-300 ml-[3.25rem] leading-relaxed';
+			message.textContent = item.message.length > 160 ? `${item.message.slice(0, 160)}...` : item.message;
+
+			card.append(meta, badges, message);
+			return card;
+		}
+
+		/** @param {InboxMessage} item */
+		function isSeededTestMessage(item) {
+			const name = String(item.name || '').toLowerCase();
+			const email = String(item.email || '').toLowerCase();
+			const message = String(item.message || '').toLowerCase();
+			const source = String(item.source_site || '').toLowerCase();
+			const mockEmails = [
+				'real-visitor@example.com',
+				'public-contact@example.com',
+				'contact-test@probablyfinestudios.com',
+				'nina@homekitchencollective.org',
+				'samir@atlasventures.io',
+				'elena.rossi-photo@gmail.com',
+				'maya@cookbookverse.co',
+				'jordan.lee@example.com',
+			];
+			const mockNameSnippets = ['real visitor test', 'public contact smoke', 'pfs contact test', 'nina brooks', 'samir patel', 'elena rossi', 'maya carter', 'jordan lee'];
+			const mockMessageSnippets = [
+				'public visitor contact flow',
+				'contact page flow into the shared hub inbox',
+				'without admin session',
+				'testing live inbox flow',
+				'looking for a fast mvp build partner for a mapping-heavy internal tool',
+				'are you open to building a similar photography portfolio package',
+				'interested in a paid customization sprint for meal planning and shopping list sync',
+			];
+
+			if (mockEmails.includes(email)) return true;
+			if (mockNameSnippets.some((snippet) => name.includes(snippet))) return true;
+			if (mockMessageSnippets.some((snippet) => message.includes(snippet))) return true;
+
+			if (email.endsWith('@example.com')) return true;
+			if (email.endsWith('@homekitchencollective.org')) return true;
+
+			// Remove prior hub-seeded contact flow test messages from studio inbox view.
+			if (
+				source === 'probablyfinestudios' &&
+				(email.includes('contact-test@probablyfinestudios.com') || message.includes('public visitor contact flow') || message.includes('shared hub inbox'))
+			) {
+				return true;
+			}
+
+			if (source === 'probablyfinestudios' && name === 'jordan lee') {
+				return true;
+			}
+
+			return false;
+		}
+
+		function filteredMessages() {
+			return allMessages.filter((item) => {
+				const siteOk = activeSite === 'all' || item.source_site === activeSite;
+				const statusOk = activeStatus === 'all' || item.status === activeStatus;
+				return siteOk && statusOk;
+			});
+		}
+
+		function updateCounts() {
+			const counts = allMessages.reduce((acc, item) => {
+				acc.all += 1;
+				acc[item.status] = (acc[item.status] || 0) + 1;
+				return acc;
+			}, { all: 0, unread: 0, read: 0, archived: 0 });
+
+			if (countAllEl) countAllEl.textContent = `All: ${counts.all}`;
+			if (countUnreadEl) countUnreadEl.textContent = `Unread: ${counts.unread}`;
+			if (countReadEl) countReadEl.textContent = `Read: ${counts.read}`;
+			if (countArchivedEl) countArchivedEl.textContent = `Archived: ${counts.archived}`;
+			if (mailboxCountAll) mailboxCountAll.textContent = `${counts.all}`;
+			for (const button of mailboxButtons) {
+				const site = button.dataset.site;
+				if (!site || site === 'all') continue;
+				const countEl = button.querySelector('[data-count-site]');
+				if (!countEl) continue;
+				const total = allMessages.filter((item) => item.source_site === site).length;
+				countEl.textContent = String(total);
+			}
+		}
+
+		function updateActiveNav() {
+			for (const button of mailboxButtons) {
+				const isActive = button.dataset.site === activeSite;
+				button.classList.toggle('border-sky-400', isActive);
+				button.classList.toggle('bg-zinc-800/90', isActive);
+			}
+
+			for (const button of folderButtons) {
+				const isActive = button.dataset.status === activeStatus;
+				button.classList.toggle('border-sky-400', isActive);
+				button.classList.toggle('bg-zinc-800/90', isActive);
+			}
+
+			if (mailboxLabel) {
+				mailboxLabel.textContent = activeSite === 'all' ? 'All Inboxes' : (siteDirectory[activeSite]?.name || activeSite);
+			}
+			if (mailboxSubLabel) {
+				if (activeSite === 'all') {
+					mailboxSubLabel.textContent = activeStatus === 'all' ? 'Combined view across every site.' : `Combined ${activeStatus} mail across every site.`;
+				} else {
+					const siteMeta = siteDirectory[activeSite];
+					mailboxSubLabel.textContent = siteMeta ? `${siteMeta.note} ${activeStatus === 'all' ? '' : `Viewing ${activeStatus} mail.`}`.trim() : activeSite;
+				}
+			}
+		}
+
+		function selectedMessage() {
+			return allMessages.find((item) => item.id === selectedMessageId) || null;
+		}
+
+		function renderDetail() {
+			const item = selectedMessage();
+			const hasItem = Boolean(item);
+			if (detailPanel) detailPanel.classList.toggle('hidden', !hasItem);
+			if (detailState) detailState.classList.toggle('hidden', hasItem);
+			if (markReadBtn) markReadBtn.toggleAttribute('disabled', !hasItem || item?.status === 'read');
+			if (markUnreadBtn) markUnreadBtn.toggleAttribute('disabled', !hasItem || item?.status === 'unread');
+			if (archiveBtn) archiveBtn.toggleAttribute('disabled', !hasItem || item?.status === 'archived');
+			if (replyLink) {
+				replyLink.classList.toggle('pointer-events-none', !hasItem);
+				replyLink.classList.toggle('opacity-50', !hasItem);
+			}
+			if (openSiteLink) {
+				openSiteLink.classList.toggle('pointer-events-none', !hasItem);
+				openSiteLink.classList.toggle('opacity-50', !hasItem);
+			}
+
+			if (!item || !detailName || !detailEmail || !detailSite || !detailStatus || !detailDate || !detailMessage) {
+				return;
+			}
+
+			detailName.textContent = item.name;
+			detailEmail.textContent = item.email;
+			detailSite.textContent = item.source_site;
+			detailStatus.textContent = item.status;
+			detailDate.textContent = item.created_at;
+			detailMessage.textContent = item.message;
+			if (replyLink) {
+				replyLink.href = `mailto:${encodeURIComponent(item.email)}?subject=${encodeURIComponent(`[${item.source_site}] Re: message from ${item.name}`)}`;
+			}
+			if (openSiteLink) {
+				openSiteLink.href = siteDirectory[item.source_site]?.url || '#';
+			}
+		}
+
+		function renderInbox() {
+			if (!inboxList || !inboxState) return;
+			const items = filteredMessages();
+			inboxList.innerHTML = '';
+			updateCounts();
+			updateActiveNav();
+
+			if (items.length === 0) {
+				inboxState.textContent = allMessages.length === 0 ? 'No messages found yet.' : 'No messages match the current filters.';
+				return;
+			}
+
+			for (const item of items) {
+				inboxList.appendChild(renderMessageRow(item));
+			}
+
+			inboxState.textContent = `Showing ${items.length} of ${allMessages.length} real message${allMessages.length === 1 ? '' : 's'} in ${activeSite === 'all' ? 'all inboxes' : activeSite}.`;
+		}
+
+		async function updateStatus(nextStatus) {
+			const token = getToken();
+			const item = selectedMessage();
+			if (!token || !item) return;
+			if (detailState) detailState.textContent = 'Updating message...';
+
+			try {
+				const response = await fetch(`${messageEndpoint}/${item.id}`, {
+					method: 'PATCH',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ status: nextStatus }),
+				});
+				const json = await response.json();
+				if (!response.ok) {
+					if (response.status === 401) {
+						window.localStorage.removeItem(storageKey);
+						setAuthedUi(false);
+						if (inboxState) inboxState.textContent = 'Session expired. Sign in again.';
+						return;
+					}
+					if (detailState) detailState.textContent = json.error || 'Failed to update message.';
+					return;
+				}
+
+				const updated = json.item;
+				allMessages = allMessages.map((message) => (message.id === updated.id ? updated : message));
+				selectedMessageId = updated.id;
+				renderInbox();
+				renderDetail();
+				if (detailState) detailState.textContent = 'Message detail';
+			} catch (error) {
+				if (detailState) detailState.textContent = error && typeof error === 'object' && 'message' in error ? `Update failed: ${error.message}` : 'Update failed.';
+			}
+		}
+
+		function getToken() {
+			return window.localStorage.getItem(storageKey);
+		}
+
+		function setAuthedUi(isAuthed) {
+			if (loginPanel) loginPanel.classList.toggle('hidden', isAuthed);
+			if (appPanel) appPanel.classList.toggle('hidden', !isAuthed);
+		}
+
+		async function login() {
+			if (!(passwordInput instanceof HTMLInputElement) || !loginState || !loginBtn) return;
+			const password = passwordInput.value.trim();
+			if (!password) {
+				loginState.textContent = 'Enter the dashboard password.';
+				return;
+			}
+
+			loginBtn.setAttribute('disabled', 'true');
+			loginBtn.classList.add('opacity-60', 'cursor-not-allowed');
+			loginState.textContent = 'Signing in...';
+
+			try {
+				const response = await fetch(loginEndpoint, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({ password }),
+				});
+				const json = await response.json();
+				if (!response.ok || !json.token) {
+					loginState.textContent = response.status === 401 ? 'Wrong password.' : 'Login failed.';
+					return;
+				}
+
+				window.localStorage.setItem(storageKey, json.token);
+				passwordInput.value = '';
+				setAuthedUi(true);
+				loginState.textContent = 'Signed in.';
+				await loadInbox();
+			} catch (error) {
+				loginState.textContent = error && typeof error === 'object' && 'message' in error ? `Network error: ${error.message}` : 'Network error.';
+			} finally {
+				loginBtn.removeAttribute('disabled');
+				loginBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+			}
+		}
+
+		async function loadInbox() {
+			if (!inboxState || !inboxList || !loadInboxBtn || !messageLimitEl) return;
+			const token = getToken();
+			if (!token) {
+				setAuthedUi(false);
+				inboxState.textContent = 'Sign in first to load inbox.';
+				return;
+			}
+
+			const limit = messageLimitEl instanceof HTMLSelectElement ? messageLimitEl.value : '50';
+
+			loadInboxBtn.setAttribute('disabled', 'true');
+			loadInboxBtn.classList.add('opacity-60', 'cursor-not-allowed');
+			inboxState.textContent = 'Loading real messages...';
+
+			try {
+				const response = await fetch(`${messageEndpoint}?limit=${limit}`, {
+					method: 'GET',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+					},
+				});
+
+				const json = await response.json();
+				if (!response.ok) {
+					if (response.status === 401) {
+						window.localStorage.removeItem(storageKey);
+						setAuthedUi(false);
+						inboxState.textContent = 'Session expired. Sign in again.';
+						return;
+					}
+
+					inboxState.textContent = `Failed to load inbox (${response.status}).`;
+					return;
+				}
+
+				/** @type {InboxMessage[]} */
+				allMessages = (Array.isArray(json.items) ? json.items : []).filter((item) => !isSeededTestMessage(item));
+				if (!selectedMessageId && allMessages.length > 0) {
+					selectedMessageId = allMessages[0].id;
+				}
+				if (selectedMessageId && !allMessages.some((item) => item.id === selectedMessageId)) {
+					selectedMessageId = allMessages[0]?.id ?? null;
+				}
+				renderInbox();
+				renderDetail();
+			} catch (error) {
+				if (error && typeof error === 'object' && 'message' in error) {
+					inboxState.textContent = `Network error: ${error.message}`;
+				} else {
+					inboxState.textContent = 'Network error while loading inbox.';
+				}
+			} finally {
+				loadInboxBtn.removeAttribute('disabled');
+				loadInboxBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+			}
+		}
+
+		loadInboxBtn?.addEventListener('click', async () => {
+			await loadInbox();
+		});
+
+		for (const button of mailboxButtons) {
+			button.addEventListener('click', () => {
+				activeSite = button.dataset.site || 'all';
+				renderInbox();
+				renderDetail();
+			});
+		}
+
+		for (const button of folderButtons) {
+			button.addEventListener('click', () => {
+				activeStatus = button.dataset.status || 'all';
+				renderInbox();
+				renderDetail();
+			});
+		}
+
+		loginBtn?.addEventListener('click', async () => {
+			await login();
+		});
+
+		passwordInput?.addEventListener('keydown', async (event) => {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+				await login();
+			}
+		});
+
+		logoutBtn?.addEventListener('click', () => {
+			window.localStorage.removeItem(storageKey);
+			setAuthedUi(false);
+			allMessages = [];
+			selectedMessageId = null;
+			if (inboxList) inboxList.innerHTML = '';
+			if (inboxState) inboxState.textContent = 'Signed out. Sign in again to load inbox.';
+		});
+
+		markReadBtn?.addEventListener('click', async () => {
+			await updateStatus('read');
+		});
+
+		markUnreadBtn?.addEventListener('click', async () => {
+			await updateStatus('unread');
+		});
+
+		archiveBtn?.addEventListener('click', async () => {
+			await updateStatus('archived');
+		});
+
+		if (getToken()) {
+			setAuthedUi(true);
+			void loadInbox();
+		} else {
+			setAuthedUi(false);
+		}
+	</script>
+
+	<Footer />
+</Layout>

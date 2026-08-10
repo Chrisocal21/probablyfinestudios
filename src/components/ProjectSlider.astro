@@ -6,6 +6,7 @@ interface Props {
 }
 
 const { autoplay = false } = Astro.props;
+const hasProjects = projects.length > 0;
 ---
 
 <div class="slider-container relative h-screen w-full overflow-hidden">
@@ -36,18 +37,28 @@ const { autoplay = false } = Astro.props;
 							One developer, a handful of good ideas, and AI doing the heavy lifting. Real products, shipped — photography tools, recipe apps, maps, dashboards, games. And honestly? They're probably fine.
 						</p>
 						<div class="flex gap-4 justify-center">
-							<button
-								id="pfs-view-work"
-								class="group px-8 py-4 rounded-lg font-semibold transition duration-300 transform hover:scale-105"
-								style="background: linear-gradient(90deg, #8b5cf6, #6366f1); color: #fff"
-							>
-								<span class="flex items-center gap-2">
-									View Our Work
-									<svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-									</svg>
-								</span>
-							</button>
+							{hasProjects ? (
+								<button
+									id="pfs-view-work"
+									class="group px-8 py-4 rounded-lg font-semibold transition duration-300 transform hover:scale-105"
+									style="background: linear-gradient(90deg, #8b5cf6, #6366f1); color: #fff"
+								>
+									<span class="flex items-center gap-2">
+										View Our Work
+										<svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+										</svg>
+									</span>
+								</button>
+							) : (
+								<a
+									href="/portfolio"
+									class="px-8 py-4 rounded-lg font-semibold transition duration-300 transform hover:scale-105"
+									style="background: linear-gradient(90deg, #8b5cf6, #6366f1); color: #fff"
+								>
+									Start Building Portfolio
+								</a>
+							)}
 							<a
 								href="/about"
 								class="px-8 py-4 rounded-lg font-semibold transition border text-white hover:bg-white/10"
@@ -178,6 +189,7 @@ const { autoplay = false } = Astro.props;
 	</div>
 	
 	<!-- Navigation arrows -->
+	{hasProjects && (
 	<button 
 		class="nav-btn prev absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white p-4 rounded-full transition border border-white/20"
 		aria-label="Previous project"
@@ -194,6 +206,7 @@ const { autoplay = false } = Astro.props;
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
 		</svg>
 	</button>
+	)}
 	
 	<!-- Slide indicators -->
 	<div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-3">
@@ -256,12 +269,14 @@ const { autoplay = false } = Astro.props;
 		}
 		
 		function goToSlide(index: number) {
-			currentIndex = index;
+			currentIndex = Math.max(0, Math.min(index, totalSlides - 1));
 			updateSlider();
 		}
 		
 		// PFS hero CTA
-		document.getElementById('pfs-view-work')?.addEventListener('click', () => goToSlide(1));
+		document.getElementById('pfs-view-work')?.addEventListener('click', () => {
+			if (totalSlides > 1) goToSlide(1);
+		});
 
 		// Navigation buttons
 		prevBtn?.addEventListener('click', prevSlide);

@@ -1,0 +1,13 @@
+name = "probablyfinestudios-message-hub"
+main = "src/index.ts"
+compatibility_date = "2026-08-08"
+
+routes = [
+	{ pattern = "mail.probablyfinestudios.com", custom_domain = true }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "message_hub"
+database_id = "1d424f8e-36f0-4c73-8a7f-0fcd63e7d607"
+migrations_dir = "migrations"

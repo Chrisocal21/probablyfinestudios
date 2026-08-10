@@ -1,5 +1,28 @@
 # Probably Fine Studios - Development Phases
 
+## Phase 0: Message Hub Foundation (Standalone) 
+
+### Goal:
+- [ ] Build a standalone contact message hub that does not depend on the current site stack or overhaul timeline.
+
+### Must Complete:
+- [ ] Scaffold a standalone Cloudflare Worker project with Wrangler
+- [ ] Create and bind a D1 database for message storage
+- [ ] Add `POST /api/messages` endpoint with validation
+- [ ] Enforce shared secret header (`X-Hub-Key`) using `HUB_API_KEY`
+- [ ] Test locally with `wrangler dev` and confirm inserts in local D1
+
+### Out of Scope for Phase 0:
+- [ ] Dashboard UI
+- [ ] Form integrations from cookbookverse/fieldkit
+- [ ] Email notifications
+- [ ] Reply workflows
+- [ ] Dashboard auth/login system
+
+Reference spec: [MESSAGE_HUB_PHASE1.md](MESSAGE_HUB_PHASE1.md)
+
+---
+
 ## Phase 1: Essential Content ✅ (Current Phase)
 
 ### Must Complete:

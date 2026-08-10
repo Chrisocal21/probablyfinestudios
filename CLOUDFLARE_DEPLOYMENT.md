@@ -1,5 +1,10 @@
 # Cloudflare Pages Deployment Guide
 
+## Related Infrastructure Track
+
+- For the standalone contact API hub (Worker + D1), see [MESSAGE_HUB_PHASE1.md](MESSAGE_HUB_PHASE1.md).
+- That hub is intentionally separate from this Pages deployment flow.
+
 ## Automatic Deployment via Cloudflare Dashboard
 
 1. **Connect Your Repository**

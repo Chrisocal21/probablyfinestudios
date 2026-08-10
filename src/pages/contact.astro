@@ -16,21 +16,40 @@ import Footer from '../components/Footer.astro';
 				</p>
 			</div>
 
-			<div class="space-y-4">
-				<div class="bg-gray-900 rounded-xl p-6 border border-gray-800 flex items-center gap-4">
-					<div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-						<svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-						</svg>
-					</div>
-					<div>
-						<p class="text-xs text-gray-500 uppercase tracking-widest mb-0.5">Email</p>
-						<a href="mailto:hello@probablyfinestudios.com" class="text-white hover:text-gray-300 transition font-medium">
-							hello@probablyfinestudios.com
-						</a>
-					</div>
+			<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 mb-8">
+				<div class="mb-5">
+					<p class="text-xs uppercase tracking-[0.18em] text-zinc-500 mb-2">Contact Form</p>
+					<h2 class="text-2xl font-bold text-white">Send a message</h2>
+					<p class="text-zinc-400 mt-2 max-w-xl">If you have a project, product, or weirdly specific idea that needs building, send it here. It goes straight into the inbox.</p>
 				</div>
 
+				<form id="contact-form" class="space-y-4">
+					<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+						<div>
+							<label for="contactName" class="block text-sm text-zinc-300 mb-1">Name</label>
+							<input id="contactName" name="contactName" type="text" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white" placeholder="Jane Doe" required />
+						</div>
+						<div>
+							<label for="contactEmail" class="block text-sm text-zinc-300 mb-1">Email</label>
+							<input id="contactEmail" name="contactEmail" type="email" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white" placeholder="jane@example.com" required />
+						</div>
+					</div>
+					<div>
+						<label for="contactMessage" class="block text-sm text-zinc-300 mb-1">Message</label>
+						<textarea id="contactMessage" name="contactMessage" rows="5" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-3 text-sm text-white" placeholder="Tell me what you need built." required></textarea>
+					</div>
+					<div class="hidden" aria-hidden="true">
+						<label for="contactCompany">Company</label>
+						<input id="contactCompany" name="contactCompany" type="text" tabindex="-1" autocomplete="off" />
+					</div>
+					<div class="flex flex-wrap items-center gap-3">
+						<button id="contactSendBtn" type="submit" class="px-5 py-2.5 rounded-lg font-semibold text-black bg-emerald-300 hover:bg-emerald-200 transition">Send Message</button>
+						<span id="contactSendState" class="text-sm text-zinc-400">Your message goes straight to the inbox.</span>
+					</div>
+				</form>
+			</div>
+
+			<div class="space-y-4">
 				<div class="bg-gray-900 rounded-xl p-6 border border-gray-800 flex items-center gap-4">
 					<div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
 						<svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -71,6 +90,67 @@ import Footer from '../components/Footer.astro';
 			</div>
 		</div>
 	</section>
+
+	<script>
+		// @ts-nocheck
+		const messageEndpoint = 'https://mail.probablyfinestudios.com/api/public/messages';
+		const contactForm = document.getElementById('contact-form');
+		const contactSendBtn = document.getElementById('contactSendBtn');
+		const contactSendState = document.getElementById('contactSendState');
+
+		contactForm?.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			if (!(contactForm instanceof HTMLFormElement)) return;
+			if (!contactSendBtn || !contactSendState) return;
+
+			const nameInput = contactForm.elements.namedItem('contactName');
+			const emailInput = contactForm.elements.namedItem('contactEmail');
+			const messageInput = contactForm.elements.namedItem('contactMessage');
+			const companyInput = contactForm.elements.namedItem('contactCompany');
+			const name = nameInput instanceof HTMLInputElement ? nameInput.value : '';
+			const email = emailInput instanceof HTMLInputElement ? emailInput.value : '';
+			const message = messageInput instanceof HTMLTextAreaElement ? messageInput.value : '';
+			const company = companyInput instanceof HTMLInputElement ? companyInput.value : '';
+
+			contactSendBtn.setAttribute('disabled', 'true');
+			contactSendBtn.classList.add('opacity-60', 'cursor-not-allowed');
+			contactSendState.textContent = 'Sending message...';
+
+			try {
+				const response = await fetch(messageEndpoint, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						source_site: 'probablyfinestudios',
+						name,
+						email,
+						message,
+						company,
+					}),
+				});
+
+				const text = await response.text();
+				let parsed = text;
+				try {
+					parsed = JSON.parse(text);
+				} catch {
+					parsed = text;
+				}
+
+				contactSendState.textContent = response.ok ? 'Message sent successfully.' : 'Request failed.';
+				if (response.ok) {
+					contactForm.reset();
+				}
+			} catch (error) {
+				contactSendState.textContent = 'Network error.';
+			} finally {
+				contactSendBtn.removeAttribute('disabled');
+				contactSendBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+			}
+		});
+	</script>
 
 	<Footer />
 </Layout>

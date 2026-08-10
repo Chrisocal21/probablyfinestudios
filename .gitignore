@@ -17,6 +17,10 @@ pnpm-debug.log*
 .env
 .env.production
 
+# message hub local worker state
+message-hub/.wrangler/
+message-hub/.dev.vars
+
 # macOS-specific files
 .DS_Store
 
