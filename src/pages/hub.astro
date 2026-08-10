@@ -31,8 +31,8 @@ const knownSites = [
 
 	<section class="bg-black">
 		<div class="w-full">
-			<div class="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-0 min-h-[calc(100vh-4rem)]">
-				<div class="border-r border-zinc-800 bg-zinc-950">
+			<div id="hubWorkspaceGrid" class="grid grid-cols-1 gap-0 min-h-[calc(100vh-4rem)]">
+				<div id="hubSidebar" class="hidden border-r border-zinc-800 bg-zinc-950">
 					<div class="px-4 py-5 border-b border-zinc-800">
 						<p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Mailboxes</p>
 					</div>
@@ -184,6 +184,8 @@ const knownSites = [
 		const logoutBtn = document.getElementById('logoutBtn');
 		const loginState = document.getElementById('loginState');
 		const passwordInput = document.getElementById('dashboardPassword');
+		const workspaceGrid = document.getElementById('hubWorkspaceGrid');
+		const sidebar = document.getElementById('hubSidebar');
 		const inboxState = document.getElementById('inboxState');
 		const inboxList = document.getElementById('inboxList');
 		const loadInboxBtn = document.getElementById('loadInboxBtn');
@@ -468,9 +470,19 @@ const knownSites = [
 			return window.localStorage.getItem(storageKey);
 		}
 
+		function setWorkspaceLayout(isAuthed) {
+			if (workspaceGrid) {
+				workspaceGrid.classList.toggle('lg:grid-cols-[260px_minmax(0,1fr)]', isAuthed);
+			}
+			if (sidebar) {
+				sidebar.classList.toggle('hidden', !isAuthed);
+			}
+		}
+
 		function setAuthedUi(isAuthed) {
 			if (loginPanel) loginPanel.classList.toggle('hidden', isAuthed);
 			if (appPanel) appPanel.classList.toggle('hidden', !isAuthed);
+			setWorkspaceLayout(isAuthed);
 		}
 
 		async function login() {
