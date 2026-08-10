@@ -57,7 +57,7 @@ const SITE_ALLOWED_ORIGINS: Record<string, string[]> = {
 function corsHeaders(): Record<string, string> {
   return {
     'access-control-allow-origin': '*',
-    'access-control-allow-methods': 'GET, POST, PATCH, OPTIONS',
+    'access-control-allow-methods': 'GET, POST, PATCH, DELETE, OPTIONS',
     'access-control-allow-headers': 'authorization, content-type, x-hub-key',
   };
 }
@@ -333,6 +333,22 @@ async function updateMessageStatus(env: Env, request: Request, messageId: number
   });
 }
 
+async function deleteMessageById(env: Env, messageId: number): Promise<Response> {
+  const result = await env.DB.prepare(
+    `DELETE FROM messages
+     WHERE id = ?1`
+  )
+    .bind(messageId)
+    .run();
+
+  const rowsWritten = Number((result.meta as { changes?: number }).changes ?? 0);
+  if (rowsWritten === 0) {
+    return jsonResponse(404, { error: 'Message not found.' });
+  }
+
+  return jsonResponse(200, { ok: true, id: messageId });
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -401,6 +417,10 @@ export default {
 
       if (request.method === 'PATCH') {
         return updateMessageStatus(env, request, messageId);
+      }
+
+      if (request.method === 'DELETE') {
+        return deleteMessageById(env, messageId);
       }
 
       return jsonResponse(405, { error: 'Method not allowed.' });

@@ -32,7 +32,7 @@ const knownSites = [
 	<section class="bg-black">
 		<div class="w-full">
 			<div id="hubWorkspaceGrid" class="grid grid-cols-1 gap-0 min-h-[calc(100vh-4rem)]">
-				<div id="hubSidebar" class="hidden border-r border-zinc-800 bg-zinc-950">
+				<div id="hubSidebar" class="hidden border-r border-zinc-800 bg-zinc-950" style="display: none;" aria-hidden="true">
 					<div class="px-4 py-5 border-b border-zinc-800">
 						<p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Mailboxes</p>
 					</div>
@@ -151,6 +151,7 @@ const knownSites = [
 										<button id="markReadBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-sky-300 text-black hover:bg-sky-200 transition disabled:opacity-40">Mark Read</button>
 										<button id="markUnreadBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-300 text-black hover:bg-emerald-200 transition disabled:opacity-40">Mark Unread</button>
 										<button id="archiveBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-300 text-black hover:bg-amber-200 transition disabled:opacity-40">Archive</button>
+										<button id="deleteBtn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-500 text-white hover:bg-red-400 transition disabled:opacity-40">Delete</button>
 									</div>
 								</div>
 								<div id="detailState" class="text-sm text-zinc-500">Select a message to inspect it here.</div>
@@ -212,6 +213,7 @@ const knownSites = [
 		const markReadBtn = document.getElementById('markReadBtn');
 		const markUnreadBtn = document.getElementById('markUnreadBtn');
 		const archiveBtn = document.getElementById('archiveBtn');
+		const deleteBtn = document.getElementById('deleteBtn');
 		const loginEndpoint = 'https://mail.probablyfinestudios.com/api/admin/login';
 		const messageEndpoint = 'https://mail.probablyfinestudios.com/api/admin/messages';
 		const storageKey = 'pfs_hub_admin_token';
@@ -382,6 +384,7 @@ const knownSites = [
 			if (markReadBtn) markReadBtn.toggleAttribute('disabled', !hasItem || item?.status === 'read');
 			if (markUnreadBtn) markUnreadBtn.toggleAttribute('disabled', !hasItem || item?.status === 'unread');
 			if (archiveBtn) archiveBtn.toggleAttribute('disabled', !hasItem || item?.status === 'archived');
+			if (deleteBtn) deleteBtn.toggleAttribute('disabled', !hasItem);
 			if (replyLink) {
 				replyLink.classList.toggle('pointer-events-none', !hasItem);
 				replyLink.classList.toggle('opacity-50', !hasItem);
@@ -466,6 +469,53 @@ const knownSites = [
 			}
 		}
 
+		async function deleteSelectedMessage() {
+			const token = getToken();
+			const item = selectedMessage();
+			if (!token || !item) return;
+
+			const confirmed = window.confirm(`Delete this message from ${item.name} (${item.email})? This cannot be undone.`);
+			if (!confirmed) return;
+
+			if (detailState) detailState.textContent = 'Deleting message...';
+
+			try {
+				const response = await fetch(`${messageEndpoint}/${item.id}`, {
+					method: 'DELETE',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+					},
+				});
+
+				let json = null;
+				try {
+					json = await response.json();
+				} catch {
+					json = null;
+				}
+
+				if (!response.ok) {
+					if (response.status === 401) {
+						window.localStorage.removeItem(storageKey);
+						setAuthedUi(false);
+						if (inboxState) inboxState.textContent = 'Session expired. Sign in again.';
+						return;
+					}
+					if (detailState) detailState.textContent = (json && json.error) ? json.error : 'Failed to delete message.';
+					return;
+				}
+
+				allMessages = allMessages.filter((message) => message.id !== item.id);
+				const nextVisible = filteredMessages();
+				selectedMessageId = nextVisible[0]?.id ?? allMessages[0]?.id ?? null;
+				renderInbox();
+				renderDetail();
+				if (detailState && !selectedMessageId) detailState.textContent = 'Message deleted.';
+			} catch (error) {
+				if (detailState) detailState.textContent = error && typeof error === 'object' && 'message' in error ? `Delete failed: ${error.message}` : 'Delete failed.';
+			}
+		}
+
 		function getToken() {
 			return window.localStorage.getItem(storageKey);
 		}
@@ -476,6 +526,8 @@ const knownSites = [
 			}
 			if (sidebar) {
 				sidebar.classList.toggle('hidden', !isAuthed);
+				sidebar.style.display = isAuthed ? 'block' : 'none';
+				sidebar.setAttribute('aria-hidden', isAuthed ? 'false' : 'true');
 			}
 		}
 
@@ -632,6 +684,10 @@ const knownSites = [
 
 		archiveBtn?.addEventListener('click', async () => {
 			await updateStatus('archived');
+		});
+
+		deleteBtn?.addEventListener('click', async () => {
+			await deleteSelectedMessage();
 		});
 
 		if (getToken()) {
