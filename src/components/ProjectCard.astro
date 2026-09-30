@@ -7,11 +7,11 @@ interface ProjectTheme {
 }
 
 interface Props {
+	id: string;
 	title: string;
 	description: string;
-	image?: string;
+	role?: string;
 	tags: string[];
-	previewStyle?: 'browser' | 'dashboard';
 	liveUrl?: string;
 	githubUrl?: string;
 	wip?: boolean;
@@ -19,141 +19,28 @@ interface Props {
 	collaborators?: Array<{ name: string; url: string }>;
 }
 
-const { title, description, image, tags, previewStyle = 'browser', liveUrl, githubUrl, wip, theme, collaborators } = Astro.props;
-const explicitPreviewClass = title === 'Hang'
-	? 'object-cover object-[50%_44%]'
-	: 'object-cover object-top';
+const { id, title, description, role, tags, liveUrl, githubUrl, wip, theme, collaborators } = Astro.props;
 ---
 
 <div class="bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-800 hover:border-zinc-600 transition duration-300 flex flex-col shadow-xl">
-	<!-- Preview -->
-	<div class="relative overflow-hidden p-4" style={`background: ${theme?.gradient ?? 'linear-gradient(135deg, #312e81, #1e1b4b)'}`}>
-		{theme?.pattern && (
-			<div class="absolute inset-0" style={`background-image: ${theme.pattern}; background-size: ${theme.patternSize ?? 'auto'}`}></div>
-		)}
-		<div class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/60"></div>
-		{previewStyle === 'dashboard' ? (
-			<div class="relative rounded-xl overflow-hidden border border-white/20 backdrop-blur-sm bg-zinc-950/80">
-				<div class="grid grid-cols-[72px_minmax(0,1fr)] min-h-[240px]">
-					<div class="border-r border-white/10 bg-black/35 p-3 flex flex-col gap-3">
-						<div class="h-8 rounded-lg" style={`background: ${theme?.accent ?? '#22d3ee'}20; border: 1px solid ${theme?.accent ?? '#22d3ee'}40`}></div>
-						<div class="space-y-2">
-							<div class="h-2 rounded-full bg-white/15"></div>
-							<div class="h-2 rounded-full bg-white/10"></div>
-							<div class="h-2 rounded-full bg-white/10"></div>
-						</div>
-						<div class="mt-auto grid gap-2">
-							<div class="h-8 rounded-lg bg-white/8"></div>
-							<div class="h-8 rounded-lg bg-white/8"></div>
-						</div>
-					</div>
-					<div class="p-4 flex flex-col gap-4">
-						<div class="flex items-center justify-between gap-4">
-							<div>
-								<p class="text-[10px] uppercase tracking-[0.22em] text-white/50 mb-1">Field Ops Dashboard</p>
-								<div class="h-3 w-32 rounded-full bg-white/15"></div>
-							</div>
-							<div class="h-8 w-24 rounded-lg" style={`background: ${theme?.accent ?? '#22d3ee'}20; border: 1px solid ${theme?.accent ?? '#22d3ee'}40`}></div>
-						</div>
-						<div class="grid grid-cols-3 gap-3">
-							<div class="rounded-xl border border-white/10 bg-white/5 p-3">
-								<div class="h-2 w-10 rounded-full bg-white/15 mb-3"></div>
-								<div class="h-6 w-12 rounded-full" style={`background: ${theme?.accent ?? '#22d3ee'}22`}></div>
-							</div>
-							<div class="rounded-xl border border-white/10 bg-white/5 p-3">
-								<div class="h-2 w-10 rounded-full bg-white/15 mb-3"></div>
-								<div class="h-6 w-14 rounded-full bg-emerald-400/20"></div>
-							</div>
-							<div class="rounded-xl border border-white/10 bg-white/5 p-3">
-								<div class="h-2 w-10 rounded-full bg-white/15 mb-3"></div>
-								<div class="h-6 w-10 rounded-full bg-amber-400/20"></div>
-							</div>
-						</div>
-						<div class="rounded-2xl border border-white/10 bg-black/25 p-4 flex-1 flex flex-col gap-3">
-							<div class="flex items-center justify-between gap-3">
-								<div class="h-2 w-24 rounded-full bg-white/15"></div>
-								<div class="h-2 w-12 rounded-full bg-white/10"></div>
-							</div>
-							<div class="grid grid-cols-[1.1fr_0.9fr] gap-3 flex-1">
-								<div class="rounded-xl bg-white/5 border border-white/8 p-3 flex flex-col gap-2">
-									<div class="h-2 w-16 rounded-full bg-white/15"></div>
-									<div class="flex-1 rounded-lg" style={`background: linear-gradient(180deg, ${theme?.accent ?? '#22d3ee'}22, transparent)`}></div>
-								</div>
-								<div class="rounded-xl bg-white/5 border border-white/8 p-3 flex flex-col gap-2">
-									<div class="h-2 w-14 rounded-full bg-white/15"></div>
-									<div class="space-y-2">
-										<div class="h-8 rounded-lg bg-white/8"></div>
-										<div class="h-8 rounded-lg bg-white/8"></div>
-										<div class="h-8 rounded-lg bg-white/8"></div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		) : image ? (
-			<div class="relative rounded-xl overflow-hidden border border-white/20 backdrop-blur-sm">
-				<div class="flex items-center gap-2 px-3 py-2 bg-black/70 border-b border-white/10">
-					<div class="flex gap-1">
-						<div class="w-2 h-2 rounded-full bg-red-500/70"></div>
-						<div class="w-2 h-2 rounded-full bg-yellow-500/70"></div>
-						<div class="w-2 h-2 rounded-full bg-green-500/70"></div>
-					</div>
-					<div class="flex-1 mx-2 bg-white/10 rounded px-2 py-0.5 text-xs text-gray-300 truncate">
-						{liveUrl ? liveUrl.replace('https://', '') : `${title.toLowerCase().replace(/\s+/g, '')}.preview`}
-					</div>
-				</div>
-				<div class="aspect-video bg-black relative overflow-hidden">
-					<img
-						src={image}
-						alt={`${title} preview`}
-						class={`block w-full h-full ${explicitPreviewClass}`}
-						loading="lazy"
-					/>
-					<div class="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"></div>
-				</div>
-			</div>
-		) : liveUrl ? (
-			<div class="relative rounded-xl overflow-hidden border border-white/20 backdrop-blur-sm">
-				<div class="flex items-center gap-2 px-3 py-2 bg-black/70 border-b border-white/10">
-					<div class="flex gap-1">
-						<div class="w-2 h-2 rounded-full bg-red-500/70"></div>
-						<div class="w-2 h-2 rounded-full bg-yellow-500/70"></div>
-						<div class="w-2 h-2 rounded-full bg-green-500/70"></div>
-					</div>
-					<div class="flex-1 mx-2 bg-white/10 rounded px-2 py-0.5 text-xs text-gray-300 truncate">
-						{liveUrl.replace('https://', '')}
-					</div>
-				</div>
-				<div class="aspect-video bg-zinc-950 relative">
-					<img
-						src={`https://s0.wordpress.com/mshots/v1/${encodeURIComponent(liveUrl)}?w=900&h=506`}
-						alt={`${title} preview`}
-						class="w-full h-full object-cover"
-						loading="lazy"
-					/>
-					<div class="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"></div>
-				</div>
-			</div>
-		) : (
-			<div class="relative rounded-xl border border-white/15 bg-black/30 backdrop-blur-sm aspect-video flex items-center justify-center">
-				<span class="text-xs uppercase tracking-[0.2em] text-white/55">Preview Coming Soon</span>
-			</div>
-		)}
-	</div>
+	<div class="h-1" style={`background: ${theme?.accent ?? '#ffffff'}`}></div>
 
 	<!-- Content -->
 	<div class="p-6 flex flex-col flex-1 gap-4">
 		<div>
 			<div class="flex items-start justify-between gap-3 mb-1">
-				<h3 class="text-2xl font-bold text-white leading-tight">{title}</h3>
+				<h3 class="text-2xl font-bold text-white leading-tight">
+					<a href={`/portfolio/${id}`} class="hover:underline">{title}</a>
+				</h3>
 				{wip && (
 					<span class="text-[10px] font-medium tracking-widest uppercase px-2.5 py-0.5 rounded-full shrink-0 mt-1" style={`background: ${theme?.accent ?? '#fbbf24'}18; color: ${theme?.accent ?? '#fbbf24'}; border: 1px solid ${theme?.accent ?? '#fbbf24'}40`}>
 						In Development
 					</span>
 				)}
 			</div>
+			<p class="text-[11px] uppercase tracking-[0.2em] font-semibold mb-2" style={`color: ${theme?.accent ?? '#a1a1aa'}`}>
+				{role ?? tags[0]}{liveUrl ? ` · ${liveUrl.replace('https://', '').replace('www.', '').replace(/\/$/, '')}` : ''}
+			</p>
 			<p class="text-zinc-300 text-sm leading-relaxed">{description}</p>
 		</div>
 
@@ -178,6 +65,12 @@ const explicitPreviewClass = title === 'Hang'
 		)}
 
 		<div class="flex gap-2 mt-auto pt-2">
+			<a
+				href={`/portfolio/${id}`}
+				class="border border-gray-700 text-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition"
+			>
+				Case Study
+			</a>
 			{liveUrl && (
 				<a
 					href={liveUrl}

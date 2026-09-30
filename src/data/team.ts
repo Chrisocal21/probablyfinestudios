@@ -35,20 +35,18 @@ export const teamMembers: TeamMember[] = [
 		image: '/images/Chris.png',
 		links: {
 			github: 'https://github.com/Chrisocal21',
-			linkedin: 'https://linkedin.com/in/yourusername',
-			instagram: 'https://instagram.com/chrisocphoto',
-			photography: 'https://chrisocphoto.vercel.app',
-			digital: 'https://chrisocdigital.com'
+			linkedin: 'https://www.linkedin.com/in/chrisocphoto',
+			instagram: 'https://www.instagram.com/chrisocphoto',
+			photography: 'https://www.chrisocphoto.com',
 		},
 		projects: [
 			{ name: 'CookBookVerse', contribution: 'Full-stack Development & Design' },
-			{ name: 'Editly', contribution: 'Full-stack Development & AI Integration' },
 			{ name: 'FieldKit', contribution: 'Full-stack Development & Platform Architecture' },
 			{ name: 'ChrisOCPhoto', contribution: 'Full-stack Development & Photography Portfolio' },
-			{ name: 'ChrisOCDigital', contribution: 'Full-stack Development & Digital Creative Portfolio' },
-			{ name: 'Wandr', contribution: 'Full-stack Development & Location API Integration' },
+			{ name: 'Standalone', contribution: 'Parametric Geometry & Fabrication Tooling' },
+			{ name: 'Burrow', contribution: 'Full-stack Development & 3D Visualization' },
 			{ name: 'Mapit', contribution: 'Full-stack Development & Mapping Integration' },
-			{ name: 'URBN Weather', contribution: 'Full-stack Development & Real-time Data Integration' },
+			{ name: 'WX', contribution: 'Full-stack Development & Real-time Data Integration' },
 			{ name: 'Scramble', contribution: 'Game Development & Phaser Engine' },
 		],
 		tools: {

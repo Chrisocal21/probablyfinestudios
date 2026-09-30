@@ -1,41 +1,57 @@
 ---
 const currentPath = Astro.url.pathname;
+
+const links = [
+	{ href: '/', label: 'Home' },
+	{ href: '/portfolio', label: 'All Projects' },
+	{ href: '/about', label: 'About' },
+];
 ---
 
 <nav class="bg-black shadow-sm sticky top-0 z-50 border-b border-gray-800">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-		<div class="flex justify-between h-16">
-			<div class="flex items-center">
-				<a href="/" class="flex items-center">
-					<img src="/logo.svg" alt="Probably Fine Studios" class="h-8" />
-				</a>
-			</div>
-			<div class="flex items-center space-x-8">
-				<a 
-					href="/" 
-					class={`hover:text-gray-300 transition ${currentPath === '/' ? 'text-white font-semibold' : 'text-gray-400'}`}
-				>
-					Home
-				</a>
-				<a 
-					href="/portfolio" 
-					class={`hover:text-gray-300 transition ${currentPath === '/portfolio' ? 'text-white font-semibold' : 'text-gray-400'}`}
-				>
-					All Projects
-				</a>
-				<a 
-					href="/about" 
-					class={`hover:text-gray-300 transition ${currentPath === '/about' ? 'text-white font-semibold' : 'text-gray-400'}`}
-				>
-					About
-				</a>
-				<a 
-					href="/contact" 
-					class={`bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition ${currentPath === '/contact' ? 'bg-gray-200' : ''}`}
+		<input type="checkbox" id="nav-toggle" class="peer hidden" />
+
+		<div class="flex items-center justify-between h-16">
+			<a href="/" class="flex items-center gap-2.5 shrink-0">
+				<img src="/logo-mark.png" alt="" class="h-7 md:h-8 w-auto" width="793" height="259" />
+				<span class="leading-none">
+					<span class="block text-white font-bold text-base md:text-lg tracking-tight">Probably Fine</span>
+					<span class="block text-gray-400 text-[10px] md:text-xs tracking-[0.2em] uppercase -mt-0.5">Studios</span>
+				</span>
+			</a>
+
+			<div class="flex items-center gap-3">
+				<a
+					href="/about#contact"
+					class="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
 				>
 					Contact
 				</a>
+
+				<!-- Menu toggle -->
+				<label
+					for="nav-toggle"
+					class="flex items-center justify-center w-10 h-10 -mr-2 text-gray-300 cursor-pointer"
+					aria-label="Toggle menu"
+				>
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+					</svg>
+				</label>
 			</div>
+		</div>
+
+		<!-- Menu -->
+		<div class="hidden peer-checked:flex flex-col gap-1 pb-4">
+			{links.map(link => (
+				<a
+					href={link.href}
+					class={`px-2 py-2.5 rounded-lg transition ${currentPath === link.href ? 'text-white font-semibold bg-white/5' : 'text-gray-400 hover:bg-white/5'}`}
+				>
+					{link.label}
+				</a>
+			))}
 		</div>
 	</div>
 </nav>

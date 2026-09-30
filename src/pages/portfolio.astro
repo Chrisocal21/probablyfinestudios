@@ -30,11 +30,11 @@ import { projects } from '../data/projects';
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 					{projects.map(project => (
 						<ProjectCard
+							id={project.id}
 							title={project.title}
 							description={project.description}
-							image={project.image}
+							role={project.role}
 							tags={project.tags}
-							previewStyle={project.previewStyle}
 							liveUrl={project.liveUrl}
 							githubUrl={project.githubUrl}
 							wip={project.wip}

@@ -1,0 +1,161 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import { projects } from '../../data/projects';
+
+export function getStaticPaths() {
+	return projects.map(project => ({
+		params: { id: project.id },
+		props: { project },
+	}));
+}
+
+const { project } = Astro.props;
+const {
+	title,
+	description,
+	longDescription,
+	role,
+	stack,
+	highlights,
+	image,
+	tags,
+	liveUrl,
+	githubUrl,
+	wip,
+	theme,
+	collaborators,
+} = project;
+---
+
+<Layout title={`${title} - Probably Fine Studios`} description={description}>
+	<Nav />
+
+	<section class="relative overflow-hidden py-20" style={`background: ${theme?.gradient ?? 'linear-gradient(135deg, #312e81, #1e1b4b)'}`}>
+		{theme?.pattern && (
+			<div class="absolute inset-0" style={`background-image: ${theme.pattern}; background-size: ${theme.patternSize ?? 'auto'}`}></div>
+		)}
+		<div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black"></div>
+		<div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+			<a href="/portfolio" class="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white transition mb-8">
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+				</svg>
+				Back to Portfolio
+			</a>
+
+			<div class="flex items-start justify-between gap-4 flex-wrap mb-4">
+				<h1 class="text-4xl md:text-5xl font-bold text-white">{title}</h1>
+				{wip && (
+					<span class="text-[10px] font-medium tracking-widest uppercase px-2.5 py-1 rounded-full shrink-0 mt-2" style={`background: ${theme?.accent ?? '#fbbf24'}18; color: ${theme?.accent ?? '#fbbf24'}; border: 1px solid ${theme?.accent ?? '#fbbf24'}40`}>
+						In Development
+					</span>
+				)}
+			</div>
+
+			{role && (
+				<p class="text-sm uppercase tracking-[0.25em] font-semibold mb-6" style={`color: ${theme?.accent ?? '#a1a1aa'}`}>
+					{role}{liveUrl ? ` · ${liveUrl.replace('https://', '').replace('www.', '').replace(/\/$/, '')}` : ''}
+				</p>
+			)}
+
+			<p class="text-xl text-gray-200 max-w-2xl leading-relaxed mb-8">{description}</p>
+
+			<div class="flex flex-wrap gap-2 mb-8">
+				{tags.map(tag => (
+					<span class="bg-white/10 text-white px-3 py-1 rounded-full text-sm" style={`border: 1px solid ${theme?.accent ?? '#ffffff'}40`}>
+						{tag}
+					</span>
+				))}
+			</div>
+
+			<div class="flex gap-3">
+				{liveUrl && (
+					<a
+						href={liveUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="group px-6 py-3 rounded-lg font-semibold text-sm transition hover:scale-105 flex items-center gap-2"
+						style={`background: ${theme?.accent ?? '#ffffff'}; color: #000`}
+					>
+						Visit Live Site
+						<svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+						</svg>
+					</a>
+				)}
+				{githubUrl && (
+					<a
+						href={githubUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="bg-white/10 text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-white/20 transition border border-white/20"
+					>
+						View Code
+					</a>
+				)}
+			</div>
+		</div>
+	</section>
+
+	<section class="py-16 bg-black">
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+			{image && (
+				<div class="rounded-xl overflow-hidden border border-zinc-800 mb-12">
+					<img src={image} alt={`${title} preview`} class="w-full h-auto" loading="lazy" />
+				</div>
+			)}
+
+			<div class="grid md:grid-cols-[1fr_280px] gap-12">
+				<div>
+					<h2 class="text-2xl font-bold text-white mb-4">About This Project</h2>
+					<p class="text-zinc-300 leading-relaxed whitespace-pre-line">{longDescription ?? description}</p>
+
+					{collaborators && collaborators.length > 0 && (
+						<p class="text-sm text-zinc-400 mt-6">
+							<span class="uppercase tracking-widest mr-1">With:</span>
+							{collaborators.map((collab, i) => (
+								<Fragment>
+									<a href={collab.url} target="_blank" rel="noopener noreferrer" class="text-zinc-200 hover:text-white transition underline">{collab.name}</a>
+									{i < collaborators.length - 1 && ', '}
+								</Fragment>
+							))}
+						</p>
+					)}
+				</div>
+
+				<div class="flex flex-col gap-8">
+					{highlights && highlights.length > 0 && (
+						<div>
+							<h3 class="text-xs uppercase tracking-[0.2em] text-zinc-500 font-semibold mb-3">Highlights</h3>
+							<ul class="flex flex-col gap-2.5">
+								{highlights.map(item => (
+									<li class="flex items-start gap-2 text-sm text-zinc-300">
+										<span class="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style={`background: ${theme?.accent ?? '#ffffff'}`}></span>
+										{item}
+									</li>
+								))}
+							</ul>
+						</div>
+					)}
+
+					{stack && stack.length > 0 && (
+						<div>
+							<h3 class="text-xs uppercase tracking-[0.2em] text-zinc-500 font-semibold mb-3">Stack</h3>
+							<div class="flex flex-wrap gap-2">
+								{stack.map(item => (
+									<span class="bg-zinc-900 text-zinc-300 px-2.5 py-1 rounded-full text-xs border border-zinc-800">
+										{item}
+									</span>
+								))}
+							</div>
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<Footer />
+</Layout>
