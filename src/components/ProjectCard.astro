@@ -1,4 +1,6 @@
 ---
+import ProjectIcon from './ProjectIcon.astro';
+
 interface ProjectTheme {
 	gradient: string;
 	accent: string;
@@ -11,6 +13,8 @@ interface Props {
 	title: string;
 	description: string;
 	role?: string;
+	image?: string;
+	icon?: string;
 	tags: string[];
 	liveUrl?: string;
 	githubUrl?: string;
@@ -19,11 +23,48 @@ interface Props {
 	collaborators?: Array<{ name: string; url: string }>;
 }
 
-const { id, title, description, role, tags, liveUrl, githubUrl, wip, theme, collaborators } = Astro.props;
+const { id, title, description, role, image, icon, tags, liveUrl, githubUrl, wip, theme, collaborators } = Astro.props;
+const explicitPreviewClass = title === 'Hang'
+	? 'object-cover object-[50%_44%]'
+	: 'object-cover object-top';
 ---
 
 <div class="bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-800 hover:border-zinc-600 transition duration-300 flex flex-col shadow-xl">
-	<div class="h-1" style={`background: ${theme?.accent ?? '#ffffff'}`}></div>
+	{image ? (
+		<div class="relative rounded-t-2xl overflow-hidden border-b border-white/10">
+			<div class="flex items-center gap-2 px-3 py-2 bg-black/70 border-b border-white/10">
+				<div class="flex gap-1">
+					<div class="w-2 h-2 rounded-full bg-red-500/70"></div>
+					<div class="w-2 h-2 rounded-full bg-yellow-500/70"></div>
+					<div class="w-2 h-2 rounded-full bg-green-500/70"></div>
+				</div>
+				<div class="flex-1 mx-2 bg-white/10 rounded px-2 py-0.5 text-xs text-gray-300 truncate">
+					{liveUrl ? liveUrl.replace('https://', '') : `${title.toLowerCase().replace(/\s+/g, '')}.preview`}
+				</div>
+			</div>
+			<div class="aspect-video bg-black relative overflow-hidden">
+				<img
+					src={image}
+					alt={`${title} preview`}
+					class={`block w-full h-full ${explicitPreviewClass}`}
+					loading="lazy"
+				/>
+				<div class="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"></div>
+			</div>
+		</div>
+	) : (
+		<div class="relative aspect-[3/1.4] flex items-center justify-center overflow-hidden" style={`background: ${theme?.gradient ?? 'linear-gradient(135deg, #312e81, #1e1b4b)'}`}>
+			{theme?.pattern && (
+				<div class="absolute inset-0" style={`background-image: ${theme.pattern}; background-size: ${theme.patternSize ?? 'auto'}`}></div>
+			)}
+			<div class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/50"></div>
+			{icon && (
+				<div class="relative" style={`color: ${theme?.accent ?? '#ffffff'}`}>
+					<ProjectIcon icon={icon} class="w-12 h-12" />
+				</div>
+			)}
+		</div>
+	)}
 
 	<!-- Content -->
 	<div class="p-6 flex flex-col flex-1 gap-4">

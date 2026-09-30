@@ -1,5 +1,6 @@
 ---
 import { projects } from '../data/projects';
+import ProjectIcon from './ProjectIcon.astro';
 
 interface Props {
 	autoplay?: boolean;
@@ -110,6 +111,20 @@ const hasProjects = projects.length > 0;
 								{project.role ?? project.tags[0]}{project.liveUrl ? ` · ${project.liveUrl.replace('https://', '').replace('www.', '').replace(/\/$/, '')}` : ''}
 							</p>
 						</div>
+
+						<!-- Visual -->
+						{project.image ? (
+							<div class="w-full max-w-sm rounded-xl overflow-hidden border border-white/15 shadow-xl" style={`box-shadow: 0 0 30px ${project.theme?.accent ?? '#818cf8'}20`}>
+								<img src={project.image} alt={`${project.title} preview`} class="w-full h-auto block" loading="lazy" />
+							</div>
+						) : project.icon ? (
+							<div
+								class="w-20 h-20 rounded-2xl flex items-center justify-center border"
+								style={`background: ${project.theme?.accent ?? '#ffffff'}12; border-color: ${project.theme?.accent ?? '#ffffff'}30; color: ${project.theme?.accent ?? '#ffffff'}`}
+							>
+								<ProjectIcon icon={project.icon} class="w-10 h-10" />
+							</div>
+						) : null}
 
 						<!-- Description -->
 						<p class="text-base text-gray-300 max-w-xl">

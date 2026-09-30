@@ -13,6 +13,7 @@ longDescription?: string;
 role?: string;
 stack?: string[];
 highlights?: string[];
+icon?: string;
 image: string;
 tags: string[];
 previewStyle?: 'browser' | 'dashboard';
@@ -26,6 +27,7 @@ collaborators?: Array<{ name: string; url: string }>;
 export const projects: Project[] = [
 {
 id: 'chrisocphoto',
+icon: 'camera',
 title: 'ChrisOCPhoto',
 description: 'A photography-first portfolio built to present visual work with clarity, speed, and a focused art direction.',
 longDescription: 'ChrisOCPhoto is a photography portfolio built around a simple rule: get out of the way of the images. Every layout decision favors fast loading, generous whitespace, and a dark, gallery-like backdrop so the photos carry the page instead of competing with UI chrome. Photos carry their own EXIF and location data, mapped out with Mapbox for a sense of where each shot was taken.',
@@ -72,6 +74,7 @@ patternSize: '18px 18px',
 },
 {
 id: 'cookbookverse',
+icon: 'book',
 title: 'CookBookVerse',
 description: 'A digital cookbook platform designed to make recipes feel usable, lively, and easy to revisit daily.',
 longDescription: 'CookBookVerse turns a personal recipe collection into something you actually want to open at dinnertime — recipes are organized to be found again quickly, not buried in a feed, with a layout built for reading on a phone propped up next to the stove. OpenAI helps fill in the gaps — cleaning up messy recipe text and suggesting substitutions — on top of a Postgres-backed recipe store.',
@@ -95,6 +98,7 @@ patternSize: '14px 14px',
 },
 {
 id: 'davapalooza',
+icon: 'calendar',
 title: 'Davapalooza',
 description: 'A personality-led event and brand site built to feel energetic, promotional, and easy to navigate when attention is short.',
 longDescription: 'Davapalooza is a brand and event site built for a moment, not a browsing session — bold color, a clear hierarchy, and fast navigation so visitors get the info they came for (what, when, where) without hunting for it. It runs on Cloudflare Workers with OpenAI wired in for content generation behind the scenes.',
@@ -118,6 +122,7 @@ patternSize: '24px 24px',
 },
 {
 id: 'trvlplay',
+icon: 'plane',
 title: 'TRVLPlay',
 description: 'A travel-forward concept focused on discovery, planning, and playful trip inspiration in one lightweight web experience.',
 longDescription: 'TRVLPlay is a lightweight travel discovery concept — a place to browse trip ideas and get a playful nudge toward planning something, rather than a heavyweight booking platform. It favors quick exploration over forms and filters, and installs like a native app thanks to its PWA setup.',
@@ -141,6 +146,7 @@ patternSize: '22px 22px',
 },
 {
 id: 'scramble',
+icon: 'grid',
 title: 'Scramble',
 description: 'A browser game project built around quick loops, playful challenge, and a lightweight mobile-friendly experience.',
 longDescription: 'Scramble is a browser word/puzzle game built for short, repeatable play sessions — the kind of game you open for two minutes between other things. Built with Phaser and Vite, it runs entirely client-side with no install and no accounts.',
@@ -210,6 +216,7 @@ patternSize: '20px 20px',
 },
 {
 id: 'standalone',
+icon: 'gear',
 title: 'Standalone',
 description: 'A parametric fabrication toolkit generating ready-to-cut laser files, 3D-printable models, and CNC feeds-and-speeds from a single account.',
 longDescription: 'Standalone is a maker-focused toolkit that turns precise material specs into fabrication-ready output — kerf-compensated SVGs for laser-cut jointed boxes and cylinders, parametric STL enclosures for 3D printing, and chip-thinning-compensated feeds-and-speeds for CNC work. It consolidates several one-off fabrication scripts into a single account-based tool, with dimensions driven by actual material thickness instead of guesswork.',
@@ -234,6 +241,7 @@ patternSize: '16px 16px',
 },
 {
 id: 'ping',
+icon: 'chat',
 title: 'Ping',
 description: 'An AI companion for quick emotional check-ins and conversation — a smart-mouthed, no-therapy-vibes way to talk something through.',
 longDescription: 'Ping is a lightweight AI companion built for the moments you just need to vent, think out loud, or get a quick reality check — not a therapy replacement, just a smart, slightly irreverent conversation partner that is always available.',
@@ -257,6 +265,7 @@ patternSize: '20px 20px',
 },
 {
 id: 'splitnote',
+icon: 'calculator',
 title: 'SplitNote',
 description: 'A discreet bill-splitting and tip calculator that behaves like an ordinary utility app.',
 longDescription: 'SplitNote is a clean, no-frills bill-splitting and tip calculator — built to feel like a normal utility app rather than a flashy finance tool, for quick math at dinner without extra noise.',
@@ -280,6 +289,7 @@ patternSize: '18px 18px',
 },
 {
 id: 'games-collection',
+icon: 'grid',
 title: 'Games Collection',
 description: 'A small collection of web-based word games, including a Connections-style word puzzle.',
 longDescription: 'Games Collection bundles a handful of browser word games under one roof, starting with a Connections-style puzzle — group four sets of four related words. Browser-based, no installs, no accounts.',
@@ -303,6 +313,7 @@ patternSize: '18px 18px',
 },
 {
 id: 'burrow',
+icon: 'globe',
 title: 'Burrow',
 description: 'A trip and event management companion for touring event professionals — jobs, travel, and communications in one place.',
 longDescription: 'Burrow helps touring event professionals manage job trips, travel logistics, and communications without juggling a dozen disconnected tools. It renders travel routes on an interactive 3D globe and can generate PDF itineraries and QR codes for quick sharing on-site.',
@@ -326,6 +337,7 @@ patternSize: '20px 20px',
 },
 {
 id: 'wanderlog',
+icon: 'pin',
 title: 'Wanderlog',
 description: 'A mobile-first travel blog platform with a visual canvas editor, built for a writer-and-developer pair.',
 longDescription: 'Wanderlog is a reusable travel blog platform built for two people — the developer who builds and maintains it, and the blogger who writes and publishes from anywhere in the world — with a visual, drag-and-drop canvas editor instead of a traditional CMS form.',
@@ -349,6 +361,7 @@ patternSize: '20px 20px',
 },
 {
 id: 'ctrii',
+icon: 'pencil',
 title: 'ctrII',
 description: 'An early-stage rich-text writing tool built around a block editor.',
 longDescription: 'ctrII is an early-stage writing tool built around Tiptap\'s rich block editor, with account sign-in already wired up. It is still taking shape, but the foundation — a real editor, not a plain textarea — is already in place.',

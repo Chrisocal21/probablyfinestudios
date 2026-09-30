@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
+import ProjectIcon from '../../components/ProjectIcon.astro';
 import { projects } from '../../data/projects';
 
 export function getStaticPaths() {
@@ -20,6 +21,7 @@ const {
 	stack,
 	highlights,
 	image,
+	icon,
 	tags,
 	liveUrl,
 	githubUrl,
@@ -101,11 +103,23 @@ const {
 
 	<section class="py-16 bg-black">
 		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-			{image && (
+			{image ? (
 				<div class="rounded-xl overflow-hidden border border-zinc-800 mb-12">
 					<img src={image} alt={`${title} preview`} class="w-full h-auto" loading="lazy" />
 				</div>
-			)}
+			) : icon ? (
+				<div
+					class="rounded-xl border border-zinc-800 mb-12 aspect-[3/1] flex items-center justify-center"
+					style={`background: ${theme?.gradient ?? 'linear-gradient(135deg, #312e81, #1e1b4b)'}`}
+				>
+					<div
+						class="w-20 h-20 rounded-2xl flex items-center justify-center border"
+						style={`background: ${theme?.accent ?? '#ffffff'}12; border-color: ${theme?.accent ?? '#ffffff'}30; color: ${theme?.accent ?? '#ffffff'}`}
+					>
+						<ProjectIcon icon={icon} class="w-10 h-10" />
+					</div>
+				</div>
+			) : null}
 
 			<div class="grid md:grid-cols-[1fr_280px] gap-12">
 				<div>
