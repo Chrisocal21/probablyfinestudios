@@ -2,50 +2,40 @@
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import ProjectCard from '../components/ProjectCard.astro';
+import ProjectSection from '../components/ProjectSection.astro';
 import { projects } from '../data/projects';
+
+const shipped = projects.filter(p => !p.wip);
+const exploring = projects.filter(p => p.wip);
 ---
 
 <Layout title="Portfolio - Probably Fine Studios">
 	<Nav />
-	
+
 	<section class="py-20 bg-black">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="text-center mb-12">
-				<h1 class="text-5xl font-bold mb-4 text-white">Our Portfolio</h1>
-				<p class="text-xl text-gray-400">
-					A clean slate for the next wave of projects
-				</p>
+			<div class="text-center mb-16">
+				<h1 class="text-5xl font-bold mb-4 text-white">All Projects</h1>
+				<p class="text-xl text-gray-400">Here's what shipped. Here's what's next.</p>
 			</div>
 
-			{projects.length === 0 ? (
-				<div class="max-w-3xl mx-auto rounded-2xl border border-zinc-800 bg-zinc-950 p-10 text-center">
-					<p class="text-xs uppercase tracking-[0.25em] text-zinc-500 mb-3">Portfolio Reset</p>
-					<h2 class="text-3xl font-bold text-white mb-4">No projects published yet</h2>
-					<p class="text-zinc-300 leading-relaxed max-w-xl mx-auto">
-						The old project list has been removed. Add new items in src/data/projects.ts and each one will appear in the newly reformatted preview cards automatically.
-					</p>
-				</div>
-			) : (
-				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-					{projects.map(project => (
-						<ProjectCard
-							id={project.id}
-							title={project.title}
-							description={project.description}
-							role={project.role}
-							image={project.image}
-							icon={project.icon}
-							tags={project.tags}
-							liveUrl={project.liveUrl}
-							githubUrl={project.githubUrl}
-							wip={project.wip}
-							theme={project.theme}
-							collaborators={project.collaborators}
-						/>
-					))}
-				</div>
-			)}
+			<ProjectSection
+				id="shipped"
+				title="Shipped & Live"
+				subtitle="Real products, up and running. Go click around."
+				projects={shipped}
+				variant="shipped"
+			/>
+
+			<div class="my-16 border-t border-zinc-800/70"></div>
+
+			<ProjectSection
+				id="exploring"
+				title="Exploring & In Progress"
+				subtitle="Ideas I'm still poking at. Some will ship, some won't."
+				projects={exploring}
+				variant="exploring"
+			/>
 		</div>
 	</section>
 
