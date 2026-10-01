@@ -1,64 +1,176 @@
 ---
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
 import ProjectSection from '../components/ProjectSection.astro';
-import { projects } from '../data/projects';
+import OpenTo from '../components/OpenTo.astro';
+import logoMark from '../assets/logo-mark.png';
+import chrisPhoto from '../assets/chris.jpg';
+import { projects, shippedProjects, inProgressProjects } from '../data/projects';
+import { profile, scripting } from '../data/profile';
+import { site, contactLink } from '../data/site';
+import { getContributions } from '../data/github';
 
-const shipped = projects.filter(p => !p.wip);
-const exploring = projects.filter(p => p.wip);
+const contributions = await getContributions();
+
+const stats = [
+	{ value: contributions.total.toLocaleString('en-US'), label: 'GitHub contributions in the last year' },
+	{ value: String(shippedProjects.length), label: 'products live right now' },
+	{ value: String(inProgressProjects.length), label: 'more in the works' },
+];
+
+const jsonLd = [
+	{
+		'@context': 'https://schema.org',
+		'@type': 'WebSite',
+		name: site.name,
+		url: `${site.url}/`,
+		description: site.description,
+	},
+	{
+		'@context': 'https://schema.org',
+		'@type': 'Organization',
+		name: site.name,
+		url: `${site.url}/`,
+		logo: `${site.url}/icon-512.png`,
+		founder: { '@type': 'Person', name: profile.name, url: `${site.url}/about/` },
+		sameAs: [profile.links.github, profile.links.linkedin, profile.links.instagram],
+	},
+];
 ---
 
-<Layout title="Probably Fine Studios - Showcase">
-	<Nav />
-
+<Layout title="Probably Fine Studios | Web apps, tools, and games by Chris" jsonLd={jsonLd}>
 	<section class="relative overflow-hidden bg-black">
 		<div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 40px 40px"></div>
-		<div class="absolute inset-0" style="background: radial-gradient(ellipse 70% 55% at 50% 42%, rgba(99,59,200,0.14) 0%, transparent 70%)"></div>
+		<div class="absolute inset-0" style="background: radial-gradient(ellipse 70% 55% at 50% 42%, rgba(99,59,200,0.16) 0%, transparent 70%)"></div>
 		<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
 
-		<div class="relative max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 text-center">
-			<img src="/logo-mark.png" alt="PFS" class="h-12 md:h-14 w-auto mx-auto mb-7" width="793" height="259" />
-			<h1 class="text-4xl md:text-5xl font-bold text-white mb-5 tracking-tight">Probably Fine Studios</h1>
-			<p class="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed">
-				Solo studio. Real products. AI doing the heavy lifting.
+		<div class="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 md:pt-24 md:pb-28 text-center">
+			{profile.availability.open && (
+				<a
+					href="#work-with-me"
+					class="inline-flex items-center gap-2 text-xs text-zinc-200 bg-white/5 border border-white/10 rounded-full pl-2.5 pr-3.5 py-1.5 mb-10 hover:bg-white/10 transition"
+				>
+					<span class="relative flex h-2 w-2" aria-hidden="true">
+						<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
+						<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+					</span>
+					{profile.availability.label}
+				</a>
+			)}
+
+			<Image src={logoMark} alt="" width={343} class="h-12 md:h-14 w-auto mx-auto mb-7" loading="eager" fetchpriority="high" />
+			<h1 class="text-4xl md:text-6xl font-bold text-white mb-5 tracking-tight">Probably Fine Studios</h1>
+			<p class="text-lg md:text-2xl text-zinc-100 mb-4 leading-snug">{site.tagline}</p>
+			<p class="text-base md:text-lg text-zinc-400 mb-9 leading-relaxed max-w-2xl mx-auto">
+				I'm Chris. I build web apps, desktop tools, games, and the odd Illustrator script that actually ship, mostly with AI and stubbornness. I named the studio after my quality-assurance process. So far it's just me in here, and I'd like to fix that.
 			</p>
-			<div class="flex flex-wrap gap-2 justify-center mb-9 text-xs">
-				<a href="#shipped" class="bg-white/5 text-gray-300 px-3 py-1 rounded-full border border-white/10 hover:bg-white/10 transition">{shipped.length} shipped</a>
-				<a href="#exploring" class="bg-white/5 text-gray-400 px-3 py-1 rounded-full border border-white/10 hover:bg-white/10 transition">{exploring.length} in the works</a>
-			</div>
-			<div class="flex gap-3 justify-center">
-				<a href="#shipped" class="px-6 py-3 rounded-lg font-semibold text-sm transition hover:opacity-90 bg-white text-black">
-					See What Shipped
+
+			<div class="flex flex-wrap gap-3 justify-center mb-8">
+				<a href="#shipped" class="px-6 py-3 rounded-lg font-semibold text-sm transition bg-white text-black hover:bg-zinc-200">
+					See what shipped
 				</a>
-				<a href="/about" class="px-6 py-3 rounded-lg font-semibold text-sm transition border border-white/20 text-white hover:bg-white/10">
-					About
+				<a href="#work-with-me" class="px-6 py-3 rounded-lg font-semibold text-sm transition border border-white/25 text-white hover:bg-white/10">
+					Come build with me
 				</a>
 			</div>
+
+			<p class="text-sm text-zinc-400">
+				<a href="#shipped" class="hover:text-white transition"><span class="text-zinc-200 font-semibold">{shippedProjects.length}</span> shipped</a>
+				<span class="mx-2 text-zinc-600" aria-hidden="true">·</span>
+				<a href="#exploring" class="hover:text-white transition"><span class="text-zinc-200 font-semibold">{inProgressProjects.length}</span> in the works</a>
+				<span class="mx-2 text-zinc-600" aria-hidden="true">·</span>
+				<a href="/about/#github" class="hover:text-white transition"><span class="text-zinc-200 font-semibold">{contributions.total.toLocaleString('en-US')}</span> GitHub contributions this year</a>
+			</p>
 		</div>
 	</section>
 
-	<div class="bg-black pb-24">
+	<div class="bg-black">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<ProjectSection
 				id="shipped"
 				title="Shipped & Live"
-				subtitle="Real products, up and running. Go click around."
-				projects={shipped}
+				subtitle="Real products, up and running. Go click around. I'll wait."
+				projects={shippedProjects}
 				variant="shipped"
 			/>
 
-			<div class="my-16 border-t border-zinc-800/70"></div>
+			<!-- Behind the studio -->
+			<section class="my-20" aria-labelledby="behind-heading">
+				<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 sm:p-10 grid md:grid-cols-[200px_1fr] gap-8 md:gap-10 items-center">
+					<Image
+						src={chrisPhoto}
+						alt={`Portrait sketch of ${profile.name}`}
+						widths={[200, 300, 400, 600]}
+						sizes="(min-width: 768px) 200px, 144px"
+						class="w-36 md:w-full aspect-[4/5] object-cover object-top rounded-xl border border-zinc-800"
+					/>
+					<div>
+						<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-indigo-300">The guy behind the curtain</p>
+						<h2 id="behind-heading" class="text-2xl md:text-3xl font-bold text-white mb-3">{profile.headline}</h2>
+						<p class="text-zinc-300 leading-relaxed mb-7 max-w-2xl">{profile.hook}</p>
+						<dl class="grid grid-cols-3 gap-4 sm:gap-8 mb-7 max-w-xl">
+							{stats.map(stat => (
+								<div class="flex flex-col-reverse justify-end">
+									<dt class="text-xs text-zinc-400 mt-1 leading-snug">{stat.label}</dt>
+									<dd class="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">{stat.value}</dd>
+								</div>
+							))}
+						</dl>
+						<div class="flex flex-wrap gap-3">
+							<a href="/about/" class="px-5 py-2.5 rounded-lg font-semibold text-sm border border-white/25 text-white hover:bg-white/10 transition">More about me</a>
+							<a href="/resume/" class="px-5 py-2.5 rounded-lg font-semibold text-sm border border-white/25 text-white hover:bg-white/10 transition">Resume</a>
+						</div>
+					</div>
+				</div>
+			</section>
 
 			<ProjectSection
 				id="exploring"
 				title="Exploring & In Progress"
-				subtitle="Ideas I'm still poking at. Some will ship, some won't."
-				projects={exploring}
+				subtitle="Ideas I'm still poking at. Some will ship, some won't. All of them seemed like a good idea at the time."
+				projects={inProgressProjects}
 				variant="exploring"
 			/>
+
+			<!-- Adobe scripting -->
+			<section id="scripts" class="mt-24 scroll-mt-24" aria-labelledby="scripts-heading">
+				<div class="max-w-2xl mb-8">
+					<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-amber-300">{scripting.eyebrow}</p>
+					<h2 id="scripts-heading" class="text-3xl md:text-4xl font-bold text-white mb-4">{scripting.title}</h2>
+					<p class="text-zinc-300 text-lg leading-relaxed">{scripting.body}</p>
+				</div>
+				<div class="grid md:grid-cols-3 gap-4">
+					{scripting.examples.map(example => (
+						<div class="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
+							<p class="text-[11px] uppercase tracking-[0.2em] font-semibold mb-2 text-amber-300">{example.app}</p>
+							<h3 class="text-lg font-bold text-white mb-2">{example.title}</h3>
+							<p class="text-zinc-300 text-sm leading-relaxed">{example.body}</p>
+						</div>
+					))}
+				</div>
+				<a href={contactLink({ topic: 'project' })} class="mt-6 inline-flex px-5 py-2.5 rounded-lg font-semibold text-sm border border-white/25 text-white hover:bg-white/10 transition">
+					{scripting.cta}
+				</a>
+			</section>
+
+			<!-- Work with me -->
+			<section id="work-with-me" class="mt-24 scroll-mt-24" aria-labelledby="work-heading">
+				<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 sm:p-10">
+					<div class="max-w-2xl mb-8">
+						<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-indigo-300">Working together</p>
+						<h2 id="work-heading" class="text-3xl md:text-4xl font-bold text-white mb-4">This was never supposed to stay a one-person studio</h2>
+						<p class="text-zinc-300 text-lg leading-relaxed">
+							Everything on this page was built solo. That was fun, and it's also the problem: the next things I want to build are bigger than one person. Seasoned pro or just trying to get a foot in the door, if one of these sounds like you, come say hi.
+						</p>
+					</div>
+					<OpenTo />
+					<p class="mt-8 text-sm text-zinc-400">
+						Curious what I'm like to work with?{' '}
+						<a href="/about/#people" class="text-zinc-100 underline hover:text-white">Here's what I look for in people</a>,
+						and here are <a href="/portfolio/" class="text-zinc-100 underline hover:text-white">all {projects.length} projects</a>.
+					</p>
+				</div>
+			</section>
 		</div>
 	</div>
-
-	<Footer />
 </Layout>

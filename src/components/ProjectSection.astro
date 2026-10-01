@@ -14,32 +14,16 @@ const { id, title, subtitle, projects, variant } = Astro.props;
 const exploring = variant === 'exploring';
 ---
 
-<section id={id} class="scroll-mt-20">
+<section id={id} class="project-section scroll-mt-24" aria-labelledby={`${id}-heading`}>
 	<div class="mb-8">
-		<h2 class={exploring ? 'text-2xl font-bold text-zinc-300' : 'text-3xl font-bold text-white'}>
+		<h2 id={`${id}-heading`} class={exploring ? 'text-2xl font-bold text-zinc-200' : 'text-3xl font-bold text-white'}>
 			{title}
-			<span class="ml-2 align-middle text-sm font-medium text-zinc-500">{projects.length}</span>
+			<span class="project-count ml-2 align-middle text-sm font-medium text-zinc-400 font-sans tracking-normal">{projects.length}</span>
 		</h2>
 		<p class="mt-2 text-zinc-400">{subtitle}</p>
 	</div>
 
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-		{projects.map(project => (
-			<ProjectCard
-				id={project.id}
-				title={project.title}
-				description={project.description}
-				role={project.role}
-				image={project.image}
-				icon={project.icon}
-				tags={project.tags}
-				liveUrl={project.liveUrl}
-				githubUrl={project.githubUrl}
-				wip={project.wip}
-				theme={project.theme}
-				collaborators={project.collaborators}
-				variant={variant}
-			/>
-		))}
+		{projects.map(project => <ProjectCard project={project} variant={variant} />)}
 	</div>
 </section>

@@ -1,166 +1,88 @@
 # Probably Fine Studios
 
-A modern portfolio and showcase website for Probably Fine Studios, built with Astro and Tailwind CSS.
+The studio site for Probably Fine Studios: a small product studio (started solo, looking to grow) shipping web apps, tools, and games.
 
-🌐 **Live Site:** [probablyfinestudios.com](https://probablyfinestudios.com)
+**Live:** [probablyfinestudios.com](https://probablyfinestudios.com)
 
-## Features
+Built with [Astro](https://astro.build) and [Tailwind CSS v4](https://tailwindcss.com). It is a fully static site: no framework runtime, and only a few small scripts (contact form, project filter, mobile menu).
 
-- 🚀 Built with Astro for blazing-fast performance
-- 🎨 Styled with Tailwind CSS v4
-- 📱 Fully responsive design
-- 🎯 Portfolio showcase with project cards
-- 👥 Team member profiles with social links
-- 📧 Contact page with multiple connection options
-- ⚡ Optimized for Cloudflare Pages deployment
+## Pages
 
-## Project Structure
+| Path | What it is |
+| :--- | :--- |
+| `/` | Homepage: shipped projects, projects in progress, and how to work with me |
+| `/portfolio/` | Every project, filterable by technology (`/portfolio/?tech=Next.js`) |
+| `/portfolio/[id]/` | A case study per project |
+| `/about/` | Story, GitHub activity, skills, who I want to work with, and the contact form |
+| `/resume/` | A one-page resume generated from the same data, with a print / save-as-PDF layout |
+| `/hub/` | Private inbox for contact-form messages (not indexed) |
 
-```text
-/
-├── src/
-│   ├── components/       # Reusable UI components
-│   │   ├── Nav.astro
-│   │   ├── Footer.astro
-│   │   ├── ProjectCard.astro
-│   │   └── TeamCard.astro
-│   ├── data/            # Data files for content
-│   │   ├── projects.ts
-│   │   └── team.ts
-│   ├── layouts/         # Page layouts
-│   │   └── Layout.astro
-│   ├── pages/           # Site pages (auto-routed)
-│   │   ├── index.astro      # Home page
-│   │   ├── portfolio.astro  # Projects showcase
-│   │   ├── team.astro       # Team members
-│   │   ├── about.astro      # About the studio
-│   │   └── contact.astro    # Contact page
-│   └── styles/
-│       └── global.css   # Global styles with Tailwind
-├── public/              # Static assets
-└── dist/                # Build output (generated)
-```
+## Where the content lives
 
-## Getting Started
+Almost everything on the site is data. Edit these files and the pages follow.
 
-### Prerequisites
+| File | What it controls |
+| :--- | :--- |
+| [src/data/projects.ts](src/data/projects.ts) | Every project: description, case study text, tech stack, links, colors, icon, and the "who I'd like to hear from" line |
+| [src/data/profile.ts](src/data/profile.ts) | The About page: bio, timeline, how I work, what I look for in people, availability, and resume extras (experience, education) |
+| [src/data/site.ts](src/data/site.ts) | Site name, tagline, description, and the navigation links |
+| [src/data/icons.ts](src/data/icons.ts) | The outline icon for each project |
 
-- Node.js 18+ installed
-- npm or pnpm
+### Adding a project
 
-### Installation
+1. Copy an entry in [src/data/projects.ts](src/data/projects.ts) (or start from `starterProjectTemplate` at the bottom of that file).
+2. Give it a unique `id`, a `stack`, and `wip: true` or `false`.
+3. Pick an `icon` from [src/data/icons.ts](src/data/icons.ts), or add a new one there.
+4. Optional: run `npm run screens -- your-project-id` to capture a screenshot of its live site for the case study.
 
-```bash
-# Install dependencies
-npm install
-```
+That is all. The rest updates itself:
 
-### Development
+- the homepage, projects page, and a new case study page
+- the skills list on `/about/` and `/resume/` (built from every project's `stack`)
+- a link-preview image for the new page (`/og/[id].png`)
+- the sitemap
 
-```bash
-# Start dev server at http://localhost:3000
-npm run dev
-```
+## What gets generated at build time
 
-The site will automatically reload when you make changes.
+- **GitHub activity** on `/about/` is read from the public contribution calendar ([src/data/github.ts](src/data/github.ts)). If GitHub can't be reached, the build falls back to `src/data/contributions-snapshot.json`.
+- **Link-preview images** (the card shown when a link is pasted into a chat or LinkedIn) are drawn by [src/lib/og.ts](src/lib/og.ts): one for the site, one for `/about/`, and one per project.
+- **`sitemap.xml` and `robots.txt`** come from [src/pages/sitemap.xml.ts](src/pages/sitemap.xml.ts) and [src/pages/robots.txt.ts](src/pages/robots.txt.ts).
+- **Favicon and app icons** in `public/` are made from `public/logo-mark.png` by `npm run icons`. Re-run it only if the logo changes.
 
-### Building for Production
+## Case-study screenshots
 
-```bash
-# Create production build
-npm run build
+Each case study shows a screenshot of the live product when `src/assets/screens/<id>.webp` exists. `npm run screens` opens every project's live site in headless Chrome (or Edge) and saves a fresh one; `npm run screens -- wx hang` does only those projects. Projects that need a click or a location to show something useful have a recipe at the top of [scripts/capture-screens.mjs](scripts/capture-screens.mjs). Look at the images before committing them: they are pictures of whatever the live sites showed at that moment.
 
-# Preview production build locally
-npm run preview
-```
+## Commands
 
-## Customization
+| Command | Action |
+| :--- | :--- |
+| `npm install` | Install dependencies |
+| `npm run dev` | Start the dev server at `localhost:3000` |
+| `npm run build` | Build the site to `./dist/` |
+| `npm run preview` | Serve the built site locally |
+| `npm run deploy` | Build, then upload `./dist/` to Cloudflare Pages |
+| `npm run icons` | Regenerate the favicon and app icons from the logo |
+| `npm run screens` | Re-capture the case-study screenshots from the live sites |
+| `npm run check` | Build, then check every internal link and anchor |
 
-### Adding Projects
+Requires Node.js 22.12 or newer.
 
-Edit [src/data/projects.ts](src/data/projects.ts) to add your projects:
+## Deployment
 
-```typescript
-{
-  id: 'project-id',
-  title: 'Project Name',
-  description: 'Project description',
-  image: 'https://image-url.com/image.jpg',
-  tags: ['React', 'TypeScript', 'Node.js'],
-  liveUrl: 'https://project-url.com',
-  githubUrl: 'https://github.com/user/repo',
-  collaborators: [
-    { name: 'Collaborator Name', url: 'https://github.com/username' }
-  ]
-}
-```
+`probablyfinestudios.com` is served by Cloudflare Pages, which is updated by uploading a build, not by pushing to GitHub. See [CLOUDFLARE_DEPLOYMENT.md](CLOUDFLARE_DEPLOYMENT.md).
 
-### Adding Team Members
+Vercel also builds every push to `main` and serves it at `probablyfinestudios.vercel.app`, which is useful as a preview. Canonical URLs on every page point at the `.com`.
 
-Edit [src/data/team.ts](src/data/team.ts) to add team members:
+## Related
 
-```typescript
-{
-  id: 'member-id',
-  name: 'Member Name',
-  role: 'Job Title',
-  bio: 'Short bio',
-  image: 'https://image-url.com/photo.jpg',
-  links: {
-    github: 'https://github.com/username',
-    twitter: 'https://twitter.com/username',
-    linkedin: 'https://linkedin.com/in/username',
-    website: 'https://personal-site.com'
-  }
-}
-```
-
-### Updating Colors
-
-The site uses a indigo/purple color scheme. To change it, update the Tailwind classes in the components:
-
-- Primary: `indigo-600`, `indigo-700`
-- Accent: `purple-600`, `purple-700`
-
-## Deployment to Cloudflare Pages
-
-See [CLOUDFLARE_DEPLOYMENT.md](CLOUDFLARE_DEPLOYMENT.md) for detailed deployment instructions.
-
-## Roadmap Documents
-
-- [PHASES.md](PHASES.md) - Main website development phases
-- [MESSAGE_HUB_PHASE1.md](MESSAGE_HUB_PHASE1.md) - Standalone Cloudflare Worker + D1 message hub plan
-
-### Quick Deploy
-
-1. Push to GitHub
-2. Connect repository in Cloudflare Pages dashboard
-3. Set build command: `npm run build`
-4. Set output directory: `dist`
-5. Deploy!
-
-## Commands Reference
-
-| Command                | Action                                           |
-| :--------------------- | :----------------------------------------------- |
-| `npm install`          | Install dependencies                             |
-| `npm run dev`          | Start dev server at `localhost:3000`             |
-| `npm run build`        | Build production site to `./dist/`               |
-| `npm run preview`      | Preview production build locally                 |
-| `npm run astro ...`    | Run Astro CLI commands                           |
-
-## Tech Stack
-
-- **Framework:** [Astro](https://astro.build)
-- **Styling:** [Tailwind CSS v4](https://tailwindcss.com)
-- **Deployment:** [Cloudflare Pages](https://pages.cloudflare.com)
-- **Language:** TypeScript
+- [VOICE.md](VOICE.md) is how the site talks. Read it before writing or editing any copy.
+- [CHECKUP.md](CHECKUP.md) is the checklist for the periodic deep review of the site, with a log of each one and the list of open items.
+- [message-hub/](message-hub/) is a separate Cloudflare Worker with a D1 database that receives the contact form. It deploys on its own; see [MESSAGE_HUB_PHASE1.md](MESSAGE_HUB_PHASE1.md).
+- [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) has a longer description of the site's structure and design decisions.
 
 ## License
 
 © 2026 Probably Fine Studios. All rights reserved.
 
-## Support
-
-For questions or issues, reach out at hello@probablyfinestudios.com.
-
+Questions or ideas: use the contact form at [probablyfinestudios.com/about/#contact](https://probablyfinestudios.com/about/#contact).

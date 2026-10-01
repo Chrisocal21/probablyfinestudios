@@ -1,5 +1,5 @@
 {
-  "name": "shaggy-series",
+  "name": "probablyfinestudios",
   "type": "module",
   "version": "0.9.0",
   "scripts": {
@@ -7,11 +7,20 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "deploy": "npm run build && npx wrangler pages deploy ./dist --project-name probablyfinestudios"
+    "deploy": "npm run build && npx wrangler pages deploy ./dist --project-name probablyfinestudios",
+    "icons": "node scripts/generate-icons.mjs",
+    "screens": "node scripts/capture-screens.mjs",
+    "check": "npm run build && node scripts/check-links.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/sora": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/sora": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.1.1",
+    "satori": "^0.33.5",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3"
   }
 }

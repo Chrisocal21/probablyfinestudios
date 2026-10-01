@@ -1,350 +1,557 @@
 ---
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
-import { teamMembers } from '../data/team';
-import { projects } from '../data/projects';
+import OpenTo from '../components/OpenTo.astro';
+import chrisPhoto from '../assets/chris.jpg';
+import { projects, shippedProjects, inProgressProjects } from '../data/projects';
+import { profile, principles, finePrint, lookFor, timeline, experience, beyondCode, getSkills } from '../data/profile';
+import { getContributions, GITHUB_USER } from '../data/github';
+import { site } from '../data/site';
 
-const founder = teamMembers[0];
-const allTools = founder.tools
-	? [
-		...(founder.tools.frontend ?? []),
-		...(founder.tools.backend ?? []),
-		...(founder.tools.devTools ?? []),
-		...(founder.tools.designDeploy ?? []),
-		...(founder.tools.apiIntegration ?? []),
-	]
-	: [];
+const skills = getSkills();
+const contributions = await getContributions();
+
+const levelColors = ['#18181b', '#312e81', '#4f46e5', '#818cf8', '#c7d2fe'];
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const formatDay = (date: string) =>
+	new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+
+// One label per month, placed on the first week that starts in it.
+const monthLabels: { week: number; label: string }[] = [];
+contributions.weeks.forEach((week, index) => {
+	const first = week.find(day => day !== null);
+	if (!first) return;
+	const month = Number(first.date.slice(5, 7)) - 1;
+	const previous = monthLabels[monthLabels.length - 1];
+	if (previous?.label === monthNames[month]) return;
+	if (previous && index - previous.week < 3) monthLabels.pop();
+	monthLabels.push({ week: index, label: monthNames[month] });
+});
+
+const stats = [
+	{ value: contributions.total.toLocaleString('en-US'), label: 'contributions in the last year' },
+	{ value: String(contributions.activeDays), label: 'days with code pushed' },
+	{ value: `${contributions.longestStreak} days`, label: 'longest streak' },
+	{ value: profile.publicRepos, label: 'public repositories' },
+];
+
+const social = [
+	{
+		label: 'GitHub',
+		note: `${profile.publicRepos} repos`,
+		href: profile.links.github,
+		path: 'M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z',
+	},
+	{
+		label: 'LinkedIn',
+		href: profile.links.linkedin,
+		path: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z',
+	},
+	{
+		label: 'Instagram',
+		href: profile.links.instagram,
+		path: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z',
+	},
+];
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'ProfilePage',
+	url: `${site.url}/about/`,
+	mainEntity: {
+		'@type': 'Person',
+		name: profile.name,
+		jobTitle: 'Founder and developer',
+		description: profile.hook,
+		image: `${site.url}/og/about.png`,
+		url: `${site.url}/about/`,
+		worksFor: { '@type': 'Organization', name: site.name, url: `${site.url}/` },
+		sameAs: Object.values(profile.links),
+		knowsAbout: skills.flatMap(group => group.skills.map(skill => skill.name)),
+	},
+};
+
+const projectTitles = Object.fromEntries(projects.map(project => [project.id, project.title]));
+
+const eyebrow = 'text-[11px] uppercase tracking-[0.2em] text-zinc-400 font-semibold';
+const card = 'bg-zinc-950 rounded-2xl border border-zinc-800 p-6 sm:p-8';
+const field = 'w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-indigo-300 focus:outline-none';
 ---
 
-<Layout title="About - Probably Fine Studios">
-	<Nav />
-
-	<section class="py-20 bg-black">
+<Layout
+	title="About Chris | Probably Fine Studios"
+	description="Chris is a photographer turned developer who started Probably Fine Studios solo and is growing it. The story, the day job, the skills, the GitHub activity, and how to work with him."
+	image="/og/about.png"
+	imageAlt={`${profile.name}, founder of ${site.name}. ${profile.headline}`}
+	type="profile"
+	jsonLd={jsonLd}
+>
+	<section class="py-12 md:py-20 bg-black">
 		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-			<!-- Header -->
-			<div class="text-center mb-12">
-				<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3" style="color: #a5b4fc">About</p>
-				<h1 class="text-4xl md:text-5xl font-bold mb-4 text-white tracking-tight">Who's Behind This</h1>
-				<p class="text-lg text-gray-400 max-w-xl mx-auto">
-					The talented <span class="line-through decoration-2 text-gray-500">people</span> <span class="text-white font-medium">person</span> behind Probably Fine Studios
-				</p>
-			</div>
-
-			<!-- Founder profile -->
-			<div class="mb-16">
-				<div class="bg-zinc-950 rounded-2xl border border-zinc-800 p-8">
-					<div class="flex flex-col sm:flex-row gap-6 sm:items-start mb-6">
-						<div class="w-16 h-16 rounded-2xl flex-shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-							<span class="text-white font-bold text-2xl select-none">{founder.name.charAt(0)}</span>
-						</div>
-						<div>
-							<h2 class="text-2xl font-bold text-white">{founder.name}</h2>
-							<p class="text-indigo-300 text-[11px] uppercase tracking-[0.2em] font-semibold mb-3">{founder.role}</p>
-							<p class="text-zinc-300 leading-relaxed max-w-2xl">{founder.bio}</p>
-						</div>
+			<!-- Intro -->
+			<div class="grid sm:grid-cols-[200px_1fr] gap-8 items-center mb-10">
+				<Image
+					src={chrisPhoto}
+					alt={`Portrait sketch of ${profile.name}`}
+					widths={[200, 300, 400, 600]}
+					sizes="(min-width: 640px) 200px, 160px"
+					loading="eager"
+					fetchpriority="high"
+					class="w-40 sm:w-full aspect-[4/5] object-cover object-top rounded-2xl border border-zinc-800 mx-auto"
+				/>
+				<div class="text-center sm:text-left">
+					<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-indigo-300">{profile.role}</p>
+					<h1 class="text-4xl md:text-5xl font-bold mb-4 text-white leading-[1.1]">{profile.headline}</h1>
+					<p class="text-lg text-zinc-300 leading-relaxed mb-6">{profile.hook}</p>
+					<div class="flex flex-wrap gap-3 justify-center sm:justify-start">
+						<a href="#contact" class="px-5 py-2.5 rounded-lg font-semibold text-sm text-black bg-white hover:bg-zinc-200 transition">Come build with me</a>
+						<a href="/portfolio/" class="px-5 py-2.5 rounded-lg font-semibold text-sm border border-white/25 text-white hover:bg-white/10 transition">See the work</a>
+						<a href="/resume/" class="px-5 py-2.5 rounded-lg font-semibold text-sm border border-white/25 text-white hover:bg-white/10 transition">Resume</a>
 					</div>
-
-					{founder.links && (
-						<div class="flex flex-wrap gap-2 mb-6">
-							{founder.links.github && (
-								<a href={founder.links.github} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-zinc-300 hover:text-white text-sm px-3 py-1.5 rounded-lg border border-zinc-800 hover:border-zinc-600 transition">
-									<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-									GitHub
-								</a>
-							)}
-							{founder.links.linkedin && (
-								<a href={founder.links.linkedin} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-zinc-300 hover:text-white text-sm px-3 py-1.5 rounded-lg border border-zinc-800 hover:border-zinc-600 transition">
-									<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-									LinkedIn
-								</a>
-							)}
-							{founder.links.instagram && (
-								<a href={founder.links.instagram} target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 text-zinc-300 hover:text-white text-sm px-3 py-1.5 rounded-lg border border-zinc-800 hover:border-zinc-600 transition">
-									<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-									Instagram
-								</a>
-							)}
-						</div>
-					)}
-
-					{allTools.length > 0 && (
-						<div>
-							<p class="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold mb-3">Tools & Technologies</p>
-							<div class="flex flex-wrap gap-2">
-								{allTools.map(tool => (
-									<span class="text-zinc-300 text-xs px-2.5 py-1 rounded-full border border-zinc-800">{tool}</span>
-								))}
-							</div>
-						</div>
-					)}
 				</div>
 			</div>
 
-			<!-- Divider -->
-			<div class="border-t border-zinc-800 mb-16"></div>
+			<!-- Page index -->
+			<nav aria-label="On this page" class="flex flex-wrap gap-2 justify-center sm:justify-start mb-12 text-xs">
+				{[
+					['#story', 'Story'],
+					['#day-shift', 'Day job'],
+					['#github', 'GitHub activity'],
+					['#skills', 'Skills'],
+					['#fine-print', 'The fine print'],
+					['#people', 'Who I work with'],
+					['#work', 'The work'],
+					['#contact', 'Contact'],
+				].map(([href, label]) => (
+					<a href={href} class="text-zinc-300 hover:text-white px-3 py-1.5 rounded-full border border-zinc-800 hover:border-zinc-600 transition">{label}</a>
+				))}
+			</nav>
 
-			<!-- About content -->
 			<div class="space-y-6">
-				<!-- Who We Are -->
-				<div class="bg-zinc-950 rounded-2xl p-8 border border-zinc-800">
-					<p class="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold mb-2">The Studio</p>
-					<h2 class="text-2xl font-bold mb-4 text-white">Who We Are</h2>
-					<p class="text-zinc-300 mb-4 leading-relaxed">
-						Probably Fine Studios is a one-person digital studio — Chris at the helm, building apps, tools, and products around ideas that feel worth building, using whatever combination of code, AI, and stubbornness gets the job done.
-					</p>
-					<p class="text-zinc-300 mb-6 leading-relaxed">
-						The name is honest. Nothing here claims to be perfect — but the work ships, the products are real, and they're probably fine.
-					</p>
 
-					<div class="flex flex-wrap gap-2">
-						<a
-							href="https://github.com/Chrisocal21?tab=repositories"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="bg-white/5 text-zinc-200 px-3 py-1.5 rounded-full text-xs border border-white/15 hover:border-white/30 transition"
-						>
-							45+ Repositories on GitHub
-						</a>
-						<span class="bg-white/5 text-zinc-300 px-3 py-1.5 rounded-full text-xs border border-white/10">
-							Mostly TypeScript
-						</span>
-						<span class="bg-white/5 text-zinc-300 px-3 py-1.5 rounded-full text-xs border border-white/10">
-							{projects.length} Shipped to Production
-						</span>
+				<!-- Story -->
+				<section id="story" class={`${card} scroll-mt-24`} aria-labelledby="story-heading">
+					<p class={`${eyebrow} mb-2`}>The short version</p>
+					<h2 id="story-heading" class="text-2xl font-bold mb-4 text-white">Camera first, code second</h2>
+					<div class="space-y-4 mb-8">
+						{profile.bio.map(paragraph => <p class="text-zinc-300 leading-relaxed">{paragraph}</p>)}
 					</div>
-				</div>
 
-				<!-- The Origin -->
-				<div class="bg-zinc-950 rounded-2xl p-8 border border-zinc-800">
-					<p class="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold mb-2">The Timeline</p>
-					<h2 class="text-2xl font-bold mb-6 text-white">How We Got Here</h2>
-					<div class="space-y-6">
-						<div class="flex gap-4">
-							<div class="flex-shrink-0 w-2 rounded-full" style="background: #d6d3d1"></div>
+					<ol class="grid sm:grid-cols-3 gap-4 mb-8">
+						{timeline.map((step, index) => (
+							<li class="border-t-2 pt-4" style={`border-color: ${step.accent}`}>
+								<p class="text-[11px] uppercase tracking-[0.2em] font-semibold mb-1" style={`color: ${step.accent}`}>{String(index + 1).padStart(2, '0')} · {step.tag}</p>
+								<strong class="text-white block mb-1.5">{step.title}</strong>
+								<p class="text-zinc-400 text-sm leading-relaxed">{step.body}</p>
+							</li>
+						))}
+					</ol>
+
+					<p class={`${eyebrow} mb-3`}>How I work</p>
+					<div class="grid sm:grid-cols-2 gap-x-8 gap-y-5">
+						{principles.map(item => (
 							<div>
-								<strong class="text-white text-lg block mb-1">ChrisOCPhoto — The Original</strong>
-								<p class="text-zinc-400">It started with photography. ChrisOCPhoto has been the home base for a long time — a personal portfolio built from scratch because nothing else felt right for the work. It's still going, still the OG.</p>
+								<strong class="text-white text-sm block mb-1">{item.title}</strong>
+								<p class="text-zinc-400 text-sm leading-relaxed">{item.body}</p>
 							</div>
-						</div>
-						<div class="flex gap-4">
-							<div class="flex-shrink-0 w-2 rounded-full" style="background: #e879f9"></div>
-							<div>
-								<strong class="text-white text-lg block mb-1">ChrisOCDigital — Where the Code Started</strong>
-								<p class="text-zinc-400">ChrisOCDigital grew out of that same creative energy, born when the code side kicked in. What started as building a better photography site turned into tools, scripts, programs, and experiments — a whole body of work taking shape under one roof. It was the pre-rebuild of ChrisOCPhoto and the stepping stone before Probably Fine Studios existed.</p>
-							</div>
-						</div>
-						<div class="flex gap-4">
-							<div class="flex-shrink-0 w-2 rounded-full" style="background: #8b5cf6"></div>
-							<div>
-								<strong class="text-white text-lg block mb-1">Probably Fine Studios — The Next Step</strong>
-								<p class="text-zinc-400">When the projects needed a proper home, Probably Fine Studios became that. A studio name for a body of work that had quietly grown into something real — recipe apps, maps, weather dashboards, field tools, a browser game, and more. Built with AI, shipped with care.</p>
-							</div>
-						</div>
+						))}
 					</div>
-				</div>
+				</section>
 
-				<!-- The Work -->
-				<div class="bg-zinc-950 rounded-2xl p-8 border border-zinc-800">
+				<!-- Day jobs -->
+				{experience.length > 0 && (
+					<section id="day-shift" class={`${card} scroll-mt-24`} aria-labelledby="day-shift-heading">
+						<p class={`${eyebrow} mb-2`}>The day shift</p>
+						<h2 id="day-shift-heading" class="text-2xl font-bold mb-2 text-white">The studio is the night shift</h2>
+						<p class="text-zinc-300 leading-relaxed mb-6 max-w-2xl">
+							Everything on this site gets built after hours. Here's where the hours go first.
+						</p>
+						<div class="space-y-6">
+							{experience.map(job => (
+								<div class="border-l-2 border-indigo-400/60 pl-4">
+									<div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+										<h3 class="text-lg font-bold text-white">
+											{job.url ? (
+												<a href={job.url} target="_blank" rel="noopener noreferrer" class="hover:underline">{job.org}<span class="sr-only"> (opens in a new tab)</span></a>
+											) : (
+												job.org
+											)}
+										</h3>
+										<p class="text-xs text-zinc-400">{job.period}</p>
+									</div>
+									<p class="text-sm text-indigo-200 mt-0.5">{job.title}</p>
+									{job.aside && <p class="text-zinc-400 text-sm leading-relaxed mt-2">{job.aside}</p>}
+								</div>
+							))}
+						</div>
+					</section>
+				)}
+
+				<!-- GitHub activity -->
+				<section id="github" class={`${card} scroll-mt-24`} aria-labelledby="github-heading">
 					<div class="flex items-start justify-between gap-4 mb-6 flex-wrap">
 						<div>
-							<p class="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold mb-2">The Portfolio</p>
-							<h2 class="text-2xl font-bold text-white">The Work</h2>
+							<p class={`${eyebrow} mb-2`}>Proof of work</p>
+							<h2 id="github-heading" class="text-2xl font-bold text-white">GitHub activity</h2>
 						</div>
-						<a href="/portfolio" class="text-sm text-zinc-400 hover:text-white transition flex items-center gap-1.5 mt-1">
-							View all {projects.length}
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-							</svg>
+						<a href={profile.links.github} target="_blank" rel="noopener noreferrer" class="text-sm text-zinc-300 hover:text-white transition mt-1 underline">
+							@{GITHUB_USER}<span class="sr-only"> on GitHub (opens in a new tab)</span>
 						</a>
 					</div>
+
+					<dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+						{stats.map(stat => (
+							<div class="flex flex-col-reverse justify-end">
+								<dt class="text-xs text-zinc-400 mt-1">{stat.label}</dt>
+								<dd class="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight">{stat.value}</dd>
+							</div>
+						))}
+					</dl>
+
+					<div id="contribution-scroll" class="overflow-x-auto pb-2" tabindex="0" role="group" aria-label="Contribution calendar, scrollable">
+						<div class="w-max mx-auto" role="img" aria-label={`GitHub contribution calendar: ${contributions.total} contributions in the last year across ${contributions.activeDays} days.`}>
+							<div class="grid text-[10px] text-zinc-400 mb-1.5 h-3" style={`grid-template-columns: repeat(${contributions.weeks.length}, 11px); column-gap: 3px`} aria-hidden="true">
+								{monthLabels.map(month => (
+									<span class="whitespace-nowrap" style={`grid-column-start: ${month.week + 1}; grid-row: 1`}>{month.label}</span>
+								))}
+							</div>
+							<div class="grid" style="grid-auto-flow: column; grid-template-rows: repeat(7, 11px); grid-auto-columns: 11px; gap: 3px">
+								{contributions.weeks.map(week =>
+									week.map(day =>
+										day ? (
+											<span
+												class="rounded-[2px]"
+												style={`background: ${levelColors[day.level] ?? levelColors[0]}`}
+												title={`${day.count} contribution${day.count === 1 ? '' : 's'} on ${formatDay(day.date)}`}
+											/>
+										) : (
+											<span />
+										)
+									)
+								)}
+							</div>
+						</div>
+					</div>
+
+					<div class="flex items-center justify-between gap-4 flex-wrap mt-3 text-xs text-zinc-400">
+						<span>
+							{contributions.bestDay && <>Busiest day: {contributions.bestDay.count} contributions on {formatDay(contributions.bestDay.date)}. Something was going either very well or very badly. </>}
+							On GitHub since {profile.githubSince}.
+						</span>
+						<span class="flex items-center gap-1" aria-hidden="true">
+							Less
+							{levelColors.map(color => <span class="w-[11px] h-[11px] rounded-[2px] inline-block" style={`background: ${color}`} />)}
+							More
+						</span>
+					</div>
+				</section>
+
+				<!-- Skills -->
+				<section id="skills" class={`${card} scroll-mt-24`} aria-labelledby="skills-heading">
+					<div class="flex items-start justify-between gap-4 flex-wrap mb-2">
+						<div>
+							<p class={`${eyebrow} mb-2`}>The living resume</p>
+							<h2 id="skills-heading" class="text-2xl font-bold text-white">What I build with</h2>
+						</div>
+						<a href="/resume/" class="text-sm text-zinc-300 hover:text-white transition mt-1 underline">One-page resume</a>
+					</div>
+					<p class="text-zinc-400 text-sm mb-6 max-w-2xl">
+						Nothing here is self-reported. It's pulled straight from the tech stacks of the {projects.length} projects on this site, so it grows as I do. The number is how many projects used it; click one to see the receipts.
+					</p>
+
+					<div class="space-y-5">
+						{skills.map(group => (
+							<div class="grid sm:grid-cols-[190px_1fr] gap-2 sm:gap-4">
+								<h3 class="text-sm text-zinc-400 pt-1 font-sans font-normal tracking-normal">{group.group}</h3>
+								<ul class="flex flex-wrap gap-2">
+									{group.skills.map(skill => (
+										<li>
+											<a
+												href={`/portfolio/?tech=${encodeURIComponent(skill.name)}`}
+												title={`See the ${skill.count} project${skill.count === 1 ? '' : 's'} built with ${skill.name}`}
+												class={`text-xs pl-2.5 pr-1.5 py-1 rounded-full border flex items-center gap-1.5 transition hover:border-zinc-400 hover:text-white ${skill.learning ? 'border-dashed border-zinc-600 text-zinc-300' : 'border-zinc-700 text-zinc-100'}`}
+											>
+												{skill.name}
+												<span class="text-[10px] tabular-nums px-1.5 py-0.5 rounded-full bg-white/10 text-zinc-200">{skill.count}</span>
+											</a>
+										</li>
+									))}
+								</ul>
+							</div>
+						))}
+						<div class="grid sm:grid-cols-[190px_1fr] gap-2 sm:gap-4">
+							<h3 class="text-sm text-zinc-400 pt-1 font-sans font-normal tracking-normal">Beyond the code</h3>
+							<ul class="flex flex-wrap gap-2">
+								{beyondCode.map(item => (
+									<li class="text-xs px-2.5 py-1 rounded-full border border-zinc-700 text-zinc-100">{item}</li>
+								))}
+							</ul>
+						</div>
+					</div>
+
+					<p class="text-xs text-zinc-400 mt-6">
+						<span class="inline-block align-middle w-6 border-t border-dashed border-zinc-400 mr-1.5"></span>
+						Dashed outline = picking it up now, used only in projects still in progress.
+					</p>
+				</section>
+
+				<!-- The fine print -->
+				<section id="fine-print" class={`${card} scroll-mt-24`} aria-labelledby="fine-print-heading">
+					<p class={`${eyebrow} mb-2`}>The fine print</p>
+					<h2 id="fine-print-heading" class="text-2xl font-bold mb-2 text-white">Things you should probably know</h2>
+					<p class="text-zinc-300 leading-relaxed mb-6 max-w-2xl">
+						All true. I checked. Mostly.
+					</p>
+					<ul class="grid sm:grid-cols-2 gap-x-8 gap-y-4">
+						{finePrint.map((fact, index) => (
+							<li class="flex gap-3 text-sm text-zinc-300 leading-relaxed">
+								<span class="font-display font-bold text-indigo-300 tabular-nums shrink-0" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+								<span>{fact}</span>
+							</li>
+						))}
+					</ul>
+				</section>
+
+				<!-- People -->
+				<section id="people" class={`${card} scroll-mt-24`} aria-labelledby="people-heading">
+					<p class={`${eyebrow} mb-2`}>Working together</p>
+					<h2 id="people-heading" class="text-2xl font-bold mb-2 text-white">This was never supposed to stay a one-person studio</h2>
+					<p class="text-zinc-300 leading-relaxed mb-8 max-w-2xl">
+						I started this solo because that's how most things start: one person, too many ideas, and nobody around to say "maybe don't." Everything here was built that way. The next things are bigger, so I'm looking for people to build them with (and, occasionally, to say "maybe don't").
+					</p>
+
+					<div class="mb-10">
+						<OpenTo samePage />
+					</div>
+
+					<h3 class={`${eyebrow} mb-4 font-sans`}>What I look for in people</h3>
+					<div class="grid sm:grid-cols-2 gap-x-8 gap-y-5">
+						{lookFor.map(item => (
+							<div class="border-l-2 border-zinc-700 pl-4">
+								<strong class="text-white block mb-1">{item.title}</strong>
+								<p class="text-zinc-400 text-sm leading-relaxed">{item.body}</p>
+							</div>
+						))}
+					</div>
+				</section>
+
+				<!-- The Work -->
+				<section id="work" class={`${card} scroll-mt-24`} aria-labelledby="work-heading">
+					<div class="flex items-start justify-between gap-4 mb-6 flex-wrap">
+						<div>
+							<p class={`${eyebrow} mb-2`}>The portfolio</p>
+							<h2 id="work-heading" class="text-2xl font-bold text-white">{shippedProjects.length} shipped, {inProgressProjects.length} in the works</h2>
+						</div>
+						<a href="/portfolio/" class="text-sm text-zinc-300 hover:text-white transition mt-1 underline">View all {projects.length}</a>
+					</div>
 					<div class="grid sm:grid-cols-2 gap-x-6 gap-y-4">
-						{projects.filter(p => !p.wip).map(project => (
-							<a href={`/portfolio/${project.id}`} class="border-l-2 pl-4 block group" style={`border-color: ${project.theme?.accent ?? '#6366f1'}`}>
+						{shippedProjects.map(project => (
+							<a href={`/portfolio/${project.id}/`} class="border-l-2 pl-4 block group" style={`border-color: ${project.theme?.accent ?? '#6366f1'}`}>
 								<strong class="text-white group-hover:underline">{project.title}</strong>
 								<p class="text-zinc-400 text-sm mt-1">{project.description}</p>
 							</a>
 						))}
 					</div>
-					<p class="text-zinc-500 text-sm mt-6">
-						Those are the shipped, polished ones. There's also a growing shelf of in-progress experiments —
-						<a href="/portfolio" class="text-zinc-300 hover:text-white underline">{projects.filter(p => p.wip).length} in development</a> right now —
-						plus <a href="https://github.com/Chrisocal21?tab=repositories" target="_blank" rel="noopener noreferrer" class="text-zinc-300 hover:text-white underline">45+ repos on GitHub</a> of scripts and half-finished ideas that sometimes turn into the next thing on this page.
+					<p class="text-zinc-400 text-sm mt-6">
+						Still cooking:{' '}
+						{inProgressProjects.map((project, index) => (
+							<>
+								<a href={`/portfolio/${project.id}/`} class="text-zinc-200 hover:text-white underline">{project.title}</a>{index < inProgressProjects.length - 1 ? ', ' : '.'}
+							</>
+						))}
 					</p>
-				</div>
+				</section>
 			</div>
 
-			<!-- Divider -->
 			<div class="border-t border-zinc-800 my-16"></div>
 
 			<!-- Contact -->
-			<div id="contact" class="scroll-mt-24">
+			<section id="contact" class="scroll-mt-24" aria-labelledby="contact-heading">
 				<div class="text-center mb-12">
-					<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3" style="color: #a5b4fc">Get In Touch</p>
-					<h2 class="text-4xl font-bold mb-4 text-white">Let's build something</h2>
-					<p class="text-xl text-gray-400">
-						One person. Real work. Drop me a line.
+					<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-indigo-300">Get in touch</p>
+					<h2 id="contact-heading" class="text-4xl font-bold mb-4 text-white">Let's build something</h2>
+					<p class="text-xl text-zinc-400">
+						Collaboration, partnership, a project, a first break, or just a hello. I read everything. (It's a small inbox.)
 					</p>
 				</div>
 
 				<div class="grid lg:grid-cols-[1fr_320px] gap-6">
-					<!-- Form -->
 					<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-6">
 						<div class="mb-5">
-							<p class="text-xs uppercase tracking-[0.18em] text-zinc-500 mb-2">Contact Form</p>
 							<h3 class="text-2xl font-bold text-white">Send a message</h3>
-							<p class="text-zinc-400 mt-2 max-w-xl">If you have a project, product, or weirdly specific idea that needs building, send it here. It goes straight into the inbox.</p>
+							<p class="text-zinc-400 mt-2 max-w-xl">A project, a partnership, or a weirdly specific idea that needs building: send it here. It goes straight into my inbox.</p>
 						</div>
 
-						<form id="contact-form" class="space-y-4">
+						<form id="contact-form" class="space-y-4" data-projects={JSON.stringify(projectTitles)}>
+							<p id="contactContext" class="hidden items-center gap-2 text-sm text-zinc-200 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+								<span>About <strong id="contactContextName" class="text-white"></strong></span>
+								<button type="button" id="contactContextClear" class="ml-auto text-xs text-zinc-400 underline hover:text-white">Remove</button>
+							</p>
 							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div>
 									<label for="contactName" class="block text-sm text-zinc-300 mb-1">Name</label>
-									<input id="contactName" name="contactName" type="text" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white" placeholder="Jane Doe" required />
+									<input id="contactName" name="contactName" type="text" autocomplete="name" class={field} placeholder="Jane Doe" required />
 								</div>
 								<div>
 									<label for="contactEmail" class="block text-sm text-zinc-300 mb-1">Email</label>
-									<input id="contactEmail" name="contactEmail" type="email" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white" placeholder="jane@example.com" required />
+									<input id="contactEmail" name="contactEmail" type="email" autocomplete="email" class={field} placeholder="jane@example.com" required />
 								</div>
 							</div>
 							<div>
+								<label for="contactTopic" class="block text-sm text-zinc-300 mb-1">What's this about?</label>
+								<select id="contactTopic" name="contactTopic" class={field}>
+									<option value="">Just saying hi</option>
+									<option value="collaboration">Collaboration</option>
+									<option value="partnership">Business partnership</option>
+									<option value="project">A project I need built</option>
+									<option value="learn">I want to learn or lend a hand</option>
+								</select>
+							</div>
+							<div>
 								<label for="contactMessage" class="block text-sm text-zinc-300 mb-1">Message</label>
-								<textarea id="contactMessage" name="contactMessage" rows="5" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-3 text-sm text-white" placeholder="Tell me what you need built." required></textarea>
+								<textarea id="contactMessage" name="contactMessage" rows="5" class={field} placeholder="What do you want to build, and where do I come in?" required></textarea>
 							</div>
 							<div class="hidden" aria-hidden="true">
 								<label for="contactCompany">Company</label>
 								<input id="contactCompany" name="contactCompany" type="text" tabindex="-1" autocomplete="off" />
 							</div>
 							<div class="flex flex-wrap items-center gap-3">
-								<button id="contactSendBtn" type="submit" class="px-5 py-2.5 rounded-lg font-semibold text-black bg-white hover:bg-gray-200 transition">Send Message</button>
-								<span id="contactSendState" class="text-sm text-zinc-400">Goes straight to the inbox.</span>
+								<button id="contactSendBtn" type="submit" class="px-5 py-2.5 rounded-lg font-semibold text-black bg-white hover:bg-zinc-200 transition">Send it</button>
+								<span id="contactSendState" class="text-sm text-zinc-400" role="status" aria-live="polite">Goes straight to my inbox. No robots in between.</span>
 							</div>
 						</form>
 					</div>
 
-					<!-- Sidebar: direct + elsewhere -->
 					<div class="flex flex-col gap-4">
 						<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
-							<p class="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold mb-3">Direct</p>
-							<a href="mailto:hello@probablyfinestudios.com" class="flex items-center gap-3 group">
-								<div class="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
-									<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-									</svg>
-								</div>
-								<span class="text-sm text-white group-hover:text-gray-300 transition font-medium break-all">hello@probablyfinestudios.com</span>
-							</a>
+							<h3 class={`${eyebrow} mb-3 font-sans`}>How this works</h3>
+							<p class="text-sm text-zinc-300 leading-relaxed">The form is the best way to reach me. Your message lands in my inbox, and I reply by email to the address you leave. No auto-replies, no "your message is important to us."</p>
+							<p class="text-xs text-zinc-400 leading-relaxed mt-3">I only keep what you type here, and only to reply. Please don't send anything confidential. <a href="/legal/#privacy" class="underline hover:text-white">Privacy and terms</a>.</p>
 						</div>
 
 						<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
-							<p class="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold mb-3">Elsewhere</p>
+							<h3 class={`${eyebrow} mb-3 font-sans`}>Elsewhere</h3>
 							<div class="flex flex-col gap-3">
-								<a href="https://github.com/Chrisocal21" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 group">
-									<div class="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
-										<svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-											<path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-										</svg>
-									</div>
-									<span>
-										<span class="block text-sm text-white group-hover:text-gray-300 transition font-medium">GitHub</span>
-										<span class="block text-xs text-zinc-500">45+ repos</span>
-									</span>
-								</a>
-								<a href="https://www.linkedin.com/in/chrisocphoto" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 group">
-									<div class="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
-										<svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-											<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-										</svg>
-									</div>
-									<span class="text-sm text-white group-hover:text-gray-300 transition font-medium">LinkedIn</span>
-								</a>
-								<a href="https://www.instagram.com/chrisocphoto" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 group">
-									<div class="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
-										<svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-											<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-										</svg>
-									</div>
-									<span class="text-sm text-white group-hover:text-gray-300 transition font-medium">Instagram</span>
-								</a>
+								{social.map(item => (
+									<a href={item.href} target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 group">
+										<span class="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
+											<svg class="w-4 h-4 text-zinc-300" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d={item.path} /></svg>
+										</span>
+										<span>
+											<span class="block text-sm text-white group-hover:underline font-medium">{item.label}<span class="sr-only"> (opens in a new tab)</span></span>
+											{item.note && <span class="block text-xs text-zinc-400">{item.note}</span>}
+										</span>
+									</a>
+								))}
 							</div>
 						</div>
 
 						<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
-							<p class="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-semibold mb-3">Snapshot</p>
-							<div class="flex flex-wrap gap-2">
-								<span class="bg-white/5 text-zinc-300 px-2.5 py-1 rounded-full text-xs border border-white/10">{projects.length} Shipped</span>
-								<span class="bg-white/5 text-zinc-300 px-2.5 py-1 rounded-full text-xs border border-white/10">45+ Repos</span>
-								<span class="bg-white/5 text-zinc-300 px-2.5 py-1 rounded-full text-xs border border-white/10">Solo Developer</span>
-							</div>
+							<h3 class={`${eyebrow} mb-3 font-sans`}>Snapshot</h3>
+							<ul class="flex flex-wrap gap-2">
+								<li class="bg-white/5 text-zinc-200 px-2.5 py-1 rounded-full text-xs border border-white/10">{shippedProjects.length} shipped</li>
+								<li class="bg-white/5 text-zinc-200 px-2.5 py-1 rounded-full text-xs border border-white/10">{profile.publicRepos} repos</li>
+								<li class="bg-white/5 text-zinc-200 px-2.5 py-1 rounded-full text-xs border border-white/10">Team of 1 (for now)</li>
+							</ul>
 						</div>
 					</div>
 				</div>
-			</div>
+			</section>
 
 		</div>
 	</section>
 
-	<script>
-		// @ts-nocheck
-		const messageEndpoint = 'https://mail.probablyfinestudios.com/api/public/messages';
-		const contactForm = document.getElementById('contact-form');
-		const contactSendBtn = document.getElementById('contactSendBtn');
-		const contactSendState = document.getElementById('contactSendState');
+<script>
+	const messageEndpoint = 'https://mail.probablyfinestudios.com/api/public/messages';
+	const form = document.getElementById('contact-form');
+	const sendButton = document.getElementById('contactSendBtn');
+	const sendState = document.getElementById('contactSendState');
+	const topicSelect = document.getElementById('contactTopic');
+	const context = document.getElementById('contactContext');
+	const contextName = document.getElementById('contactContextName');
+	const contextClear = document.getElementById('contactContextClear');
 
-		contactForm?.addEventListener('submit', async (event) => {
-			event.preventDefault();
-			if (!(contactForm instanceof HTMLFormElement)) return;
-			if (!contactSendBtn || !contactSendState) return;
+	// Which project the visitor is writing about, when they arrived from a case study.
+	let aboutProject = '';
 
-			const nameInput = contactForm.elements.namedItem('contactName');
-			const emailInput = contactForm.elements.namedItem('contactEmail');
-			const messageInput = contactForm.elements.namedItem('contactMessage');
-			const companyInput = contactForm.elements.namedItem('contactCompany');
-			const name = nameInput instanceof HTMLInputElement ? nameInput.value : '';
-			const email = emailInput instanceof HTMLInputElement ? emailInput.value : '';
-			const message = messageInput instanceof HTMLTextAreaElement ? messageInput.value : '';
-			const company = companyInput instanceof HTMLInputElement ? companyInput.value : '';
+	function setProject(title: string) {
+		aboutProject = title;
+		if (contextName) contextName.textContent = title;
+		context?.classList.toggle('hidden', !title);
+		context?.classList.toggle('flex', Boolean(title));
+	}
 
-			contactSendBtn.setAttribute('disabled', 'true');
-			contactSendBtn.classList.add('opacity-60', 'cursor-not-allowed');
-			contactSendState.textContent = 'Sending message...';
+	function setTopic(value: string | null | undefined) {
+		if (!(topicSelect instanceof HTMLSelectElement) || !value) return;
+		if (Array.from(topicSelect.options).some(option => option.value === value)) topicSelect.value = value;
+	}
 
-			try {
-				const response = await fetch(messageEndpoint, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						source_site: 'probablyfinestudios',
-						name,
-						email,
-						message,
-						company,
-					}),
-				});
+	// Links elsewhere on the site arrive as /about/?topic=collaboration&project=burrow#contact
+	const params = new URLSearchParams(window.location.search);
+	setTopic(params.get('topic'));
+	if (form instanceof HTMLFormElement) {
+		const titles: Record<string, string> = JSON.parse(form.dataset.projects ?? '{}');
+		const title = titles[params.get('project') ?? ''];
+		if (title) setProject(title);
+	}
+	contextClear?.addEventListener('click', () => setProject(''));
 
-				const text = await response.text();
-				let parsed = text;
-				try {
-					parsed = JSON.parse(text);
-				} catch {
-					parsed = text;
-				}
+	document.querySelectorAll<HTMLAnchorElement>('a[data-topic]').forEach(link => {
+		link.addEventListener('click', () => setTopic(link.dataset.topic));
+	});
 
-				contactSendState.textContent = response.ok ? 'Message sent successfully.' : 'Request failed.';
-				if (response.ok) {
-					contactForm.reset();
-				}
-			} catch (error) {
-				contactSendState.textContent = 'Network error.';
-			} finally {
-				contactSendBtn.removeAttribute('disabled');
-				contactSendBtn.classList.remove('opacity-60', 'cursor-not-allowed');
-			}
+	// Start the contribution calendar on the most recent weeks when it overflows (mobile).
+	const contributionScroll = document.getElementById('contribution-scroll');
+	if (contributionScroll) {
+		requestAnimationFrame(() => {
+			contributionScroll.scrollLeft = contributionScroll.scrollWidth;
 		});
-	</script>
+	}
 
-	<Footer />
+	form?.addEventListener('submit', async event => {
+		event.preventDefault();
+		if (!(form instanceof HTMLFormElement) || !sendButton || !sendState) return;
+
+		const data = new FormData(form);
+		const message = String(data.get('contactMessage') ?? '');
+		const topic = topicSelect instanceof HTMLSelectElement && topicSelect.value ? topicSelect.selectedOptions[0].textContent : '';
+		const tags = [topic, aboutProject].filter(Boolean).join(' · ');
+
+		sendButton.setAttribute('disabled', 'true');
+		sendButton.classList.add('opacity-60', 'cursor-not-allowed');
+		sendState.className = 'text-sm text-zinc-400';
+		sendState.textContent = 'Sending...';
+
+		try {
+			const response = await fetch(messageEndpoint, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					source_site: 'probablyfinestudios',
+					name: String(data.get('contactName') ?? ''),
+					email: String(data.get('contactEmail') ?? ''),
+					message: tags ? `[${tags}] ${message}` : message,
+					company: String(data.get('contactCompany') ?? ''),
+				}),
+			});
+
+			if (response.ok) {
+				form.reset();
+				setProject('');
+				sendState.className = 'text-sm text-emerald-300';
+				sendState.textContent = "Sent. I'll reply by email. Cheers!";
+			} else {
+				sendState.className = 'text-sm text-rose-300';
+				sendState.textContent = "That didn't send, which is not fine. Please try again in a minute.";
+			}
+		} catch {
+			sendState.className = 'text-sm text-rose-300';
+			sendState.textContent = "Couldn't reach the server. Check your connection and try again.";
+		} finally {
+			sendButton.removeAttribute('disabled');
+			sendButton.classList.remove('opacity-60', 'cursor-not-allowed');
+		}
+	});
+</script>
 </Layout>

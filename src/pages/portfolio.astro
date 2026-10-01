@@ -1,43 +1,180 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
 import ProjectSection from '../components/ProjectSection.astro';
-import { projects } from '../data/projects';
+import { projects, shippedProjects, inProgressProjects } from '../data/projects';
+import { site, contactLink } from '../data/site';
 
-const shipped = projects.filter(p => !p.wip);
-const exploring = projects.filter(p => p.wip);
+// Every technology used across the projects, most-used first.
+const usage = new Map<string, number>();
+for (const project of projects) {
+	for (const tech of project.stack ?? []) usage.set(tech, (usage.get(tech) ?? 0) + 1);
+}
+const techs = [...usage.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'CollectionPage',
+	name: 'Projects by Probably Fine Studios',
+	url: `${site.url}/portfolio/`,
+	mainEntity: {
+		'@type': 'ItemList',
+		itemListElement: projects.map((project, index) => ({
+			'@type': 'ListItem',
+			position: index + 1,
+			name: project.title,
+			url: `${site.url}/portfolio/${project.id}/`,
+		})),
+	},
+};
 ---
 
-<Layout title="Portfolio - Probably Fine Studios">
-	<Nav />
-
-	<section class="py-20 bg-black">
+<Layout
+	title="Projects | Probably Fine Studios"
+	description={`All ${projects.length} projects from Probably Fine Studios: ${shippedProjects.length} shipped and live, ${inProgressProjects.length} in development. Web apps, tools, and games, each with a case study.`}
+	jsonLd={jsonLd}
+>
+	<section class="py-16 md:py-20 bg-black">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<div class="text-center mb-16">
-				<h1 class="text-5xl font-bold mb-4 text-white">All Projects</h1>
-				<p class="text-xl text-gray-400">Here's what shipped. Here's what's next.</p>
+			<div class="text-center mb-12">
+				<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-indigo-300">The work</p>
+				<h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">All Projects</h1>
+				<p class="text-lg md:text-xl text-zinc-400">Here's what shipped. Here's what's next. Here's what I probably shouldn't have started.</p>
+			</div>
+
+			<!-- Tech filter (revealed by the script below; without JavaScript every project simply shows) -->
+			<div id="tech-filter" class="hidden mb-12">
+				<div class="flex flex-wrap items-center justify-center gap-2" role="group" aria-label="Filter projects by technology">
+					<button type="button" data-tech="" aria-pressed="true" class="tech-chip">All <span class="tech-count">{projects.length}</span></button>
+					{techs.map(([tech, count]) => (
+						<button type="button" data-tech={tech} data-minor={count < 2 ? 'true' : undefined} aria-pressed="false" class={`tech-chip ${count < 2 ? 'hidden' : ''}`}>
+							{tech} <span class="tech-count">{count}</span>
+						</button>
+					))}
+				</div>
+				<p id="tech-status" class="text-center text-sm text-zinc-400 mt-4 min-h-5" aria-live="polite"></p>
 			</div>
 
 			<ProjectSection
 				id="shipped"
 				title="Shipped & Live"
-				subtitle="Real products, up and running. Go click around."
-				projects={shipped}
+				subtitle="Real products, up and running. Go click around. I'll wait."
+				projects={shippedProjects}
 				variant="shipped"
 			/>
 
-			<div class="my-16 border-t border-zinc-800/70"></div>
+			<div class="section-divider my-16 border-t border-zinc-800/70"></div>
 
 			<ProjectSection
 				id="exploring"
 				title="Exploring & In Progress"
-				subtitle="Ideas I'm still poking at. Some will ship, some won't."
-				projects={exploring}
+				subtitle="Ideas I'm still poking at. Some will ship, some won't. All of them seemed like a good idea at the time."
+				projects={inProgressProjects}
 				variant="exploring"
 			/>
+
+			<div class="mt-20 rounded-2xl border border-zinc-800 bg-zinc-950 p-8 sm:p-10 text-center">
+				<h2 class="text-2xl md:text-3xl font-bold text-white mb-3">See something you'd want to build on?</h2>
+				<p class="text-zinc-300 mb-6 max-w-xl mx-auto">Use it, break it, partner on it, or bring me the next one. Every case study ends with who I'd most like to hear from.</p>
+				<a href={contactLink({ topic: 'collaboration' })} class="inline-block px-6 py-3 rounded-lg font-semibold text-sm bg-white text-black hover:bg-zinc-200 transition">Come build with me</a>
+			</div>
 		</div>
 	</section>
 
-	<Footer />
+<style is:global>
+	.tech-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.8125rem;
+		padding: 0.375rem 0.5rem 0.375rem 0.75rem;
+		border-radius: 9999px;
+		border: 1px solid #3f3f46;
+		color: #d4d4d8;
+		cursor: pointer;
+		transition: background-color 150ms, border-color 150ms, color 150ms;
+	}
+	.tech-chip.hidden {
+		display: none;
+	}
+	.tech-chip:hover {
+		border-color: #71717a;
+		color: #fff;
+	}
+	.tech-chip[aria-pressed='true'] {
+		background: #fff;
+		border-color: #fff;
+		color: #000;
+		font-weight: 600;
+	}
+	.tech-count {
+		font-size: 0.6875rem;
+		font-variant-numeric: tabular-nums;
+		padding: 0.05rem 0.4rem;
+		border-radius: 9999px;
+		background: rgba(255, 255, 255, 0.1);
+	}
+	.tech-chip[aria-pressed='true'] .tech-count {
+		background: rgba(0, 0, 0, 0.12);
+	}
+</style>
+
+<script>
+	const filter = document.getElementById('tech-filter');
+	const status = document.getElementById('tech-status');
+	const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('.tech-chip'));
+	const cards = Array.from(document.querySelectorAll<HTMLElement>('.project-card'));
+	const sections = Array.from(document.querySelectorAll<HTMLElement>('.project-section'));
+	const divider = document.querySelector<HTMLElement>('.section-divider');
+
+	function apply(tech: string, updateUrl: boolean) {
+		const known = chips.some(chip => chip.dataset.tech === tech);
+		const active = known ? tech : '';
+
+		for (const chip of chips) {
+			const pressed = chip.dataset.tech === active;
+			chip.setAttribute('aria-pressed', String(pressed));
+			// Technologies used in a single project only get a chip while they are the active filter.
+			if (chip.dataset.minor) chip.classList.toggle('hidden', !pressed);
+		}
+
+		let shown = 0;
+		for (const card of cards) {
+			const match = !active || (card.dataset.stack ?? '').split('|').includes(active);
+			card.classList.toggle('hidden', !match);
+			if (match) shown++;
+		}
+
+		let visibleSections = 0;
+		for (const section of sections) {
+			const count = section.querySelectorAll('.project-card:not(.hidden)').length;
+			section.classList.toggle('hidden', count === 0);
+			const counter = section.querySelector('.project-count');
+			if (counter) counter.textContent = String(count);
+			if (count > 0) visibleSections++;
+		}
+		divider?.classList.toggle('hidden', visibleSections < 2);
+
+		if (status) {
+			status.textContent = active ? `${shown} of ${cards.length} projects built with ${active}` : '';
+		}
+
+		if (updateUrl) {
+			const url = new URL(window.location.href);
+			if (active) url.searchParams.set('tech', active);
+			else url.searchParams.delete('tech');
+			history.replaceState(null, '', url);
+		}
+	}
+
+	if (filter) {
+		filter.classList.remove('hidden');
+		for (const chip of chips) {
+			chip.addEventListener('click', () => {
+				const tech = chip.dataset.tech ?? '';
+				apply(chip.getAttribute('aria-pressed') === 'true' ? '' : tech, true);
+			});
+		}
+		apply(new URLSearchParams(window.location.search).get('tech') ?? '', false);
+	}
+</script>
 </Layout>

@@ -1,0 +1,140 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../data/site';
+
+/** Change this whenever the wording below changes. */
+const updated = 'October 1, 2026';
+
+const sections = [
+	{
+		id: 'as-is',
+		title: 'Everything here is provided as is',
+		body: [
+			`This site, and every project it links to, is offered as is and as available, with no warranties of any kind, express or implied. That includes any warranty that something is accurate, fit for a particular purpose, uninterrupted, or free of bugs.`,
+			`Projects marked "in development" are exactly that. They can change, break, lose data, or disappear without notice. Don't rely on them for anything that matters.`,
+			`To the fullest extent the law allows, ${site.name} and Chris are not liable for any loss or damage that comes from using this site, the projects it links to, or anything downloaded from it. You use them at your own risk.`,
+		],
+	},
+	{
+		id: 'not-advice',
+		title: 'Nothing here is professional advice',
+		body: [
+			`The tools are tools. Their output is a starting point for you to check, not an expert opinion.`,
+		],
+		list: [
+			`Standalone generates files for lasers, 3D printers, and CNC machines. Those machines can start fires and injure people. Check every dimension and setting, run a test piece, follow your machine's safety instructions, and never leave one running unattended. You are responsible for what you cut.`,
+			`Ping is an AI conversation partner. It is not therapy, medical care, or a crisis service. If you are in crisis, contact your local emergency number or a crisis line.`,
+			`WX shows weather data from third parties. Don't use it to make safety decisions; use official forecasts and warnings.`,
+			`SplitNote does arithmetic. It is not financial or tax advice.`,
+			`FieldKit helps with quotes and invoices. It is not legal, tax, or accounting advice.`,
+			`Not A Cable is desktop software that moves files over your own Wi-Fi. Use it on a network you trust, and keep your own backups.`,
+			`Anything a project says with AI can be wrong. Check it before you act on it.`,
+		],
+	},
+	{
+		id: 'work',
+		title: 'Getting in touch is not a contract',
+		body: [
+			`Nothing on this site is a job offer, an offer of employment, or a promise of pay, equity, or credit. "Collaborator", "partner", and "eager learner" describe conversations I'd like to have, not legal relationships.`,
+			`If we do decide to work together, the terms (who does what, who owns what, and whether money is involved) get agreed in writing before any work starts.`,
+			`If you send me an idea, I'm glad to hear it, but please don't send anything confidential. I may already be working on something similar, and sending an idea doesn't create any obligation or agreement between us.`,
+		],
+	},
+	{
+		id: 'names',
+		title: 'Names, trademarks, and who I speak for',
+		body: [
+			`Adobe, Illustrator, and Photoshop are trademarks of Adobe Inc. Other product and company names mentioned here (OpenAI, Cloudflare, Vercel, GitHub, LightBurn, and the rest) belong to their owners. Mentioning them means I use them, not that they sponsor, endorse, or are affiliated with ${site.name}.`,
+			`${site.name} is my own independent project. It is separate from my employers and from the organizations named on the About and Resume pages, and nothing here speaks for them.`,
+			`Unless a project says otherwise, the text, code, and images on this site are © ${site.name}. Projects that live on their own websites may have their own terms and privacy notices; those apply there.`,
+			`Links to other websites are there for convenience. I don't control them and I'm not responsible for what's on them.`,
+		],
+	},
+];
+
+const privacy = [
+	{
+		term: 'What the contact form collects',
+		detail: `The name, email address, and message you type in, plus the time you sent it. That's it.`,
+	},
+	{
+		term: 'Where it goes',
+		detail: `Into a private inbox that I run on Cloudflare. I use it to read your message and reply to you. I don't sell it, share it, or add you to a mailing list.`,
+	},
+	{
+		term: 'Analytics',
+		detail: `The site uses Cloudflare Web Analytics, which counts visits without cookies and without tracking you across other sites.`,
+	},
+	{
+		term: 'Cookies and trackers',
+		detail: `This site sets no cookies and has no ad trackers. The fonts are served from this site, not from a third party.`,
+	},
+	{
+		term: 'Hosting',
+		detail: `The site is served by Cloudflare (and a preview copy by Vercel). Like any web host, they process technical data such as your IP address to deliver pages and stop abuse.`,
+	},
+	{
+		term: 'Deleting your message',
+		detail: `Send another message through the contact form asking me to delete what you sent, and I will.`,
+	},
+	{
+		term: 'Kids',
+		detail: `This site isn't aimed at children under 13, and I don't knowingly collect their information.`,
+	},
+];
+---
+
+<Layout
+	title={`The legal bit | ${site.name}`}
+	description={`Terms, disclaimers, and privacy for ${site.name}: everything is provided as is, nothing is professional advice, and the contact form only collects what you type into it.`}
+>
+	<div class="py-12 md:py-20 bg-black">
+		<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+			<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-indigo-300">Terms, disclaimers, and privacy</p>
+			<h1 class="text-4xl md:text-5xl font-bold text-white mb-5">The legal bit</h1>
+			<p class="text-lg text-zinc-300 leading-relaxed mb-3">
+				The studio is called Probably Fine. A lawyer would like me to point out that "probably" is doing real work in that name. This is the one page where I don't joke around, so here it is in plain English.
+			</p>
+			<p class="text-sm text-zinc-400 mb-10">Last updated {updated}. By using this site you agree to what's on this page.</p>
+
+			<nav aria-label="On this page" class="flex flex-wrap gap-2 mb-12 text-xs">
+				{[...sections.map(section => [`#${section.id}`, section.title]), ['#privacy', 'Privacy']].map(([href, label]) => (
+					<a href={href} class="text-zinc-300 hover:text-white px-3 py-1.5 rounded-full border border-zinc-800 hover:border-zinc-600 transition">{label}</a>
+				))}
+			</nav>
+
+			<div class="space-y-6">
+				{sections.map(section => (
+					<section id={section.id} class="bg-zinc-950 rounded-2xl border border-zinc-800 p-6 sm:p-8 scroll-mt-24" aria-labelledby={`${section.id}-heading`}>
+						<h2 id={`${section.id}-heading`} class="text-2xl font-bold text-white mb-4">{section.title}</h2>
+						<div class="space-y-4">
+							{section.body.map(paragraph => <p class="text-zinc-300 leading-relaxed">{paragraph}</p>)}
+						</div>
+						{section.list && (
+							<ul class="list-disc pl-5 mt-4 space-y-2.5 text-zinc-300 leading-relaxed">
+								{section.list.map(item => <li>{item}</li>)}
+							</ul>
+						)}
+					</section>
+				))}
+
+				<section id="privacy" class="bg-zinc-950 rounded-2xl border border-zinc-800 p-6 sm:p-8 scroll-mt-24" aria-labelledby="privacy-heading">
+					<h2 id="privacy-heading" class="text-2xl font-bold text-white mb-4">Privacy</h2>
+					<p class="text-zinc-300 leading-relaxed mb-6">The short version: I know what you tell me through the contact form, and nothing else.</p>
+					<dl class="space-y-5">
+						{privacy.map(item => (
+							<div>
+								<dt class="text-white font-semibold mb-1">{item.term}</dt>
+								<dd class="text-zinc-300 leading-relaxed">{item.detail}</dd>
+							</div>
+						))}
+					</dl>
+				</section>
+			</div>
+
+			<p class="mt-10 text-sm text-zinc-400">
+				Questions about any of this? <a href={site.contactHref} class="text-zinc-100 underline hover:text-white">Use the contact form</a>. If this page changes, the date at the top changes with it.
+			</p>
+		</div>
+	</div>
+</Layout>

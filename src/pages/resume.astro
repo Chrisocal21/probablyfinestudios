@@ -1,0 +1,218 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { projects, shippedProjects, inProgressProjects } from '../data/projects';
+import { profile, timeline, beyondCode, experience, education, getSkills } from '../data/profile';
+import { getContributions } from '../data/github';
+import { site } from '../data/site';
+
+const contributions = await getContributions();
+const skills = getSkills();
+const name = profile.fullName || profile.name;
+const updated = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+
+const links = [
+	{ label: bare(site.url), href: `${site.url}/` },
+	{ label: bare(profile.links.github), href: profile.links.github },
+	{ label: bare(profile.links.linkedin), href: profile.links.linkedin },
+	{ label: bare(profile.links.photography), href: profile.links.photography },
+];
+
+const numbers = [
+	{ value: String(shippedProjects.length), label: 'products live' },
+	{ value: String(inProgressProjects.length), label: 'in development' },
+	{ value: contributions.total.toLocaleString('en-US'), label: 'GitHub contributions, last 12 months' },
+	{ value: profile.publicRepos, label: 'public repositories' },
+];
+
+const heading = 'text-xs uppercase tracking-[0.25em] font-semibold text-indigo-300 mb-4 font-sans';
+---
+
+<Layout
+	title={`Resume | ${name}, ${site.name}`}
+	description={`The resume of ${name}, founder and developer at ${site.name}: ${shippedProjects.length} shipped products, ${inProgressProjects.length} in development, and the skills behind them. Printable.`}
+>
+	<div class="py-10 md:py-16 bg-black print:bg-white print:py-0">
+		<div class="max-w-3xl mx-auto px-4 sm:px-6 print:max-w-none print:px-0">
+			<div class="flex flex-wrap items-center justify-between gap-3 mb-6 print:hidden">
+				<p class="text-sm text-zinc-400">
+					Built from the same data as the rest of this site, so it's always current. The jokes are on the other pages.
+				</p>
+				<button id="print-resume" type="button" class="px-4 py-2 rounded-lg font-semibold text-sm bg-white text-black hover:bg-zinc-200 transition cursor-pointer">
+					Print or save as PDF
+				</button>
+			</div>
+
+			<article class="resume bg-zinc-950 border border-zinc-800 rounded-2xl p-6 sm:p-10 print:p-0 print:border-0 print:rounded-none">
+				<header class="mb-8 pb-8 border-b border-zinc-800">
+					<h1 class="text-4xl md:text-5xl font-bold text-white mb-2">{name}</h1>
+					<p class="text-lg text-zinc-200 mb-4">Founder and developer, {site.name}</p>
+					<ul class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-zinc-300">
+						{links.map(link => (
+							<li><a href={link.href} class="underline hover:text-white">{link.label}</a></li>
+						))}
+					</ul>
+				</header>
+
+				<section class="mb-8">
+					<h2 class={heading}>Summary</h2>
+					<p class="text-zinc-200 leading-relaxed">
+						Photographer turned developer and founder of {site.name}, a product studio I started solo and am now growing. I design, build, and ship web apps, tools, and games end to end, with AI doing the heavy lifting on implementation.{' '}
+						{shippedProjects.length} products are live, {inProgressProjects.length} more are in development, and I am looking for collaborators and business partners for what comes next.
+					</p>
+					<dl class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+						{numbers.map(item => (
+							<div class="flex flex-col-reverse justify-end">
+								<dt class="text-xs text-zinc-400 mt-0.5 leading-snug">{item.label}</dt>
+								<dd class="font-display text-2xl font-bold text-white">{item.value}</dd>
+							</div>
+						))}
+					</dl>
+				</section>
+
+				{experience.length > 0 && (
+					<section class="mb-8">
+						<h2 class={heading}>Experience</h2>
+						<div class="space-y-5">
+							{experience.map(entry => (
+								<div class="entry">
+									<div class="flex flex-wrap items-baseline justify-between gap-x-4">
+										<h3 class="text-lg font-bold text-white">{entry.org}</h3>
+										<p class="text-sm text-zinc-400">{entry.period}</p>
+									</div>
+									<p class="text-sm text-zinc-200 mt-0.5">{entry.title}</p>
+									{entry.points && (
+										<ul class="list-disc pl-5 mt-1.5 space-y-1 text-sm text-zinc-300">
+											{entry.points.map(point => <li>{point}</li>)}
+										</ul>
+									)}
+								</div>
+							))}
+						</div>
+					</section>
+				)}
+
+				<section class="mb-8">
+					<h2 class={heading}>Shipped work</h2>
+					<div class="space-y-6">
+						{shippedProjects.map(project => (
+							<div class="entry">
+								<div class="flex flex-wrap items-baseline justify-between gap-x-4">
+									<h3 class="text-lg font-bold text-white">
+										<a href={`/portfolio/${project.id}/`} class="hover:underline">{project.title}</a>
+										<span class="font-sans font-normal text-sm text-zinc-400 tracking-normal"> · {project.role}</span>
+									</h3>
+									{project.liveUrl && (
+										<a href={project.liveUrl} class="text-sm text-zinc-300 underline hover:text-white">{bare(project.liveUrl)}</a>
+									)}
+								</div>
+								<p class="text-sm text-zinc-300 mt-1.5 leading-relaxed">{project.description}</p>
+								{project.highlights && (
+									<ul class="list-disc pl-5 mt-2 space-y-1 text-sm text-zinc-300">
+										{/* Two per project on paper, to keep the printout to two pages. */}
+										{project.highlights.map((item, index) => <li class={index > 1 ? 'print:hidden' : undefined}>{item}</li>)}
+									</ul>
+								)}
+								{project.stack && <p class="text-xs text-zinc-400 mt-2 print:hidden">{project.stack.join(' · ')}</p>}
+							</div>
+						))}
+					</div>
+				</section>
+
+				<section class="mb-8">
+					<h2 class={heading}>In development</h2>
+					<ul class="space-y-2.5 text-sm print:hidden">
+						{inProgressProjects.map(project => (
+							<li class="entry text-zinc-300 leading-relaxed">
+								<a href={`/portfolio/${project.id}/`} class="font-semibold text-white hover:underline">{project.title}</a>
+								<span class="text-zinc-400"> ({(project.stack ?? []).join(', ')})</span>: {project.description}
+							</li>
+						))}
+					</ul>
+					{/* The printed version keeps to two pages, so in-progress work is one compact line each there. */}
+					<p class="hidden print:block text-sm leading-relaxed">
+						{inProgressProjects.map((project, index) => (
+							<>
+								<strong>{project.title}</strong> ({project.tags.slice(0, 2).join(', ')}){index < inProgressProjects.length - 1 ? '; ' : '.'}
+							</>
+						))}
+						{' '}Details for each at {bare(site.url)}/portfolio
+					</p>
+				</section>
+
+				<section class="mb-8">
+					<h2 class={heading}>Skills</h2>
+					<dl class="space-y-2 text-sm">
+						{skills.map(group => (
+							<div class="grid sm:grid-cols-[180px_1fr] gap-x-4 print:grid-cols-[180px_1fr]">
+								<dt class="text-zinc-400">{group.group}</dt>
+								<dd class="text-zinc-200">{group.skills.map(skill => skill.name).join(', ')}</dd>
+							</div>
+						))}
+						<div class="grid sm:grid-cols-[180px_1fr] gap-x-4 print:grid-cols-[180px_1fr]">
+							<dt class="text-zinc-400">Beyond the code</dt>
+							<dd class="text-zinc-200">{beyondCode.join(', ')}</dd>
+						</div>
+					</dl>
+				</section>
+
+				{education.length > 0 && (
+					<section class="mb-8">
+						<h2 class={heading}>Education</h2>
+						<div class="space-y-3">
+							{education.map(entry => (
+								<div class="entry flex flex-wrap items-baseline justify-between gap-x-4">
+									<h3 class="text-base font-bold text-white">{entry.title}, {entry.org}</h3>
+									<p class="text-sm text-zinc-400">{entry.period}</p>
+								</div>
+							))}
+						</div>
+					</section>
+				)}
+
+				<section>
+					<h2 class={heading}>Background</h2>
+					<ol class="space-y-2.5 text-sm">
+						{timeline.map(step => (
+							<li class="entry text-zinc-300 leading-relaxed">
+								<span class="font-semibold text-white">{step.title}</span>
+								<span class="text-zinc-400"> ({step.tag.toLowerCase()})</span>: {step.body}
+							</li>
+						))}
+					</ol>
+				</section>
+
+				<footer class="mt-8 pt-6 border-t border-zinc-800 text-xs text-zinc-400">
+					Updated {updated}. Live version with case studies for all {projects.length} projects: {bare(site.url)}/resume
+				</footer>
+			</article>
+
+			<p class="mt-6 text-sm text-zinc-400 print:hidden">
+				Want the full story? <a href="/about/" class="text-zinc-100 underline hover:text-white">About me</a>,{' '}
+				<a href="/portfolio/" class="text-zinc-100 underline hover:text-white">all the projects</a>, or{' '}
+				<a href={site.contactHref} class="text-zinc-100 underline hover:text-white">get in touch</a>.
+			</p>
+		</div>
+	</div>
+
+<style is:global>
+	@media print {
+		/* Everything on the page is sized in rem, so this scales the printout to fit two pages (Letter or A4). */
+		html {
+			font-size: 12.5px;
+		}
+
+		.resume .entry {
+			break-inside: avoid;
+		}
+
+		.resume h2 {
+			break-after: avoid;
+		}
+	}
+</style>
+
+<script>
+	document.getElementById('print-resume')?.addEventListener('click', () => window.print());
+</script>
+</Layout>

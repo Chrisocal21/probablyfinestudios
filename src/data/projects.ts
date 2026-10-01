@@ -10,6 +10,8 @@ id: string;
 title: string;
 description: string;
 longDescription?: string;
+/** One or two sentences aimed at the people this project would love to hear from. Shown on its case-study page. */
+invite?: string;
 role?: string;
 stack?: string[];
 highlights?: string[];
@@ -18,6 +20,10 @@ image: string;
 tags: string[];
 previewStyle?: 'browser' | 'dashboard';
 liveUrl?: string;
+/** Shown next to the live link when visitors can't just walk in (for example a private tool). */
+liveNote?: string;
+/** For apps you install. Leave `url` out until the file is public and the button shows as "coming soon". */
+download?: { label: string; url?: string };
 githubUrl?: string;
 wip?: boolean;
 theme?: ProjectTheme;
@@ -26,11 +32,39 @@ collaborators?: Array<{ name: string; url: string }>;
 
 export const projects: Project[] = [
 {
+id: 'not-a-cable',
+icon: 'cable',
+title: 'Not A Cable',
+description: 'Photos from your phone to your PC over Wi-Fi. Scan a QR code, pick, send. Because cables are for people who plan ahead.',
+longDescription: 'Not A Cable is a small Windows app for getting photos off your phone without the usual options: finding a cable (annoying), emailing them to yourself (embarrassing), or syncing your whole life to a cloud (overkill). Open it, scan the QR code with your phone, pick photos in the browser, and they land in a dated folder on your PC while the window shows each one arriving. There is nothing to install on the phone, and the photos never leave your own Wi-Fi.',
+invite: 'Tired of emailing photos to yourself? Ask me for a copy, try it on your own Wi-Fi, and tell me where it breaks.',
+role: 'Solo build',
+stack: ['Electron', 'Express', 'JavaScript'],
+highlights: [
+'Scan a QR code and send from the phone browser, with no phone app to install',
+'Photos stay on your own Wi-Fi: no cloud, no account',
+'Lands in a dated folder you can name, saved anywhere on your PC, and never overwrites a file',
+'The desktop window shows each photo as it arrives',
+],
+image: '',
+tags: ['Desktop App', 'Photos', 'Utility'],
+liveNote: 'It runs on my desktop every day. The public download is on its way; until then, ask and I will send you a copy.',
+download: { label: 'Download for Windows' },
+wip: false,
+theme: {
+gradient: 'linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #0b0a1a 100%)',
+accent: '#a5b4fc',
+pattern: 'radial-gradient(circle, rgba(165,180,252,0.08) 1px, transparent 1px)',
+patternSize: '22px 22px',
+},
+},
+{
 id: 'chrisocphoto',
 icon: 'camera',
 title: 'ChrisOCPhoto',
 description: 'A photography portfolio built around one rule: get out of the way of the images. Everything else serves the photos.',
 longDescription: 'ChrisOCPhoto is a photography portfolio built around a simple rule: get out of the way of the images. Every layout decision favors fast loading, generous whitespace, and a dark, gallery-like backdrop so the photos carry the page instead of competing with UI chrome. Photos carry their own EXIF and location data, mapped out with Mapbox for a sense of where each shot was taken.',
+invite: 'Photographers: if you want a portfolio that gets out of the way of your work, I\'d like to build it.',
 role: 'Solo design & build',
 stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'AWS S3', 'Mapbox GL'],
 highlights: [
@@ -51,18 +85,21 @@ patternSize: '20px 20px',
 },
 {
 id: 'fieldkit',
+icon: 'clipboard',
 title: 'FieldKit',
-description: 'Field data collection without the spreadsheet wrangling. Capture it on-site, see it land in a dashboard, export it when you need it.',
-longDescription: 'FieldKit gives teams a structured way to capture information on-site and see it roll up into a dashboard without wrestling with spreadsheets or one-off forms. It is built to be embedded — forms can be submitted from outside origins, so FieldKit can sit behind a client site or internal tool instead of living in isolation. Entries can be exported straight to PDF or pulled up as a QR code for on-site use.',
+description: 'Run a small service business without the chaos. Jobs, quotes, invoices, and scheduling in one lightweight app built for crews in the field.',
+longDescription: 'FieldKit is a lightweight operations app for contractors, landscapers, and other small service businesses. A job moves from quote to schedule to invoice in one place, with materials, inventory, expenses, and time tracked alongside it. Quotes go out as a share link or a PDF, a branding studio keeps every document looking like the business that sent it, and the whole thing installs as an app and keeps working offline.',
+invite: 'If you run a service business with crews in the field, I\'d like to hear how you keep track of jobs today. Real workflows make this better.',
 role: 'Solo build',
-stack: ['Next.js', 'TypeScript', 'Cloudflare Workers', 'Cloudflare D1', 'Clerk'],
+stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Zustand', 'Cloudflare Workers', 'Cloudflare D1', 'Clerk', 'PWA'],
 highlights: [
-'Structured field data capture backed by a Cloudflare D1 database',
-'Public, embeddable submission forms with CORS-enabled origins',
-'QR code and PDF export for on-site and offline use',
+'Jobs on a kanban board, from first quote to paid invoice',
+'Quotes and invoices as share links and PDFs, with deposits and discounts',
+'Clients, team, schedule, materials, and inventory in the same app',
+'Installable, works offline, and syncs through Cloudflare Workers + D1',
 ],
 image: '/images/fieldkit-preview-v10.png',
-tags: ['Productivity', 'Data Collection', 'Web App'],
+tags: ['Field Service', 'Operations', 'Web App'],
 liveUrl: 'https://www.get-fieldkit.com',
 wip: false,
 theme: {
@@ -76,14 +113,15 @@ patternSize: '18px 18px',
 id: 'cookbookverse',
 icon: 'book',
 title: 'CookBookVerse',
-description: 'A recipe collection you actually want to open at dinnertime. Built for a phone propped up next to the stove.',
-longDescription: 'CookBookVerse turns a personal recipe collection into something you actually want to open at dinnertime — recipes are organized to be found again quickly, not buried in a feed, with a layout built for reading on a phone propped up next to the stove. OpenAI helps fill in the gaps — cleaning up messy recipe text and suggesting substitutions — on top of a Postgres-backed recipe store.',
+description: "A curated world of recipes built for discovery. Tell it what's in your kitchen and it tells you what to cook.",
+longDescription: 'CookBookVerse is a discovery-first recipe platform: a curated library you wander through like a good food market, not a search box or a social feed. Keep a running list of what you have at home and it matches that against the library, so dinner stops being a guessing game. An AI assistant and a grocery list are built in, on top of a Postgres-backed recipe store.',
+invite: 'Home cooks, recipe writers, food people: tell me what would get you to open this at dinnertime.',
 role: 'Solo build',
 stack: ['Next.js', 'TypeScript', 'Neon Postgres', 'Drizzle ORM', 'OpenAI', 'Clerk'],
 highlights: [
-'Recipe organization built for quick re-discovery, not scrolling',
-'AI-assisted recipe cleanup and substitutions via OpenAI',
-'Layout tuned for real kitchen use on mobile',
+'Kitchen list that matches what you have at home against the recipe library',
+'Ask AI: an assistant for finding the right recipe, powered by OpenAI',
+'A curated library made for browsing, with a grocery list built in',
 ],
 image: '',
 tags: ['Recipes', 'Food Tech', 'Web Platform'],
@@ -98,19 +136,20 @@ patternSize: '14px 14px',
 },
 {
 id: 'davapalooza',
-icon: 'calendar',
+icon: 'ticket',
 title: 'Davapalooza',
 description: 'An event site built for a moment, not a browsing session. Loud colors, and the what, when, and where right up front.',
-longDescription: 'Davapalooza is a brand and event site built for a moment, not a browsing session — bold color, a clear hierarchy, and fast navigation so visitors get the info they came for (what, when, where) without hunting for it. It runs on Cloudflare Workers with OpenAI wired in for content generation behind the scenes.',
+longDescription: 'Davapalooza is the site for the South O Block Party, a free community block party in Oceanside, California. It puts the what, when, and where up front with a live countdown, then gives the neighborhood a place to see the lineup, read the news, and submit their own photos to a shared gallery. Submitted photos are screened with AI and then approved from an admin dashboard, and the whole thing runs on Cloudflare.',
+invite: 'Got an event that deserves better than a template? This is the kind of site I like building.',
 role: 'Solo design & build',
-stack: ['Next.js', 'TypeScript', 'Cloudflare Workers', 'OpenAI'],
+stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Cloudflare Workers', 'Cloudflare D1', 'OpenAI'],
 highlights: [
-'Event-first layout: info visitors need, above the fold',
-'High-energy brand identity with a distinct visual voice',
-'AI-assisted content generation behind the scenes',
+'Event-first layout: date, place, and a countdown above the fold',
+'Community photo gallery with AI-assisted moderation',
+'Artist lineup, news, and an admin dashboard to run it all',
 ],
 image: '',
-tags: ['Events', 'Brand Site', 'Web'],
+tags: ['Events', 'Community', 'Web'],
 liveUrl: 'https://davapalooza.com',
 wip: false,
 theme: {
@@ -122,19 +161,20 @@ patternSize: '24px 24px',
 },
 {
 id: 'trvlplay',
-icon: 'plane',
+icon: 'dice',
 title: 'TRVLPlay',
-description: 'A playful nudge toward your next trip. Browse ideas instead of filling out search forms.',
-longDescription: 'TRVLPlay is a lightweight travel discovery concept — a place to browse trip ideas and get a playful nudge toward planning something, rather than a heavyweight booking platform. It favors quick exploration over forms and filters, and installs like a native app thanks to its PWA setup.',
+description: 'Thinking games for killing time on the road. Four quick games about sorting and spotting patterns, with daily puzzles, friends, and coins to earn.',
+longDescription: 'TRVLPlay is a lightweight collection of thinking games for people killing time while traveling or waiting. Four games are live: Sort (group 16 items into 4 categories), Impostor (spot the item that does not belong), Pairs, and Blitz, with daily puzzles to come back for. Around them sit a shared profile, friend codes, and coins you earn by playing. It installs like an app, is built to go easy on a low battery, and lets you play as a guest before you sign in.',
+invite: "Puzzle makers and game designers: the puzzles here are hand-curated, and there are more games to build. If you'd like to make one, let's talk.",
 role: 'Solo build',
 stack: ['React', 'Vite', 'TypeScript', 'Tailwind CSS', 'Clerk', 'PWA'],
 highlights: [
-'Discovery-first browsing over form-heavy search',
-'Installable as a PWA for a native-app feel',
-'Fast, mobile-friendly experience',
+'Four games so far: Sort, Impostor, Pairs, and Blitz, with daily puzzles',
+'Profiles, friend codes, and an earn-only coin economy',
+'Installable PWA with guest play, no account needed to try it',
 ],
 image: '',
-tags: ['Travel', 'Discovery', 'Web App'],
+tags: ['Games', 'Puzzles', 'PWA'],
 liveUrl: 'https://trvlplay.com',
 wip: true,
 theme: {
@@ -146,16 +186,17 @@ patternSize: '22px 22px',
 },
 {
 id: 'scramble',
-icon: 'grid',
+icon: 'egg',
 title: 'Scramble',
-description: 'A word puzzle for the two minutes between other things. No install, no account, just play.',
-longDescription: 'Scramble is a browser word/puzzle game built for short, repeatable play sessions — the kind of game you open for two minutes between other things. Built with Phaser and Vite, it runs entirely client-side with no install and no accounts.',
+description: 'A side-scrolling platformer starring an egg. Tight jumps, enemies to stomp, and star ratings to chase, right in the browser.',
+longDescription: 'Scramble is a side-scrolling platformer in the spirit of the classics, with an egg as the hero: expressive eyes, squash and stretch, and a lot of charm for something drawn entirely in code. It is built with Phaser and Vite, plays in landscape on a phone with an on-screen gamepad or on a keyboard at a desk, and saves your progress in the browser with no account.',
+invite: "Level designers and game artists: I'd like a second brain on levels, enemies, and what makes a run worth replaying.",
 role: 'Solo build',
 stack: ['Phaser', 'Vite', 'JavaScript'],
 highlights: [
-'Quick, replayable game loop for short sessions',
-'Runs fully client-side — no install, no account',
-'Mobile-friendly touch controls',
+'Platforming built around feel: variable jumps, a dash, and three enemy types',
+'Star ratings, best times, and a level select',
+'Sound effects and music synthesized in code, with no audio files',
 ],
 image: '',
 tags: ['Game Dev', 'Browser Game', 'Phaser'],
@@ -170,9 +211,11 @@ patternSize: '16px 16px',
 },
 {
 id: 'wx',
+icon: 'weather',
 title: 'WX',
 description: 'Weather, minus the clutter. What it is doing now and what is about to change, at a glance.',
 longDescription: 'WX strips a weather app down to what you actually check it for — current conditions and what is about to change — presented in a dense, dashboard-style layout instead of a scroll of marketing widgets.',
+invite: 'Weather nerds: tell me what you check first, and what every other weather app gets wrong.',
 role: 'Solo build',
 stack: ['React', 'Vite', 'TypeScript', 'Tailwind CSS'],
 highlights: [
@@ -193,18 +236,20 @@ patternSize: '18px 18px',
 },
 {
 id: 'hang',
+icon: 'qr',
 title: 'Hang',
-description: 'A word-guessing game for a group of phones. Scan a QR code, join the room, start guessing.',
-longDescription: 'Hang is a casual word-guessing game built for a quick, shareable session — simple rules, no onboarding, and a room you can join by scanning a QR code. Rounds sync live through Supabase, so a group can jump into the same game from their own phones.',
+description: 'Turns any group of phones into a game night. Scan a QR code, join the room, and the whole table is playing.',
+longDescription: 'Hang is a browser-based multiplayer game platform for bars and nights out: no app to download, no TV, no setup. One person creates a room and shares a QR code or link, and everyone joins from their own phone. A room stays live all night across games, and venues can set up their own bar room for guests. Would You Rather is playable now, with word games in progress.',
+invite: 'Run a bar, a trivia night, or a game night? I\'d like to see this played by a real crowd.',
 role: 'Solo build',
 stack: ['Next.js', 'TypeScript', 'Supabase', 'Tailwind CSS'],
 highlights: [
-'QR-code room joining for quick group sessions',
-'Live-synced rounds via Supabase',
-'Zero-onboarding, pick-up-and-play rules',
+'Join a room by QR code or link, with no app download',
+'Play stays in sync across every phone through Supabase',
+'Group rooms for friends, and bar rooms that a venue sets up',
 ],
 image: '/images/hang-preview-v9.png',
-tags: ['Game', 'Word Play', 'Browser'],
+tags: ['Party Games', 'Multiplayer', 'Browser'],
 liveUrl: 'https://hang-chrisoc.vercel.app/',
 wip: true,
 theme: {
@@ -216,10 +261,11 @@ patternSize: '20px 20px',
 },
 {
 id: 'standalone',
-icon: 'gear',
+icon: 'cube',
 title: 'Standalone',
 description: 'A pile of one-off fabrication scripts turning into one tool: laser-cut boxes, 3D-print enclosures, and CNC feeds and speeds.',
 longDescription: 'Standalone is a maker-focused toolkit that turns precise material specs into fabrication-ready output — kerf-compensated SVGs for laser-cut jointed boxes and cylinders, parametric STL enclosures for 3D printing, and chip-thinning-compensated feeds-and-speeds for CNC work. It consolidates several one-off fabrication scripts into a single account-based tool, with dimensions driven by actual material thickness instead of guesswork.',
+invite: 'Makers with a laser, a 3D printer, or a CNC: run it on a real job and tell me where the numbers are off.',
 role: 'Solo build',
 stack: ['Next.js', 'React', 'TypeScript'],
 highlights: [
@@ -231,7 +277,8 @@ highlights: [
 image: '',
 tags: ['Maker Tools', 'Parametric Design', 'Fabrication'],
 liveUrl: 'https://standalone-chrisoc.vercel.app/',
-wip: true,
+liveNote: 'Live and generating files. Like any cut file, run a test piece before you commit the good material.',
+wip: false,
 theme: {
 gradient: 'linear-gradient(135deg, #1c1917 0%, #3f3f46 48%, #09090b 100%)',
 accent: '#a3e635',
@@ -245,6 +292,7 @@ icon: 'chat',
 title: 'Ping',
 description: 'Somewhere to vent or think out loud. A smart-mouthed AI companion, with no therapy vibes.',
 longDescription: 'Ping is a lightweight AI companion built for the moments you just need to vent, think out loud, or get a quick reality check — not a therapy replacement, just a smart, slightly irreverent conversation partner that is always available.',
+invite: 'Writers and conversation designers: the personality is the product here. If you have opinions about voice, let\'s talk.',
 role: 'Solo build',
 stack: ['Next.js', 'TypeScript', 'OpenAI', 'Tailwind CSS'],
 highlights: [
@@ -265,10 +313,11 @@ patternSize: '20px 20px',
 },
 {
 id: 'splitnote',
-icon: 'calculator',
+icon: 'receipt',
 title: 'SplitNote',
 description: 'Splitting the bill at dinner without the flashy finance-app energy. Just the math.',
 longDescription: 'SplitNote is a clean, no-frills bill-splitting and tip calculator — built to feel like a normal utility app rather than a flashy finance tool, for quick math at dinner without extra noise.',
+invite: 'This one is small on purpose. If you have a sharp idea for where a no-nonsense money tool goes next, I\'m listening.',
 role: 'Solo build',
 stack: ['Next.js', 'TypeScript', 'Tailwind CSS'],
 highlights: [
@@ -291,18 +340,19 @@ patternSize: '18px 18px',
 id: 'games-collection',
 icon: 'grid',
 title: 'Games Collection',
-description: 'A growing shelf of browser word games, starting with a Connections-style puzzle.',
-longDescription: 'Games Collection bundles a handful of browser word games under one roof, starting with a Connections-style puzzle — group four sets of four related words. Browser-based, no installs, no accounts.',
+description: 'A growing shelf of browser games: Connections, Sudoku, Word Search, and more. No installs, no accounts.',
+longDescription: 'Games Collection bundles a handful of browser games under one roof. It started with a Connections-style puzzle (group four sets of four related words, across 50 levels with a high-score board) and has grown to include Sudoku, Word Search, a sliding-tile puzzle, and a rebuild-civilization game called RECLAIMED. Browser-based, no installs, no accounts.',
+invite: 'Puzzle makers: the shelf is built. Bring the next game.',
 role: 'Solo build',
 stack: ['Express', 'JavaScript'],
 highlights: [
-'Connections-style word grouping puzzle',
-'Built as a growing collection, not a single one-off game',
+'Five games so far, from Connections to Sudoku',
+'Connections has 50 levels, a lives system, and a high-score board',
 'Simple, server-rendered browser experience',
 ],
 image: '',
-tags: ['Game', 'Word Play', 'Browser'],
-liveUrl: 'https://connections.vercel.app/',
+tags: ['Games', 'Puzzles', 'Browser'],
+liveUrl: 'https://connections-chrisoc.vercel.app/',
 wip: true,
 theme: {
 gradient: 'linear-gradient(135deg, #451a03 0%, #78350f 50%, #1c0a00 100%)',
@@ -317,6 +367,7 @@ icon: 'globe',
 title: 'Burrow',
 description: 'For people who tour with events for a living. Jobs, travel, and messages in one place instead of a dozen apps.',
 longDescription: 'Burrow helps touring event professionals manage job trips, travel logistics, and communications without juggling a dozen disconnected tools. It renders travel routes on an interactive 3D globe and can generate PDF itineraries and QR codes for quick sharing on-site.',
+invite: 'If you tour with events for a living, tell me what your week actually looks like. That is who this is for.',
 role: 'Solo build',
 stack: ['Next.js', 'TypeScript', 'Three.js', 'OpenAI', 'React PDF'],
 highlights: [
@@ -327,6 +378,7 @@ highlights: [
 image: '',
 tags: ['Events', 'Travel', 'Productivity'],
 liveUrl: 'https://git-chrisoc.vercel.app/',
+liveNote: 'Private team tool: the live link opens a team sign-in.',
 wip: false,
 theme: {
 gradient: 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0a0f1a 100%)',
@@ -337,10 +389,11 @@ patternSize: '20px 20px',
 },
 {
 id: 'wanderlog',
-icon: 'pin',
+icon: 'map',
 title: 'Wanderlog',
 description: 'A travel blog built for two people: one writing from the road, one keeping it running. Drag-and-drop instead of CMS forms.',
 longDescription: 'Wanderlog is a reusable travel blog platform built for two people — the developer who builds and maintains it, and the blogger who writes and publishes from anywhere in the world — with a visual, drag-and-drop canvas editor instead of a traditional CMS form.',
+invite: 'Travel bloggers who are tired of fighting a CMS: this was built for a writer and a developer working as a pair. If that sounds like you, say hi.',
 role: 'Solo build',
 stack: ['Next.js', 'TypeScript', 'Zustand', 'Tailwind CSS'],
 highlights: [
@@ -361,19 +414,20 @@ patternSize: '20px 20px',
 },
 {
 id: 'ctrii',
-icon: 'pencil',
+icon: 'prompt',
 title: 'ctrII',
-description: 'A writing tool still finding its shape. The editor is real; the direction is still forming.',
-longDescription: 'ctrII is an early-stage writing tool built around Tiptap\'s rich block editor, with account sign-in already wired up. It is still taking shape, but the foundation — a real editor, not a plain textarea — is already in place.',
+description: 'A new-tab page that works like a command center. Ask it things, keep your links, and capture your thoughts.',
+longDescription: "ctrII replaces the browser's new tab with a bare command center: a clock and weather, an AI ask bar, folders of your own links, and a capture stream for notes, checklists, and reminders. It ships empty on purpose, with no opinions about who is using it. Right now it runs as a full demo saved to your browser; accounts and syncing across devices are the next step.",
+invite: 'People who live in their browser: tell me what your new tab should do the moment you open it.',
 role: 'Solo build',
 stack: ['React', 'Vite', 'Tiptap', 'Clerk', 'Tailwind CSS'],
 highlights: [
-'Rich block-based editor built on Tiptap',
-'Account sign-in already wired up via Clerk',
-'Early-stage — foundation in place, direction still forming',
+'Ask bar, link folders, and a capture stream on one page',
+'A full working demo with no sign-in wall',
+'Widgets that track any number from a public JSON endpoint',
 ],
 image: '',
-tags: ['Writing', 'Editor', 'Web App'],
+tags: ['Productivity', 'New Tab', 'Web App'],
 liveUrl: 'https://ctrii.vercel.app/',
 wip: true,
 theme: {
@@ -407,3 +461,19 @@ patternSize: '22px 22px',
 },
 collaborators: [],
 };
+
+/** A project's own domain, or null when it only lives on a *.vercel.app address. */
+export function customDomain(project: Pick<Project, 'liveUrl'>): string | null {
+if (!project.liveUrl) return null;
+const host = new URL(project.liveUrl).hostname.replace(/^www\./, '');
+return host.endsWith('.vercel.app') ? null : host;
+}
+
+/** Where a project lives, as a short label: its domain, or "Live preview" for vercel.app addresses. */
+export function liveLabel(project: Pick<Project, 'liveUrl'>): string | null {
+if (!project.liveUrl) return null;
+return customDomain(project) ?? 'Live preview';
+}
+
+export const shippedProjects = projects.filter(project => !project.wip);
+export const inProgressProjects = projects.filter(project => project.wip);

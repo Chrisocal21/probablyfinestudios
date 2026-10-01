@@ -1,25 +1,98 @@
 ---
 import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+import interFont from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import soraFont from '@fontsource-variable/sora/files/sora-latin-wght-normal.woff2?url';
 
 interface Props {
 	title: string;
 	description?: string;
+	/** Path of the social preview image, e.g. /og/about.png */
+	image?: string;
+	imageAlt?: string;
+	type?: 'website' | 'article' | 'profile';
+	/** Keep the page out of search engines (private or utility pages). */
+	noindex?: boolean;
+	/** schema.org structured data for this page */
+	jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+	hideFooter?: boolean;
 }
 
-const { title, description = 'Probably Fine Studios - Crafting digital experiences' } = Astro.props;
+const {
+	title,
+	description = site.description,
+	image = '/og/site.png',
+	imageAlt = `${site.name}. ${site.tagline}`,
+	type = 'website',
+	noindex = false,
+	jsonLd,
+	hideFooter = false,
+} = Astro.props;
+
+// The live host serves every page with a trailing slash, so canonical URLs use one too.
+const rawPath = Astro.url.pathname;
+const pathname = rawPath.endsWith('/') || rawPath.split('/').pop()?.includes('.') ? rawPath : `${rawPath}/`;
+const canonical = new URL(pathname, site.url).href;
+const imageUrl = new URL(image, site.url).href;
+const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="description" content={description} />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/png" href="/favicon.png" />
-		<meta name="generator" content={Astro.generator} />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+		<meta name="theme-color" content="#000000" />
+		<meta name="color-scheme" content="dark" />
+		<link rel="icon" href="/favicon.ico" sizes="48x48" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<link rel="sitemap" href="/sitemap.xml" />
+
+		<link rel="preload" as="font" type="font/woff2" href={interFont} crossorigin />
+		<link rel="preload" as="font" type="font/woff2" href={soraFont} crossorigin />
+
+		<meta property="og:site_name" content={site.name} />
+		<meta property="og:type" content={type} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={imageUrl} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content={imageAlt} />
+		<meta property="og:locale" content="en_US" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={imageUrl} />
+		<meta name="twitter:image:alt" content={imageAlt} />
+
+		{schemas.map(schema => (
+			<script is:inline type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g, '\\u003c')} />
+		))}
+		<meta name="generator" content={Astro.generator} />
 	</head>
-	<body class="bg-black text-white">
-		<slot />
+	<body class="bg-black text-white antialiased print:bg-white print:text-black">
+		<a
+			href="#main"
+			class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-black"
+		>
+			Skip to content
+		</a>
+		<Nav />
+		<main id="main">
+			<slot />
+		</main>
+		{!hideFooter && <Footer />}
 	</body>
 </html>

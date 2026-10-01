@@ -1,35 +1,70 @@
 ---
+import { Image } from 'astro:assets';
+import logoMark from '../assets/logo-mark.png';
+import { site } from '../data/site';
+import { profile } from '../data/profile';
+
 const currentYear = new Date().getFullYear();
+const elsewhere = [
+	{ href: profile.links.github, label: 'GitHub' },
+	{ href: profile.links.linkedin, label: 'LinkedIn' },
+	{ href: profile.links.instagram, label: 'Instagram' },
+	{ href: profile.links.photography, label: 'ChrisOCPhoto' },
+];
 ---
 
-<footer class="bg-black text-white mt-20 border-t border-gray-800">
+<footer class="bg-black text-white mt-24 border-t border-zinc-800 print:hidden">
 	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-		<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-			<div>
-				<h3 class="text-xl font-bold mb-4">Probably Fine Studios</h3>
-				<p class="text-gray-400">
-					Crafting digital experiences that are... probably fine.
-				</p>
+		<div class="grid grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1.2fr] gap-x-8 gap-y-10">
+			<div class="col-span-2 md:col-span-1">
+				<a href="/" class="inline-flex items-center gap-2.5 mb-4" aria-label={`${site.name} home`}>
+					<Image src={logoMark} alt="" width={196} class="h-7 w-auto" />
+					<span class="font-display font-bold text-lg tracking-tight">{site.name}</span>
+				</a>
+				<p class="text-zinc-400 text-sm leading-relaxed max-w-xs">{site.tagline}</p>
 			</div>
+
 			<div>
-				<h4 class="font-semibold mb-4">Quick Links</h4>
-				<ul class="space-y-2 text-gray-400">
-					<li><a href="/portfolio" class="hover:text-white transition">Portfolio</a></li>
-					<li><a href="/about" class="hover:text-white transition">About</a></li>
-					<li><a href="/contact" class="hover:text-white transition">Contact</a></li>
+				<h2 class="text-xs uppercase tracking-[0.2em] text-zinc-400 font-semibold mb-4 font-sans">Site</h2>
+				<ul class="space-y-2.5 text-sm text-zinc-300">
+					{site.nav.map(link => (
+						<li><a href={link.href} class="hover:text-white transition">{link.label}</a></li>
+					))}
+					<li><a href={site.contactHref} class="hover:text-white transition">Contact</a></li>
 				</ul>
 			</div>
+
 			<div>
-				<h4 class="font-semibold mb-4">Connect</h4>
-				<ul class="space-y-2 text-gray-400">
-					<li><a href="https://github.com/Chrisocal21" target="_blank" rel="noopener noreferrer" class="hover:text-white transition">GitHub</a></li>
-					<li><a href="https://www.linkedin.com/in/chrisocphoto" target="_blank" rel="noopener noreferrer" class="hover:text-white transition">LinkedIn</a></li>
-					<li><a href="https://www.instagram.com/chrisocphoto" target="_blank" rel="noopener noreferrer" class="hover:text-white transition">Instagram</a></li>
+				<h2 class="text-xs uppercase tracking-[0.2em] text-zinc-400 font-semibold mb-4 font-sans">Elsewhere</h2>
+				<ul class="space-y-2.5 text-sm text-zinc-300">
+					{elsewhere.map(link => (
+						<li><a href={link.href} target="_blank" rel="noopener noreferrer" class="hover:text-white transition">{link.label}</a></li>
+					))}
 				</ul>
+			</div>
+
+			<div class="col-span-2 md:col-span-1">
+				<h2 class="text-xs uppercase tracking-[0.2em] text-zinc-400 font-semibold mb-4 font-sans">Work with me</h2>
+				<p class="text-sm text-zinc-400 leading-relaxed mb-4">{profile.availability.note}</p>
+				<a href={site.contactHref} class="inline-flex items-center gap-2 text-sm font-semibold text-white hover:underline">
+					Start a conversation
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+					</svg>
+				</a>
 			</div>
 		</div>
-		<div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-			<p>&copy; {currentYear} Probably Fine Studios. All rights reserved.</p>
+
+		<div class="border-t border-zinc-800 mt-10 pt-6 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between text-xs text-zinc-400">
+			<p>
+				&copy; {currentYear} {site.name}
+				<span class="mx-1.5 text-zinc-600" aria-hidden="true">·</span>
+				<a href="/legal/" class="underline hover:text-white transition">Terms, disclaimers & privacy</a>
+			</p>
+			<p>
+				Built with Astro, Tailwind, and AI. Tested by me, so: probably fine.{' '}
+				<a href={site.repo} target="_blank" rel="noopener noreferrer" class="underline hover:text-white transition">View the source</a>
+			</p>
 		</div>
 	</div>
 </footer>

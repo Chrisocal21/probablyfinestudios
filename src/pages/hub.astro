@@ -1,7 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
 import { projects } from '../data/projects';
 
 const adminEndpoint = 'https://mail.probablyfinestudios.com/api/admin/messages';
@@ -26,8 +24,7 @@ const knownSites = [
 ];
 ---
 
-<Layout title="Message Inbox - Probably Fine Studios" description="Live inbox for messages collected from all Probably Fine Studios properties.">
-	<Nav />
+<Layout title="Message Inbox | Probably Fine Studios" description="Private inbox for messages sent to Probably Fine Studios." noindex>
 
 	<section class="bg-black">
 		<div class="w-full">
@@ -698,5 +695,4 @@ const knownSites = [
 		}
 	</script>
 
-	<Footer />
 </Layout>

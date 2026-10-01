@@ -1,0 +1,69 @@
+---
+import { openTo, helpWanted } from '../data/profile';
+import { contactLink } from '../data/site';
+
+interface Props {
+	/** true on the page that contains the contact form, so the links jump to it instead of reloading */
+	samePage?: boolean;
+}
+
+const { samePage = false } = Astro.props;
+---
+
+<div class="grid md:grid-cols-3 gap-4">
+	{openTo.map(item => (
+		<div class="rounded-xl border border-zinc-800 bg-black p-5 flex flex-col">
+			<h3 class="text-[11px] uppercase tracking-[0.2em] font-semibold mb-2 font-sans" style={`color: ${item.accent}`}>{item.label}</h3>
+			<p class="text-zinc-300 text-sm leading-relaxed mb-4">{item.pitch}</p>
+			<dl class="text-sm space-y-2 mb-5">
+				<div>
+					<dt class="text-zinc-400 text-xs">You bring</dt>
+					<dd class="text-zinc-100">{item.youBring}</dd>
+				</div>
+				<div>
+					<dt class="text-zinc-400 text-xs">I bring</dt>
+					<dd class="text-zinc-100">{item.iBring}</dd>
+				</div>
+			</dl>
+			<a
+				href={samePage ? '#contact' : contactLink({ topic: item.id })}
+				data-topic={item.id}
+				class="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-white hover:underline"
+			>
+				{item.cta}
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+				</svg>
+			</a>
+		</div>
+	))}
+</div>
+
+<div class="mt-4 rounded-xl border bg-black p-5 sm:p-6 grid md:grid-cols-[1fr_260px] gap-6 md:gap-8" style={`border-color: ${helpWanted.accent}55`}>
+	<div>
+		<h3 class="text-[11px] uppercase tracking-[0.2em] font-semibold mb-2 font-sans" style={`color: ${helpWanted.accent}`}>{helpWanted.label}</h3>
+		<p class="font-display text-xl font-bold text-white mb-2">{helpWanted.title}</p>
+		<p class="text-zinc-300 text-sm leading-relaxed mb-4">{helpWanted.body}</p>
+		<a
+			href={samePage ? '#contact' : contactLink({ topic: helpWanted.id })}
+			data-topic={helpWanted.id}
+			class="inline-flex items-center gap-1.5 text-sm font-semibold text-white hover:underline"
+		>
+			{helpWanted.cta}
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+			</svg>
+		</a>
+	</div>
+	<div>
+		<p class="text-zinc-400 text-xs mb-2">{helpWanted.waysLabel}</p>
+		<ul class="flex flex-wrap md:flex-col gap-2">
+			{helpWanted.ways.map(way => (
+				<li class="text-sm text-zinc-100 rounded-lg border border-zinc-800 px-3 py-1.5">{way}</li>
+			))}
+		</ul>
+	</div>
+</div>
+<p class="mt-3 text-xs text-zinc-400">
+	The unfun part: none of this is a job offer. If we work together, we agree the terms in writing first. <a href="/legal/#work" class="underline hover:text-white">The legal bit</a>.
+</p>
