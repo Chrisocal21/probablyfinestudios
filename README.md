@@ -162,5 +162,5 @@ See [CLOUDFLARE_DEPLOYMENT.md](CLOUDFLARE_DEPLOYMENT.md) for detailed deployment
 
 ## Support
 
-For questions or issues, reach out at hello@probablyfinestudios.com
+For questions or issues, reach out at hello@probablyfinestudios.com.
 
