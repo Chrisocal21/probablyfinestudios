@@ -437,6 +437,34 @@ pattern: 'linear-gradient(rgba(148,163,184,0.06) 1px, transparent 1px), linear-g
 patternSize: '18px 18px',
 },
 },
+{
+id: 'supplyline',
+icon: 'truck',
+title: 'SupplyLine',
+description: 'A logistics sim on a 3D globe. Build the chain, run the trucks, and watch a village turn into a metropolis because you fed it right.',
+longDescription: 'SupplyLine is a trucking-and-logistics simulation on a 3D globe you fly from orbit down to street level with no loading screens. Build a producer on the right ground, build a factory to turn that raw good into something better, connect them with a road or rail line, and tell a truck who to sell to. Do it well and a town\'s Supply Yard fills up, its Market starts buying, and the town grows from a Village to a Metropolis, unlocking the next tier of buildings, vehicles, and towns. Five progression tiers, three hand-built maps, 90-plus buildings and goods, and 17 vehicle classes from a Box Truck up to Cargo Jets and container ships.',
+invite: 'Logistics nerds and city-builder fans: the free demo is live. Play it, break it, and tell me what the next tier should unlock.',
+role: 'Solo build',
+stack: ['TypeScript', 'Three.js', 'Phaser', 'Electron', 'Next.js'],
+highlights: [
+'A 3D globe flown freely from orbit to street level, no loading screens',
+'Full production chains with by-products that feed recycling instead of going to waste',
+'Road, rail, sea, and air logistics, each with its own vehicle classes',
+'Towns that grow procedurally based on what you actually deliver them',
+'Every model built in code with AI doing the heavy lifting, as an honest placeholder until a 3D artist joins',
+],
+image: '/images/supplyline-preview.jpg',
+tags: ['Desktop App', 'Simulation', 'Logistics', 'Game Dev'],
+liveUrl: 'https://supplyline-chrisoc.vercel.app/',
+download: { label: 'Free demo (Windows + Mac)', url: 'https://supplyline-chrisoc.vercel.app/' },
+wip: false,
+theme: {
+gradient: 'linear-gradient(135deg, #1e3a1f 0%, #14532d 50%, #052e16 100%)',
+accent: '#86efac',
+pattern: 'linear-gradient(rgba(134,239,172,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(134,239,172,0.06) 1px, transparent 1px)',
+patternSize: '20px 20px',
+},
+},
 ];
 
 export const starterProjectTemplate: Project = {

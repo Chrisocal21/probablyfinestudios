@@ -35,4 +35,6 @@ export const projectIcons: Record<string, string> = {
 	cable: '<path d="M9 7V3M15 7V3"/><path d="M6.5 7h11v4a5.5 5.5 0 01-11 0V7z"/><path d="M12 16.5V21"/><path d="M3.5 20.5l17-17" stroke-width="1.8"/>',
 	// ctrII: a command prompt, for the ask bar
 	prompt: '<rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M7.5 9.5l3 2.5-3 2.5M13 14.5h3.5"/>',
+	// SupplyLine: a delivery truck
+	truck: '<path d="M3 7h10v9H3V7z"/><path d="M13 10.5h3.5L19 13.5V16h-6v-5.5z"/><circle cx="7" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/>',
 };

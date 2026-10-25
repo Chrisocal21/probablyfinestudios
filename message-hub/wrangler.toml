@@ -6,6 +6,10 @@ routes = [
 	{ pattern = "mail.probablyfinestudios.com", custom_domain = true }
 ]
 
+[[send_email]]
+name = "FORWARD_EMAIL"
+destination_address = "chrisoconnell21@gmail.com"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "message_hub"
