@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import ProjectIcon from './ProjectIcon.astro';
 import { liveLabel, type Project } from '../data/projects';
 
@@ -15,6 +16,11 @@ const borderVars = exploring
 	? `--card-border: ${accent}33; --card-border-hover: ${accent}80;`
 	: `--card-border: ${accent}99; --card-border-hover: ${accent};`;
 const where = liveLabel(project);
+
+// Same preview the case-study page uses: a captured screenshot, else the project's `image`, else the icon.
+const screens = import.meta.glob<ImageMetadata>('../assets/screens/*.webp', { eager: true, import: 'default' });
+const screenshot = screens[`../assets/screens/${id}.webp`];
+const legacyImage = !screenshot && project.image ? project.image : null;
 ---
 
 <article
@@ -28,12 +34,18 @@ const where = liveLabel(project);
 		</span>
 	)}
 	<div class={exploring ? 'opacity-75' : ''} aria-hidden="true">
-		<div class="relative aspect-[3/1.4] flex items-center justify-center overflow-hidden" style={`background: ${theme?.gradient ?? 'linear-gradient(135deg, #312e81, #1e1b4b)'}`}>
+		<div class="relative aspect-[16/10] flex items-center justify-center overflow-hidden" style={`background: ${theme?.gradient ?? 'linear-gradient(135deg, #312e81, #1e1b4b)'}`}>
 			{theme?.pattern && (
 				<div class="absolute inset-0" style={`background-image: ${theme.pattern}; background-size: ${theme.patternSize ?? 'auto'}`}></div>
 			)}
+			{screenshot && (
+				<Image src={screenshot} alt="" widths={[480, 640, 960]} sizes="(min-width: 1024px) 400px, (min-width: 768px) 50vw, 100vw" class="absolute inset-0 w-full h-full object-cover object-top" />
+			)}
+			{legacyImage && (
+				<img src={legacyImage} alt="" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover object-top" />
+			)}
 			<div class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/10 to-black/50"></div>
-			{icon && (
+			{icon && !screenshot && !legacyImage && (
 				<div class="relative" style={`color: ${theme?.accent ?? '#ffffff'}`}>
 					<ProjectIcon icon={icon} class="w-12 h-12" />
 				</div>

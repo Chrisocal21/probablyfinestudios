@@ -5,12 +5,22 @@ import ProjectSection from '../components/ProjectSection.astro';
 import OpenTo from '../components/OpenTo.astro';
 import logoMark from '../assets/logo-mark.png';
 import chrisPhoto from '../assets/chris.jpg';
-import { projects, shippedProjects, inProgressProjects } from '../data/projects';
+import { projects, shippedProjects, inProgressProjects, type Project } from '../data/projects';
 import { profile, scripting } from '../data/profile';
 import { site, contactLink } from '../data/site';
 import { getContributions } from '../data/github';
 
 const contributions = await getContributions();
+
+// The hero's flagship. It also stays in its genre row, so every project has a home.
+const flagship = projects.find(project => project.id === 'supplyline')!;
+const flagshipUrl = flagship.playUrl ?? flagship.liveUrl;
+// Shipped work first, then what's still cooking.
+const row = (type: Project['type']) =>
+	projects.filter(project => project.type === type).sort((a, b) => Number(a.wip ?? false) - Number(b.wip ?? false));
+const gameRow = row('game');
+const appRow = row('app');
+const toolRow = row('tool');
 
 const stats = [
 	{ value: contributions.total.toLocaleString('en-US'), label: 'GitHub contributions in the last year' },
@@ -38,17 +48,17 @@ const jsonLd = [
 ];
 ---
 
-<Layout title="Probably Fine Studios | Web apps, tools, and games by Chris" jsonLd={jsonLd}>
+<Layout title="Probably Fine Studios | Games, apps, and tools by Chris" jsonLd={jsonLd}>
 	<section class="relative overflow-hidden bg-black">
 		<div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 40px 40px"></div>
 		<div class="absolute inset-0" style="background: radial-gradient(ellipse 70% 55% at 50% 42%, rgba(99,59,200,0.16) 0%, transparent 70%)"></div>
 		<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
 
-		<div class="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 md:pt-24 md:pb-28 text-center">
+		<div class="relative max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 md:pt-12 md:pb-14 text-center">
 			{profile.availability.open && (
 				<a
 					href="#work-with-me"
-					class="inline-flex items-center gap-2 text-xs text-zinc-200 bg-white/5 border border-white/10 rounded-full pl-2.5 pr-3.5 py-1.5 mb-10 hover:bg-white/10 transition"
+					class="inline-flex items-center gap-2 text-xs text-zinc-200 bg-white/5 border border-white/10 rounded-full pl-2.5 pr-3.5 py-1.5 mb-6 hover:bg-white/10 transition"
 				>
 					<span class="relative flex h-2 w-2" aria-hidden="true">
 						<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
@@ -58,26 +68,26 @@ const jsonLd = [
 				</a>
 			)}
 
-			<Image src={logoMark} alt="" width={343} class="h-12 md:h-14 w-auto mx-auto mb-7" loading="eager" fetchpriority="high" />
-			<h1 class="text-4xl md:text-6xl font-bold text-white mb-5 tracking-tight">Probably Fine Studios</h1>
-			<p class="text-lg md:text-2xl text-zinc-100 mb-4 leading-snug">{site.tagline}</p>
-			<p class="text-base md:text-lg text-zinc-400 mb-9 leading-relaxed max-w-2xl mx-auto">
-				I'm Chris. I build web apps, desktop tools, games, and the odd Illustrator script that actually ship, mostly with AI and stubbornness. I named the studio after my quality-assurance process. So far it's just me in here, and I'd like to fix that.
+			<Image src={logoMark} alt="" width={343} class="h-9 md:h-10 w-auto mx-auto mb-5" loading="eager" fetchpriority="high" />
+			<h1 class="text-3xl md:text-5xl font-bold text-white mb-3 tracking-tight">Probably Fine Studios</h1>
+			<p class="text-base md:text-xl text-zinc-100 mb-3 leading-snug">{site.tagline}</p>
+			<p class="text-sm md:text-base text-zinc-400 mb-6 leading-relaxed max-w-xl mx-auto">
+				I'm Chris. I build web apps, desktop tools, games, and the odd Illustrator script, mostly with AI and a lot of stubbornness. I named the studio after my quality-assurance process. Right now it's just me in here, and I'd like to change that.
 			</p>
 
-			<div class="flex flex-wrap gap-3 justify-center mb-8">
-				<a href="#shipped" class="px-6 py-3 rounded-lg font-semibold text-sm transition bg-white text-black hover:bg-zinc-200">
-					See what shipped
+			<div class="flex flex-wrap gap-3 justify-center mb-5">
+				<a href="#flagship" class="px-5 py-2.5 rounded-lg font-semibold text-sm transition bg-white text-black hover:bg-zinc-200">
+					Start with the game
 				</a>
-				<a href="#work-with-me" class="px-6 py-3 rounded-lg font-semibold text-sm transition border border-white/25 text-white hover:bg-white/10">
+				<a href="#work-with-me" class="px-5 py-2.5 rounded-lg font-semibold text-sm transition border border-white/25 text-white hover:bg-white/10">
 					Come build with me
 				</a>
 			</div>
 
 			<p class="text-sm text-zinc-400">
-				<a href="#shipped" class="hover:text-white transition"><span class="text-zinc-200 font-semibold">{shippedProjects.length}</span> shipped</a>
+				<a href="/portfolio/" class="hover:text-white transition"><span class="text-zinc-200 font-semibold">{shippedProjects.length}</span> shipped</a>
 				<span class="mx-2 text-zinc-600" aria-hidden="true">·</span>
-				<a href="#exploring" class="hover:text-white transition"><span class="text-zinc-200 font-semibold">{inProgressProjects.length}</span> in the works</a>
+				<a href="/portfolio/" class="hover:text-white transition"><span class="text-zinc-200 font-semibold">{inProgressProjects.length}</span> in the works</a>
 				<span class="mx-2 text-zinc-600" aria-hidden="true">·</span>
 				<a href="/about/#github" class="hover:text-white transition"><span class="text-zinc-200 font-semibold">{contributions.total.toLocaleString('en-US')}</span> GitHub contributions this year</a>
 			</p>
@@ -86,16 +96,36 @@ const jsonLd = [
 
 	<div class="bg-black">
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			<ProjectSection
-				id="shipped"
-				title="Shipped & Live"
-				subtitle="Real products, up and running. Go click around. I'll wait."
-				projects={shippedProjects}
-				variant="shipped"
-			/>
+			<!-- Flagship -->
+			<section id="flagship" class="pt-2 pb-14 scroll-mt-20" aria-labelledby="flagship-heading">
+				<div class="grid md:grid-cols-2 rounded-2xl overflow-hidden border bg-zinc-950" style={`border-color: ${flagship.theme?.accent}66`}>
+					<div class="relative min-h-56 md:min-h-80" style={`background: ${flagship.theme?.gradient}`}>
+						<img src={flagship.image} alt={`${flagship.title} screenshot`} class="absolute inset-0 w-full h-full object-cover" />
+					</div>
+					<div class="p-6 md:p-10 flex flex-col gap-4 justify-center">
+						<p class="text-[11px] uppercase tracking-[0.2em] font-semibold" style={`color: ${flagship.theme?.accent}`}>Start here · Free tester build</p>
+						<h2 id="flagship-heading" class="text-3xl md:text-4xl font-bold text-white leading-tight">{flagship.title}</h2>
+						<p class="text-zinc-300 leading-relaxed">{flagship.description}</p>
+						<div class="flex flex-wrap gap-2 pt-2">
+							{flagshipUrl && (
+								<a href={flagshipUrl} target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-lg font-semibold text-sm transition hover:opacity-90" style={`background: ${flagship.theme?.accent}; color: #000`}>
+									{flagship.playLabel ?? 'Play the demo'}<span class="sr-only"> (opens in a new tab)</span>
+								</a>
+							)}
+							<a href={`/portfolio/${flagship.id}/`} class="px-5 py-2.5 rounded-lg text-sm border border-zinc-700 text-zinc-200 hover:bg-zinc-800 transition">About the game</a>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<div class="space-y-14">
+				<ProjectSection id="games" title="Games" subtitle="Play them in the browser. No launcher, no installer." projects={gameRow} variant="shipped" limit={3} seeAllHref="/games/" seeAllLabel="See the games shelf" />
+				<ProjectSection id="apps" title="Apps & Sites" subtitle="Real products, up and running. Go click around. I'll wait." projects={appRow} variant="shipped" limit={3} />
+				<ProjectSection id="tools" title="Tools" subtitle="Small things that scratch a specific itch (usually mine)." projects={toolRow} variant="shipped" limit={3} />
+			</div>
 
 			<!-- Behind the studio -->
-			<section class="my-20" aria-labelledby="behind-heading">
+			<section class="my-14" aria-labelledby="behind-heading">
 				<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 sm:p-10 grid md:grid-cols-[200px_1fr] gap-8 md:gap-10 items-center">
 					<Image
 						src={chrisPhoto}
@@ -124,16 +154,8 @@ const jsonLd = [
 				</div>
 			</section>
 
-			<ProjectSection
-				id="exploring"
-				title="Exploring & In Progress"
-				subtitle="Ideas I'm still poking at. Some will ship, some won't. All of them seemed like a good idea at the time."
-				projects={inProgressProjects}
-				variant="exploring"
-			/>
-
 			<!-- Adobe scripting -->
-			<section id="scripts" class="mt-24 scroll-mt-24" aria-labelledby="scripts-heading">
+			<section id="scripts" class="mt-16 scroll-mt-24" aria-labelledby="scripts-heading">
 				<div class="max-w-2xl mb-8">
 					<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-amber-300">{scripting.eyebrow}</p>
 					<h2 id="scripts-heading" class="text-3xl md:text-4xl font-bold text-white mb-4">{scripting.title}</h2>
@@ -154,7 +176,7 @@ const jsonLd = [
 			</section>
 
 			<!-- Work with me -->
-			<section id="work-with-me" class="mt-24 scroll-mt-24" aria-labelledby="work-heading">
+			<section id="work-with-me" class="mt-16 scroll-mt-24" aria-labelledby="work-heading">
 				<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 sm:p-10">
 					<div class="max-w-2xl mb-8">
 						<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-indigo-300">Working together</p>

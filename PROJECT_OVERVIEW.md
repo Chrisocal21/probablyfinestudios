@@ -57,7 +57,7 @@ Almost everything is data:
 
 ## The 16 projects (current roster)
 
-**Shipped** (`wip: false`): Not A Cable, ChrisOCPhoto, FieldKit, CookBookVerse, Davapalooza, Standalone, Burrow.
+**Shipped** (`wip: false`): Not A Cable, ChrisOCPhoto, FieldKit, CookBookVerse, Davapalooza, Standalone. (Burrow was removed from the site on 2026-11-01: it is a private team tool.)
 
 **In development** (`wip: true`): TRVLPlay, Scramble, WX, Hang, Ping, SplitNote, Games Collection, Wanderlog, ctrII.
 

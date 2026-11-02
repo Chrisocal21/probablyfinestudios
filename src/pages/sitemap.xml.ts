@@ -5,7 +5,7 @@ import { site } from '../data/site';
 /** Public pages only: the inbox (/hub) and the redirect pages (/contact, /team) are left out on purpose. */
 export const GET: APIRoute = () => {
 	const today = new Date().toISOString().slice(0, 10);
-	const paths = ['/', '/portfolio/', '/about/', '/resume/', '/legal/', ...projects.map(project => `/portfolio/${project.id}/`)];
+	const paths = ['/', '/games/', '/portfolio/', '/about/', '/resume/', '/legal/', ...projects.map(project => `/portfolio/${project.id}/`)];
 	const urls = paths
 		.map(path => `  <url>\n    <loc>${site.url}${path}</loc>\n    <lastmod>${today}</lastmod>\n  </url>`)
 		.join('\n');

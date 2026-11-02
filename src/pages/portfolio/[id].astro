@@ -24,7 +24,7 @@ export function getStaticPaths() {
 }
 
 const { project, previous, next } = Astro.props;
-const { id, title, description, longDescription, invite, role, stack, highlights, image, icon, tags, liveUrl, liveNote, download, githubUrl, wip, theme, collaborators } = project;
+const { id, title, description, longDescription, invite, role, stack, highlights, image, icon, tags, liveUrl, gallery, playUrl, steamUrl, trailerUrl, type, liveNote, download, githubUrl, wip, theme, collaborators } = project;
 
 const screenshot = screens[`../../assets/screens/${id}.webp`];
 // A full-browser capture fills the column; a smaller one (a desktop app window, say) is shown at its own size.
@@ -122,19 +122,29 @@ const jsonLd = [
 			</ul>
 
 			<div class="flex flex-wrap gap-3">
-				{liveUrl && (
+				{(type === 'game' ? (playUrl ?? liveUrl) : liveUrl) && (
 					<a
-						href={liveUrl}
+						href={type === 'game' ? (playUrl ?? liveUrl) : liveUrl}
 						target="_blank"
 						rel="noopener noreferrer"
 						class="group px-6 py-3 rounded-lg font-semibold text-sm transition hover:opacity-90 flex items-center gap-2"
 						style={`background: ${accent}; color: #000`}
 					>
-						Visit the live site
+						{type === 'game' ? (project.playLabel ?? 'Play now') : 'Visit the live site'}
 						<svg class="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7m0 0H8m9 0v9"/>
 						</svg>
 						<span class="sr-only">(opens in a new tab)</span>
+					</a>
+				)}
+				{type === 'game' && steamUrl && (
+					<a href={steamUrl} target="_blank" rel="noopener noreferrer" class="bg-white/10 text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-white/20 transition border border-white/20">
+						Wishlist on Steam<span class="sr-only"> (opens in a new tab)</span>
+					</a>
+				)}
+				{type === 'game' && trailerUrl && (
+					<a href={trailerUrl} target="_blank" rel="noopener noreferrer" class="bg-white/10 text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-white/20 transition border border-white/20">
+						Watch the trailer<span class="sr-only"> (opens in a new tab)</span>
 					</a>
 				)}
 				{download && (download.url ? (
@@ -187,6 +197,16 @@ const jsonLd = [
 						decoding="async"
 					/>
 				</figure>
+			)}
+
+			{gallery && gallery.length > 0 && (
+				<ul class="grid sm:grid-cols-2 gap-4 mb-14" aria-label={`More screenshots of ${title}`}>
+					{gallery.map(shot => (
+						<li class="rounded-xl overflow-hidden border border-zinc-800">
+							<img src={shot.src} alt={shot.alt} width="1600" height="900" class="w-full h-auto" loading="lazy" decoding="async" />
+						</li>
+					))}
+				</ul>
 			)}
 
 			<div class="grid md:grid-cols-[1fr_300px] gap-12 md:gap-14">

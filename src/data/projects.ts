@@ -5,8 +5,12 @@ pattern?: string;
 patternSize?: string;
 }
 
+/** What the project is. Drives the Games shelf and the homepage rows; `wip` stays a separate status tag. */
+export type ProjectType = 'game' | 'app' | 'tool';
+
 export interface Project {
 id: string;
+type: ProjectType;
 title: string;
 description: string;
 longDescription?: string;
@@ -25,6 +29,14 @@ liveNote?: string;
 /** For apps you install. Leave `url` out until the file is public and the button shows as "coming soon". */
 download?: { label: string; url?: string };
 githubUrl?: string;
+/** Games only. `playUrl` falls back to `liveUrl`; with neither (or `wip` and no link) the Games page shows "Coming soon". */
+playUrl?: string;
+/** Button text for `playUrl`/`liveUrl` on game pages when it is not literally "Play now" (for example a tester build). */
+playLabel?: string;
+steamUrl?: string;
+trailerUrl?: string;
+/** Extra screenshots for the case-study page, as public/ paths. */
+gallery?: Array<{ src: string; alt: string }>;
 wip?: boolean;
 theme?: ProjectTheme;
 collaborators?: Array<{ name: string; url: string }>;
@@ -33,6 +45,7 @@ collaborators?: Array<{ name: string; url: string }>;
 export const projects: Project[] = [
 {
 id: 'not-a-cable',
+type: 'tool',
 icon: 'cable',
 title: 'Not A Cable',
 description: 'Photos from your phone to your PC over Wi-Fi. Scan a QR code, pick, send. Because cables are for people who plan ahead.',
@@ -60,6 +73,7 @@ patternSize: '22px 22px',
 },
 {
 id: 'chrisocphoto',
+type: 'app',
 icon: 'camera',
 title: 'ChrisOCPhoto',
 description: 'A photography portfolio built around one rule: get out of the way of the images. Everything else serves the photos.',
@@ -85,6 +99,7 @@ patternSize: '20px 20px',
 },
 {
 id: 'fieldkit',
+type: 'app',
 icon: 'clipboard',
 title: 'FieldKit',
 description: 'Run a small service business without the chaos. Jobs, quotes, invoices, and scheduling in one lightweight app built for crews in the field.',
@@ -101,7 +116,7 @@ highlights: [
 image: '/images/fieldkit-preview-v10.png',
 tags: ['Field Service', 'Operations', 'Web App'],
 liveUrl: 'https://www.get-fieldkit.com',
-wip: false,
+wip: true,
 theme: {
 gradient: 'linear-gradient(135deg, #083344 0%, #0f172a 50%, #042f2e 100%)',
 accent: '#22d3ee',
@@ -111,6 +126,7 @@ patternSize: '18px 18px',
 },
 {
 id: 'cookbookverse',
+type: 'app',
 icon: 'book',
 title: 'CookBookVerse',
 description: "A curated world of recipes built for discovery. Tell it what's in your kitchen and it tells you what to cook.",
@@ -136,6 +152,7 @@ patternSize: '14px 14px',
 },
 {
 id: 'davapalooza',
+type: 'app',
 icon: 'ticket',
 title: 'Davapalooza',
 description: 'An event site built for a moment, not a browsing session. Loud colors, and the what, when, and where right up front.',
@@ -160,7 +177,34 @@ patternSize: '24px 24px',
 },
 },
 {
+id: 'zombie-siege',
+type: 'game',
+icon: 'cube',
+title: 'Zombie Siege',
+description: 'A zombie shooter that runs in the browser. Hold the garage: seal the gate, find the boards, and survive all five waves.',
+// Early build. Swap in a longer pitch and highlights when they exist.
+role: 'Solo build',
+image: '/images/zombie-siege/menu.webp',
+gallery: [
+{ src: '/images/zombie-siege/wave-3.webp', alt: 'Zombie Siege, wave 3 starting in the parking garage' },
+{ src: '/images/zombie-siege/garage.webp', alt: 'Zombie Siege, the B1 parking garage with boards to find for the doors' },
+{ src: '/images/zombie-siege/street.webp', alt: 'Zombie Siege, the street outside the Parking B1 loading dock' },
+{ src: '/images/zombie-siege/ramp.webp', alt: 'Zombie Siege, the ramp down into the garage' },
+{ src: '/images/zombie-siege/street-2.webp', alt: 'Zombie Siege, the street at night with parked cars' },
+],
+tags: ['Game Dev', 'Browser Game', 'Survival'],
+liveUrl: 'https://zombiesiege-chrisoc.vercel.app/',
+wip: true,
+theme: {
+gradient: 'linear-gradient(135deg, #1c1917 0%, #3f1d1d 50%, #0a0a0a 100%)',
+accent: '#f87171',
+pattern: 'radial-gradient(circle, rgba(248,113,113,0.08) 1px, transparent 1px)',
+patternSize: '22px 22px',
+},
+},
+{
 id: 'trvlplay',
+type: 'game',
 icon: 'dice',
 title: 'TRVLPlay',
 description: 'Thinking games for killing time on the road. Four quick games about sorting and spotting patterns, with daily puzzles, friends, and coins to earn.',
@@ -186,6 +230,7 @@ patternSize: '22px 22px',
 },
 {
 id: 'scramble',
+type: 'game',
 icon: 'egg',
 title: 'Scramble',
 description: 'A side-scrolling platformer starring an egg. Tight jumps, enemies to stomp, and star ratings to chase, right in the browser.',
@@ -211,6 +256,7 @@ patternSize: '16px 16px',
 },
 {
 id: 'wx',
+type: 'app',
 icon: 'weather',
 title: 'WX',
 description: 'Weather, minus the clutter. What it is doing now and what is about to change, at a glance.',
@@ -236,6 +282,7 @@ patternSize: '18px 18px',
 },
 {
 id: 'hang',
+type: 'game',
 icon: 'qr',
 title: 'Hang',
 description: 'Turns any group of phones into a game night. Scan a QR code, join the room, and the whole table is playing.',
@@ -261,6 +308,7 @@ patternSize: '20px 20px',
 },
 {
 id: 'standalone',
+type: 'tool',
 icon: 'cube',
 title: 'Standalone',
 description: 'A pile of one-off fabrication scripts turning into one tool: laser-cut boxes, 3D-print enclosures, and CNC feeds and speeds.',
@@ -288,6 +336,7 @@ patternSize: '16px 16px',
 },
 {
 id: 'ping',
+type: 'app',
 icon: 'chat',
 title: 'Ping',
 description: 'Somewhere to vent or think out loud. A smart-mouthed AI companion, with no therapy vibes.',
@@ -313,6 +362,7 @@ patternSize: '20px 20px',
 },
 {
 id: 'splitnote',
+type: 'tool',
 icon: 'receipt',
 title: 'SplitNote',
 description: 'Splitting the bill at dinner without the flashy finance-app energy. Just the math.',
@@ -338,6 +388,7 @@ patternSize: '18px 18px',
 },
 {
 id: 'games-collection',
+type: 'game',
 icon: 'grid',
 title: 'Games Collection',
 description: 'A growing shelf of browser games: Connections, Sudoku, Word Search, and more. No installs, no accounts.',
@@ -362,33 +413,8 @@ patternSize: '18px 18px',
 },
 },
 {
-id: 'burrow',
-icon: 'globe',
-title: 'Burrow',
-description: 'For people who tour with events for a living. Jobs, travel, and messages in one place instead of a dozen apps.',
-longDescription: 'Burrow helps touring event professionals manage job trips, travel logistics, and communications without juggling a dozen disconnected tools. It renders travel routes on an interactive 3D globe and can generate PDF itineraries and QR codes for quick sharing on-site.',
-invite: 'If you tour with events for a living, tell me what your week actually looks like. That is who this is for.',
-role: 'Solo build',
-stack: ['Next.js', 'TypeScript', 'Three.js', 'OpenAI', 'React PDF'],
-highlights: [
-'Interactive 3D globe for visualizing job trips and travel routes',
-'PDF itinerary generation and QR-code sharing',
-'AI-assisted trip and communication support via OpenAI',
-],
-image: '',
-tags: ['Events', 'Travel', 'Productivity'],
-liveUrl: 'https://git-chrisoc.vercel.app/',
-liveNote: 'Private team tool: the live link opens a team sign-in.',
-wip: false,
-theme: {
-gradient: 'linear-gradient(135deg, #0c4a6e 0%, #075985 50%, #0a0f1a 100%)',
-accent: '#38bdf8',
-pattern: 'linear-gradient(rgba(56,189,248,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,0.06) 1px, transparent 1px)',
-patternSize: '20px 20px',
-},
-},
-{
 id: 'wanderlog',
+type: 'app',
 icon: 'map',
 title: 'Wanderlog',
 description: 'A travel blog built for two people: one writing from the road, one keeping it running. Drag-and-drop instead of CMS forms.',
@@ -414,6 +440,7 @@ patternSize: '20px 20px',
 },
 {
 id: 'ctrii',
+type: 'tool',
 icon: 'prompt',
 title: 'ctrII',
 description: 'A new-tab page that works like a command center. Ask it things, keep your links, and capture your thoughts.',
@@ -439,6 +466,7 @@ patternSize: '18px 18px',
 },
 {
 id: 'supplyline',
+type: 'game',
 icon: 'truck',
 title: 'SupplyLine',
 description: 'A logistics sim on a 3D globe. Build the chain, run the trucks, and watch a village turn into a metropolis because you fed it right.',
@@ -456,6 +484,7 @@ highlights: [
 image: '/images/supplyline-preview.jpg',
 tags: ['Desktop App', 'Simulation', 'Logistics', 'Game Dev'],
 liveUrl: 'https://supplyline-chrisoc.vercel.app/',
+playLabel: 'Get the tester build',
 download: { label: 'Free demo (Windows + Mac)', url: 'https://supplyline-chrisoc.vercel.app/' },
 wip: false,
 theme: {
@@ -469,6 +498,7 @@ patternSize: '20px 20px',
 
 export const starterProjectTemplate: Project = {
 id: 'your-project-id',
+type: 'app',
 title: 'Your Project Name',
 description: 'A short description of what this project does and why it matters.',
 longDescription: 'A longer, 2-3 sentence case-study style description: what problem it solves, who it is for, and what makes it worth a look.',

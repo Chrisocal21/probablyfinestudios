@@ -5,9 +5,10 @@ export const site = {
 	/** The studio started as one person and is meant to grow; it is not pitched as a "solo studio". */
 	tagline: 'Started solo. Not planning to stay that way.',
 	description:
-		'Probably Fine Studios is a product studio started by Chris, a photographer turned developer who ships web apps, tools, and games with AI in the loop. Started solo, looking to grow: collaborators and business partners welcome.',
+		'Probably Fine Studios is a product studio started by Chris, a photographer turned developer who makes games, apps and sites, and tools with AI in the loop, plus the odd laser-engraving or Adobe-scripting job. Started solo, looking to grow: collaborators and business partners welcome.',
 	repo: 'https://github.com/Chrisocal21/probablyfinestudios',
 	nav: [
+		{ href: '/games/', label: 'Games' },
 		{ href: '/portfolio/', label: 'Projects' },
 		{ href: '/about/', label: 'About' },
 		{ href: '/resume/', label: 'Resume' },

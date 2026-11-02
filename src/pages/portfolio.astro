@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ProjectSection from '../components/ProjectSection.astro';
-import { projects, shippedProjects, inProgressProjects } from '../data/projects';
+import { projects, shippedProjects, inProgressProjects, type Project } from '../data/projects';
 import { site, contactLink } from '../data/site';
 
 // Every technology used across the projects, most-used first.
@@ -9,6 +9,13 @@ const usage = new Map<string, number>();
 for (const project of projects) {
 	for (const tech of project.stack ?? []) usage.set(tech, (usage.get(tech) ?? 0) + 1);
 }
+// Grouped by type, shipped work first; each card carries its own status tag.
+const byType = (type: Project['type']) => projects.filter(project => project.type === type).sort((a, b) => Number(a.wip ?? false) - Number(b.wip ?? false));
+const groups = [
+	{ id: 'games', title: 'Games', subtitle: 'Browser games and sims. The curated shelf lives on the Games page.', projects: byType('game') },
+	{ id: 'apps', title: 'Apps & Sites', subtitle: "Real products, up and running. Go click around. I'll wait.", projects: byType('app') },
+	{ id: 'tools', title: 'Tools', subtitle: 'Small things that scratch a specific itch (usually mine).', projects: byType('tool') },
+];
 const techs = [...usage.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
 const jsonLd = {
@@ -30,7 +37,7 @@ const jsonLd = {
 
 <Layout
 	title="Projects | Probably Fine Studios"
-	description={`All ${projects.length} projects from Probably Fine Studios: ${shippedProjects.length} shipped and live, ${inProgressProjects.length} in development. Web apps, tools, and games, each with a case study.`}
+	description={`All ${projects.length} projects from Probably Fine Studios: ${shippedProjects.length} shipped and live, ${inProgressProjects.length} in development. Games, apps and sites, and tools, each with a case study.`}
 	jsonLd={jsonLd}
 >
 	<section class="py-16 md:py-20 bg-black">
@@ -54,23 +61,11 @@ const jsonLd = {
 				<p id="tech-status" class="text-center text-sm text-zinc-400 mt-4 min-h-5" aria-live="polite"></p>
 			</div>
 
-			<ProjectSection
-				id="shipped"
-				title="Shipped & Live"
-				subtitle="Real products, up and running. Go click around. I'll wait."
-				projects={shippedProjects}
-				variant="shipped"
-			/>
-
-			<div class="section-divider my-16 border-t border-zinc-800/70"></div>
-
-			<ProjectSection
-				id="exploring"
-				title="Exploring & In Progress"
-				subtitle="Ideas I'm still poking at. Some will ship, some won't. All of them seemed like a good idea at the time."
-				projects={inProgressProjects}
-				variant="exploring"
-			/>
+			<div class="space-y-16">
+				{groups.map(group => (
+					<ProjectSection id={group.id} title={group.title} subtitle={group.subtitle} projects={group.projects} variant="mixed" limit={3} />
+				))}
+			</div>
 
 			<div class="mt-20 rounded-2xl border border-zinc-800 bg-zinc-950 p-8 sm:p-10 text-center">
 				<h2 class="text-2xl md:text-3xl font-bold text-white mb-3">See something you'd want to build on?</h2>
@@ -148,6 +143,13 @@ const jsonLd = {
 		for (const section of sections) {
 			const count = section.querySelectorAll('.project-card:not(.hidden)').length;
 			section.classList.toggle('hidden', count === 0);
+			// A filter shows every match; clearing it restores the "See more" collapse.
+			if (section.hasAttribute('data-collapsible')) {
+				const button = section.querySelector<HTMLButtonElement>('.see-more');
+				const expanded = button?.getAttribute('aria-expanded') === 'true';
+				section.toggleAttribute('data-collapsed', !active && !expanded);
+				button?.classList.toggle('hidden', Boolean(active));
+			}
 			const counter = section.querySelector('.project-count');
 			if (counter) counter.textContent = String(count);
 			if (count > 0) visibleSections++;
