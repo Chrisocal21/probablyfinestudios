@@ -2,6 +2,10 @@
 //
 //   npm run screens              capture every project
 //   npm run screens -- wx hang   capture only these project ids
+//   npm run screens -- --clip    also record a short looping clip of each project
+//
+// Clips are animated WebP files in src/assets/clips/<id>.webp: silent, looping, and
+// playable anywhere an image is, with no video tools to install.
 //
 // Images are written to src/assets/screens/<id>.webp, and the capture date to
 // src/assets/screens/captured.json. A case study shows its screenshot automatically
@@ -23,6 +27,7 @@ const MANIFEST = path.join(OUT_DIR, 'captured.json');
  *   wait   milliseconds to let the page settle after it loads (default 4500)
  *   geo    [latitude, longitude] to report when the site asks for a location
  *   steps  interactions before the screenshot: {click:[x,y]}, {clickText:'...'}, {key:'ArrowRight', hold:ms}, {wait:ms}
+ *   clip   for --clip: { seconds (default 6), steps (same kinds, played while recording) }
  */
 const recipes = {
 	// Private team tool: the live page is only a sign-in screen.
@@ -31,6 +36,8 @@ const recipes = {
 	trvlplay: { steps: [{ clickText: 'Play as Guest' }, { wait: 4500 }] },
 	// The game draws on a canvas: press PLAY, open level 1-1, take a few steps.
 	scramble: { steps: [{ click: [650, 452] }, { wait: 2000 }, { click: [148, 387] }, { wait: 2600 }, { key: 'ArrowRight', hold: 260 }, { wait: 120 }] },
+	// Get past the photosensitivity warning to the title menu.
+	'zombie-siege': { steps: [{ key: 'Enter' }, { wait: 3500 }] },
 	// Without a location the app only shows its welcome screen.
 	wx: { geo: [32.7157, -117.1611], wait: 7000 },
 };
@@ -52,7 +59,12 @@ if (!chromePath) {
 	process.exit(1);
 }
 
-const only = process.argv.slice(2);
+const CLIP_DIR = 'src/assets/clips';
+const CLIP_WIDTH = 960;
+const CLIP_FPS = 10;
+const args = process.argv.slice(2);
+const recordClips = args.includes('--clip');
+const only = args.filter(arg => !arg.startsWith('--'));
 const targets = projects.filter(project => project.liveUrl && recipes[project.id] !== null && (only.length === 0 || only.includes(project.id)));
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -83,8 +95,13 @@ try {
 	let nextId = 1;
 	const pending = new Map();
 	const waiters = new Map();
+	let onFrame = null;
 	socket.onmessage = event => {
 		const message = JSON.parse(event.data);
+		if (message.method === 'Page.screencastFrame') {
+			onFrame?.(message.params);
+			return;
+		}
 		if (message.id && pending.has(message.id)) {
 			const { resolve, reject } = pending.get(message.id);
 			pending.delete(message.id);
@@ -108,6 +125,59 @@ try {
 		await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 });
 	};
 
+	const runSteps = async (steps = []) => {
+		for (const step of steps) {
+			if (step.click) {
+				await click(...step.click);
+			} else if (step.clickText) {
+				const found = await send('Runtime.evaluate', {
+					expression: `(() => { const want = ${JSON.stringify(step.clickText.toLowerCase())}; const el = [...document.querySelectorAll('a,button,[role=button]')].find(e => (e.innerText || '').trim().toLowerCase().includes(want)); if (!el) return null; const r = el.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`,
+					returnByValue: true,
+				});
+				if (!found.result.value) throw new Error(`could not find a button labelled "${step.clickText}"`);
+				await click(...found.result.value);
+			} else if (step.key) {
+				const codes = { ArrowRight: 39, ArrowLeft: 37, ArrowUp: 38, ArrowDown: 40, Enter: 13, Escape: 27 };
+				const key = { key: step.key, code: step.key, windowsVirtualKeyCode: codes[step.key] ?? 0 };
+				await send('Input.dispatchKeyEvent', { type: 'keyDown', ...key });
+				await sleep(step.hold ?? 60);
+				await send('Input.dispatchKeyEvent', { type: 'keyUp', ...key });
+			} else if (step.wait) {
+				await sleep(step.wait);
+			}
+		}
+	};
+
+	// Records the page for a few seconds while optional steps play, then writes a looping animated WebP.
+	const recordClip = async (project, clip = {}) => {
+		const frames = [];
+		const started = Date.now();
+		onFrame = params => {
+			frames.push({ at: Date.now() - started, data: params.data });
+			send('Page.screencastFrameAck', { sessionId: params.sessionId }).catch(() => {});
+		};
+		await send('Page.startScreencast', { format: 'jpeg', quality: 80, maxWidth: CLIP_WIDTH, everyNthFrame: 1 });
+		const seconds = clip.seconds ?? 6;
+		await Promise.all([runSteps(clip.steps), sleep(seconds * 1000)]);
+		await send('Page.stopScreencast');
+		onFrame = null;
+		if (frames.length === 0) throw new Error('no frames recorded');
+
+		// The browser only sends a frame when the page repaints, so resample to a steady frame rate.
+		const total = Math.round(seconds * CLIP_FPS);
+		const picked = [];
+		for (let tick = 0, index = 0; tick < total; tick++) {
+			const at = (tick * 1000) / CLIP_FPS;
+			while (index + 1 < frames.length && frames[index + 1].at <= at) index++;
+			picked.push(frames[index].data);
+		}
+		const images = await Promise.all(picked.map(data => sharp(Buffer.from(data, 'base64')).resize(CLIP_WIDTH).png().toBuffer()));
+		mkdirSync(CLIP_DIR, { recursive: true });
+		const file = path.join(CLIP_DIR, `${project.id}.webp`);
+		await sharp(images, { join: { animated: true } }).webp({ quality: 70, loop: 0, delay: Array(images.length).fill(1000 / CLIP_FPS) }).toFile(file);
+		return frames.length;
+	};
+
 	await send('Page.enable');
 	await send('Emulation.setDeviceMetricsOverride', { width: WIDTH, height: HEIGHT, deviceScaleFactor: 1, mobile: false });
 	await send('Browser.grantPermissions', { permissions: ['geolocation'] });
@@ -128,32 +198,18 @@ try {
 			await loaded;
 			await sleep(recipe.wait ?? 4500);
 
-			for (const step of recipe.steps ?? []) {
-				if (step.click) {
-					await click(...step.click);
-				} else if (step.clickText) {
-					const found = await send('Runtime.evaluate', {
-						expression: `(() => { const want = ${JSON.stringify(step.clickText.toLowerCase())}; const el = [...document.querySelectorAll('a,button,[role=button]')].find(e => (e.innerText || '').trim().toLowerCase().includes(want)); if (!el) return null; const r = el.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; })()`,
-						returnByValue: true,
-					});
-					if (!found.result.value) throw new Error(`could not find a button labelled "${step.clickText}"`);
-					await click(...found.result.value);
-				} else if (step.key) {
-					const codes = { ArrowRight: 39, ArrowLeft: 37, ArrowUp: 38, ArrowDown: 40, Enter: 13, Escape: 27 };
-					const key = { key: step.key, code: step.key, windowsVirtualKeyCode: codes[step.key] ?? 0 };
-					await send('Input.dispatchKeyEvent', { type: 'keyDown', ...key });
-					await sleep(step.hold ?? 60);
-					await send('Input.dispatchKeyEvent', { type: 'keyUp', ...key });
-				} else if (step.wait) {
-					await sleep(step.wait);
-				}
-			}
+			await runSteps(recipe.steps);
 
 			const shot = await send('Page.captureScreenshot', { format: 'png' });
 			const file = path.join(OUT_DIR, `${project.id}.webp`);
 			await sharp(Buffer.from(shot.data, 'base64')).webp({ quality: 86 }).toFile(file);
 			manifest[project.id] = today;
 			console.log(`captured  ${project.id.padEnd(18)} ${project.liveUrl}`);
+
+			if (recordClips) {
+				const painted = await recordClip(project, recipe.clip);
+				console.log(`clipped   ${project.id.padEnd(18)} ${painted} repaint(s)${painted < 5 ? ' (barely moves; maybe give it clip steps)' : ''}`);
+			}
 		} catch (error) {
 			failed++;
 			console.error(`FAILED    ${project.id.padEnd(18)} ${error.message}`);

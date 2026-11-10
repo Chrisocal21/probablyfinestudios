@@ -18,6 +18,8 @@ interface Props {
 	/** schema.org structured data for this page */
 	jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 	hideFooter?: boolean;
+	/** Float the header over a full-screen scene instead of showing it as a bar. */
+	navOverlay?: boolean;
 }
 
 const {
@@ -29,6 +31,7 @@ const {
 	noindex = false,
 	jsonLd,
 	hideFooter = false,
+	navOverlay = false,
 } = Astro.props;
 
 // The live host serves every page with a trailing slash, so canonical URLs use one too.
@@ -89,7 +92,7 @@ const schemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 		>
 			Skip to content
 		</a>
-		<Nav />
+		<Nav overlay={navOverlay} />
 		<main id="main">
 			<slot />
 		</main>

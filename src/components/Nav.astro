@@ -3,6 +3,12 @@ import { Image } from 'astro:assets';
 import logoMark from '../assets/logo-mark.png';
 import { site } from '../data/site';
 
+interface Props {
+	/** Float over a full-screen scene (the studio) instead of sitting on top of the page as a bar. */
+	overlay?: boolean;
+}
+const { overlay = false } = Astro.props;
+
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (href: string) => {
 	const target = href.replace(/\/$/, '') || '/';
@@ -10,8 +16,12 @@ const isActive = (href: string) => {
 };
 ---
 
-<header class="sticky top-0 z-50 border-b border-zinc-800/80 bg-black/80 backdrop-blur-md print:hidden">
-	<nav aria-label="Main" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+<header
+	class={overlay
+		? 'absolute inset-x-0 top-0 z-50 bg-gradient-to-b from-[#07061a]/85 via-[#07061a]/40 to-transparent pb-6 print:hidden'
+		: 'sticky top-0 z-50 border-b border-zinc-800/80 bg-black/80 backdrop-blur-md print:hidden'}
+>
+	<nav aria-label="Main" class={`${overlay ? 'px-4 sm:px-8 lg:px-12' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'} h-16 flex items-center justify-between gap-4`}>
 		<a href="/" class="flex items-center gap-2.5 shrink-0">
 			<Image src={logoMark} alt="" width={196} class="h-7 md:h-8 w-auto" loading="eager" />
 			<span class="leading-none font-display">
@@ -22,13 +32,13 @@ const isActive = (href: string) => {
 		</a>
 
 		<div class="flex items-center gap-1 sm:gap-2">
-			<ul class="hidden md:flex items-center gap-1 mr-2">
+			<ul class={`hidden md:flex items-center gap-1 mr-2 ${overlay ? 'p-1 rounded-full bg-black/30 border border-white/10 backdrop-blur-md' : ''}`}>
 				{site.nav.map(link => (
 					<li>
 						<a
 							href={link.href}
 							aria-current={isActive(link.href) ? 'page' : undefined}
-							class={`px-3 py-2 rounded-lg text-sm transition ${isActive(link.href) ? 'text-white font-semibold bg-white/10' : 'text-zinc-300 hover:text-white hover:bg-white/5'}`}
+							class={`px-3 py-2 ${overlay ? 'rounded-full' : 'rounded-lg'} text-sm transition ${isActive(link.href) ? 'text-white font-semibold bg-white/10' : 'text-zinc-300 hover:text-white hover:bg-white/5'}`}
 						>
 							{link.label}
 						</a>
@@ -36,7 +46,12 @@ const isActive = (href: string) => {
 				))}
 			</ul>
 
-			<a href={site.contactHref} class="bg-white text-black px-4 py-2 rounded-lg hover:bg-zinc-200 transition text-sm font-semibold whitespace-nowrap">
+			<a
+				href={site.contactHref}
+				class={overlay
+					? 'bg-[#fcd34d] text-black px-4 py-2 rounded-full hover:bg-[#fde68a] transition text-sm font-semibold whitespace-nowrap shadow-[0_0_24px_rgba(252,211,77,0.35)]'
+					: 'bg-white text-black px-4 py-2 rounded-lg hover:bg-zinc-200 transition text-sm font-semibold whitespace-nowrap'}
+			>
 				<span class="sm:hidden">Contact</span>
 				<span class="hidden sm:inline">Work with me</span>
 			</a>

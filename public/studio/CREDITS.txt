@@ -1,0 +1,4 @@
+Studio props and textures from Poly Haven (https://polyhaven.com), released under CC0.
+
+Models: hanging_industrial_lamp, desk_lamp_arm_01, potted_plant_02, rubber_duck_toy, garden_gnome, bench_vice_01, metal_toolbox, measuring_tape_01, cross_pein_hammer, dartboard, wall_clock, boombox, cardboard_box_01, WetFloorSign_01, gamepad, mid_century_lounge_chair
+Textures: wood_floor_worn, painted_plaster_wall, fabric_pattern_07, wood_table_001, plywood
