@@ -7,7 +7,7 @@ import { projects, liveLabel } from '../data/projects';
 import { site, contactLink } from '../data/site';
 
 // The shelf is curated by hand, in this order. Other game-typed projects stay on /portfolio.
-const shelfIds = ['zombie-siege', 'supplyline', 'trvlplay'];
+const shelfIds = ['zombie-siege', 'supplyline', 'trvlplay', 'salvage-road', 'project-baja'];
 const games = shelfIds.flatMap(id => projects.filter(project => project.id === id && project.type === 'game'));
 
 // Every other game still gets a home, below the shelf.
