@@ -112,7 +112,7 @@ export async function renderSiteCard(): Promise<Buffer> {
 					{ gap: 16, marginTop: 48 },
 					pill(`${shippedProjects.length} shipped`),
 					pill(`${inProgressProjects.length} in the works`),
-					profile.availability.open ? pill('Looking for collaborators', '#ffffff', '#34d399') : null,
+					profile.availability.open ? pill('Open for projects', '#ffffff', '#34d399') : null,
 				),
 			),
 		),

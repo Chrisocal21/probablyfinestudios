@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import ProjectSection from '../components/ProjectSection.astro';
-import OpenTo from '../components/OpenTo.astro';
 import logoMark from '../assets/logo-mark.png';
 import chrisPhoto from '../assets/chris.jpg';
 import { projects, shippedProjects, inProgressProjects, type Project } from '../data/projects';
@@ -48,7 +47,7 @@ const jsonLd = [
 ];
 ---
 
-<Layout title="Probably Fine Studios | Games, apps, and tools by Chris" jsonLd={jsonLd}>
+<Layout title="Probably Fine Studios | Games, apps, and tools" jsonLd={jsonLd}>
 	<section class="relative overflow-hidden bg-black">
 		<div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px); background-size: 40px 40px"></div>
 		<div class="absolute inset-0" style="background: radial-gradient(ellipse 70% 55% at 50% 42%, rgba(99,59,200,0.16) 0%, transparent 70%)"></div>
@@ -72,7 +71,7 @@ const jsonLd = [
 			<h1 class="text-3xl md:text-5xl font-bold text-white mb-3 tracking-tight">Probably Fine Studios</h1>
 			<p class="text-base md:text-xl text-zinc-100 mb-3 leading-snug">{site.tagline}</p>
 			<p class="text-sm md:text-base text-zinc-400 mb-6 leading-relaxed max-w-xl mx-auto">
-				I'm Chris. I build web apps, desktop tools, games, and the odd Illustrator script, mostly with AI and a lot of stubbornness. I named the studio after my quality-assurance process. Right now it's just me in here, and I'd like to change that.
+				Web apps, desktop tools, games, and the odd Illustrator script, built mostly with AI and a lot of stubbornness. The studio is named after its quality-assurance process.
 			</p>
 
 			<div class="flex flex-wrap gap-3 justify-center mb-5">
@@ -135,9 +134,9 @@ const jsonLd = [
 						class="w-36 md:w-full aspect-[4/5] object-cover object-top rounded-xl border border-zinc-800"
 					/>
 					<div>
-						<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-indigo-300">The guy behind the curtain</p>
+						<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-indigo-300">Behind the studio</p>
 						<h2 id="behind-heading" class="text-2xl md:text-3xl font-bold text-white mb-3">{profile.headline}</h2>
-						<p class="text-zinc-300 leading-relaxed mb-7 max-w-2xl">{profile.hook}</p>
+						<p class="text-zinc-300 leading-relaxed mb-7 max-w-2xl">{profile.teaser}</p>
 						<dl class="grid grid-cols-3 gap-4 sm:gap-8 mb-7 max-w-xl">
 							{stats.map(stat => (
 								<div class="flex flex-col-reverse justify-end">
@@ -147,7 +146,7 @@ const jsonLd = [
 							))}
 						</dl>
 						<div class="flex flex-wrap gap-3">
-							<a href="/about/" class="px-5 py-2.5 rounded-lg font-semibold text-sm border border-white/25 text-white hover:bg-white/10 transition">More about me</a>
+							<a href="/about/" class="px-5 py-2.5 rounded-lg font-semibold text-sm border border-white/25 text-white hover:bg-white/10 transition">Read the story</a>
 							<a href="/resume/" class="px-5 py-2.5 rounded-lg font-semibold text-sm border border-white/25 text-white hover:bg-white/10 transition">Resume</a>
 						</div>
 					</div>
@@ -175,21 +174,22 @@ const jsonLd = [
 				</a>
 			</section>
 
-			<!-- Work with me -->
+			<!-- Work with the studio -->
 			<section id="work-with-me" class="mt-16 scroll-mt-24" aria-labelledby="work-heading">
 				<div class="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 sm:p-10">
 					<div class="max-w-2xl mb-8">
 						<p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3 text-indigo-300">Working together</p>
-						<h2 id="work-heading" class="text-3xl md:text-4xl font-bold text-white mb-4">This was never supposed to stay a one-person studio</h2>
+						<h2 id="work-heading" class="text-3xl md:text-4xl font-bold text-white mb-4">Got something that needs building?</h2>
 						<p class="text-zinc-300 text-lg leading-relaxed">
-							Everything on this page was built solo. That was fun, and it's also the problem: the next things I want to build are bigger than one person. Seasoned pro or just trying to get a foot in the door, if one of these sounds like you, come say hi.
+							Sites, apps, games, and tools, built properly and actually shipped. Say what you are working on and get an honest answer about whether this is the right studio for it.
 						</p>
 					</div>
-					<OpenTo />
+					<div class="flex flex-wrap gap-3">
+						<a href={contactLink({ topic: 'project' })} class="px-5 py-2.5 rounded-lg font-semibold text-sm transition bg-white text-black hover:bg-zinc-200">Start a project</a>
+						<a href="/portfolio/" class="px-5 py-2.5 rounded-lg font-semibold text-sm transition border border-white/25 text-white hover:bg-white/10">See all {projects.length} projects</a>
+					</div>
 					<p class="mt-8 text-sm text-zinc-400">
-						Curious what I'm like to work with?{' '}
-						<a href="/about/#people" class="text-zinc-100 underline hover:text-white">Here's what I look for in people</a>,
-						and here are <a href="/portfolio/" class="text-zinc-100 underline hover:text-white">all {projects.length} projects</a>.
+						Want to build things together instead? <a href="/about/#people" class="text-zinc-100 underline hover:text-white">That's on the about page</a>.
 					</p>
 				</div>
 			</section>

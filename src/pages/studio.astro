@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { projects } from '../data/projects';
 import { contactLink } from '../data/site';
+import { stops, services, type StopId } from '../data/studio';
 
 // Screenshots made by `npm run screens`; older ones live in public/ and are named in `image`.
 const screens = import.meta.glob<ImageMetadata>('../assets/screens/*.webp', { eager: true, import: 'default' });
@@ -38,13 +39,22 @@ const data = {
 		about: '/about/',
 		work: '/portfolio/',
 	},
-	portrait: '/images/compressed-Chris.jpg',
 };
+
+// Phones skip the 3D room and get the lobby directory: every department and its suite.
+const counts: Partial<Record<StopId, string>> = {
+	arcade: `${data.games.length} games`,
+	desk: `${data.apps.length} apps`,
+	bench: `${data.tools.length} tools`,
+};
+const phoneOrder: StopId[] = ['arcade', 'desk', 'bench', 'services', 'board', 'coffee'];
+const suite: Record<StopId, string> = { arcade: '101', desk: '102', bench: '103', services: '104', board: '105', coffee: 'Lobby' };
+const lists: Partial<Record<StopId, ReturnType<typeof toItem>[]>> = { desk: data.apps, bench: data.tools };
 ---
 
 <Layout
 	title="The Studio | Probably Fine Studios"
-	description="Walk around the Probably Fine Studios office. It is one guy, a lot of projects, and several empty desks."
+	description="Walk around the Probably Fine Studios office: the arcade, the main desk, the workbench, and the coffee machine where projects start."
 	hideFooter
 	navOverlay
 	noindex
@@ -54,8 +64,8 @@ const data = {
 		<div id="studio-tags" class="studio-tags" aria-hidden="true"></div>
 
 		<div id="studio-intro" class="studio-intro">
-			<p class="eyebrow">Probably Fine Studios · Est. one guy</p>
-			<h1>A whole studio.<br /><span>Staffed by Chris.</span></h1>
+			<p class="eyebrow">Games · Apps · Tools</p>
+			<h1>Come on in.<br /><span>It's probably fine.</span></h1>
 			<p class="lede">Everything in this room is real work. Click around, or scroll for the tour.</p>
 		</div>
 
@@ -94,12 +104,144 @@ const data = {
 		</noscript>
 	</section>
 
+	<div class="studio-phone">
+		<header class="ph-hero">
+			<p class="ph-eyebrow">Games · Apps · Tools</p>
+			<h1>Come on in.<br /><span>It's probably fine.</span></h1>
+			<p class="ph-lede">On a bigger screen this page is a 3D office you can walk around. Your phone gets the lobby directory instead. Same studio, fewer polygons.</p>
+		</header>
+
+		<section class="ph-board" aria-labelledby="ph-board-title">
+			<p id="ph-board-title" class="ph-board-title">Directory</p>
+			<ol>
+				{phoneOrder.map(id => (
+					<li>
+						<a href={`#ph-${id}`} style={`--accent:${stops[id].accent}`}>
+							<span class="ph-dept">{stops[id].short}</span>
+							<span class="ph-leader" aria-hidden="true"></span>
+							<span class="ph-room">{suite[id]}</span>
+						</a>
+					</li>
+				))}
+			</ol>
+			<p class="ph-board-note">Visitors, please sign in at the coffee machine.</p>
+		</section>
+
+		<nav class="ph-tabs" aria-label="Departments">
+			<ol>
+				{phoneOrder.map(id => (
+					<li><a href={`#ph-${id}`} data-tab={id} style={`--accent:${stops[id].accent}`}>{stops[id].short}</a></li>
+				))}
+			</ol>
+		</nav>
+
+		{phoneOrder.map(id => (
+			<section id={`ph-${id}`} class:list={['ph-section', id === 'coffee' && 'ph-cta']} data-section={id} style={`--accent:${stops[id].accent}`}>
+				<p class="ph-kicker">{stops[id].place}{counts[id] && ` · ${counts[id]}`}</p>
+				<h2>{stops[id].title}</h2>
+				<p class="ph-sub">{stops[id].lede}</p>
+
+				{id === 'arcade' && (
+					<ol class="ph-games" aria-label="Games">
+						{data.games.map(game => (
+							<li class="ph-game" style={`--accent:${game.accent}`}>
+								{game.screen ? <img src={game.screen} alt="" loading="lazy" decoding="async" /> : <div class="ph-shot-empty" aria-hidden="true">{game.title}</div>}
+								<div class="ph-game-body">
+									<h3>{game.title}{game.wip && <span class="ph-wip">WIP</span>}</h3>
+									<p>{game.description}</p>
+									<div class="ph-actions">
+										{game.url && <a class="ph-btn is-primary" href={game.url} target="_blank" rel="noopener noreferrer">{game.playLabel ?? 'Play'} ↗︎</a>}
+										<a class="ph-btn" href={`/portfolio/${game.id}/`}>About</a>
+									</div>
+								</div>
+							</li>
+						))}
+					</ol>
+				)}
+
+				{lists[id] && (
+					<ol class="ph-list">
+						{lists[id].map(item => (
+							<li style={`--accent:${item.accent}`}>
+								{item.screen ? <img src={item.screen} alt="" loading="lazy" decoding="async" /> : <div class="ph-thumb-empty" aria-hidden="true"></div>}
+								<div>
+									<h3>{item.title}{item.wip && <span class="ph-wip">WIP</span>}</h3>
+									<p>{item.description}</p>
+									<div class="ph-actions">
+										{item.url && <a class="ph-btn is-primary" href={item.url} target="_blank" rel="noopener noreferrer">Visit ↗︎</a>}
+										<a class="ph-btn" href={`/portfolio/${item.id}/`}>About</a>
+									</div>
+								</div>
+							</li>
+						))}
+					</ol>
+				)}
+
+				{id === 'board' && (
+					<div class="ph-actions">
+						<a class="ph-btn is-primary" href={data.links.about}>Read the about page</a>
+						<a class="ph-btn" href={data.links.work}>All the work</a>
+					</div>
+				)}
+
+				{id === 'services' && (
+					<>
+						<ul class="ph-roles">
+							{services.map(r => <li><b>{r.name}</b> {r.note}</li>)}
+						</ul>
+						<div class="ph-actions">
+							<a class="ph-btn is-primary" href={data.links.hire}>Start a project</a>
+							<a class="ph-btn" href={data.links.work}>See the work</a>
+						</div>
+					</>
+				)}
+
+				{id === 'coffee' && (
+					<div class="ph-actions">
+						<a class="ph-btn is-primary" href={data.links.hire}>Start a project</a>
+						<a class="ph-btn" href={data.links.hello}>Just say hi</a>
+					</div>
+				)}
+			</section>
+		))}
+
+		<p class="ph-foot"><a href="/portfolio/">Every project on one page →</a></p>
+	</div>
+
 	<script type="application/json" id="studio-data" set:html={JSON.stringify(data).replace(/</g, '\\u003c')} />
 </Layout>
 
 <script>
-	import { startStudio } from '../scripts/studio';
-	startStudio();
+	// The 3D room only loads on screens big enough for it; phones get the directory and never download three.js.
+	const phone = window.matchMedia('(max-width: 767px)');
+	let started = false;
+	const startRoom = () => {
+		if (started || phone.matches) return;
+		started = true;
+		import('../scripts/studio').then(({ startStudio }) => startStudio());
+	};
+	startRoom();
+	phone.addEventListener('change', startRoom);
+
+	// Light up the tab for whichever department is on screen.
+	const tabs = document.querySelectorAll<HTMLAnchorElement>('.ph-tabs a');
+	const tabList = document.querySelector('.ph-tabs ol');
+	const spy = new IntersectionObserver(
+		entries => {
+			for (const entry of entries) {
+				if (!entry.isIntersecting) continue;
+				const id = (entry.target as HTMLElement).dataset.section;
+				tabs.forEach(tab => {
+					const on = tab.dataset.tab === id;
+					if (on) tab.setAttribute('aria-current', 'true');
+					else tab.removeAttribute('aria-current');
+					if (on && tabList) tabList.scrollTo({ left: tab.offsetLeft - 16, behavior: 'smooth' });
+				});
+			}
+		},
+		{ rootMargin: '-35% 0px -60% 0px' },
+	);
+	document.querySelectorAll('.ph-section').forEach(section => spy.observe(section));
 </script>
 
 <style>
@@ -167,6 +309,7 @@ const data = {
 	.studio-intro {
 		position: absolute;
 		left: clamp(1rem, 5vw, 4rem);
+		right: clamp(1rem, 5vw, 4rem);
 		bottom: 5.5rem;
 		max-width: 38rem;
 		z-index: 2;
@@ -277,14 +420,6 @@ const data = {
 		}
 	}
 	@media (max-width: 767px) {
-		.studio-panel {
-			top: auto;
-			left: 0.75rem;
-			right: 0.75rem;
-			bottom: 4.5rem;
-			width: auto;
-			max-height: 58%;
-		}
 		.studio-skip {
 			display: none;
 		}
@@ -461,5 +596,337 @@ const data = {
 	.studio-loading.is-done {
 		opacity: 0;
 		pointer-events: none;
+	}
+
+	/* ---------- phones: no 3D room, just the lobby directory and the departments ---------- */
+	.studio-phone {
+		display: none;
+	}
+	@media (max-width: 767px) {
+		.studio {
+			display: none;
+		}
+		.studio-phone {
+			display: block;
+			background:
+				radial-gradient(120% 40rem at 100% 0%, rgba(139, 92, 246, 0.22), transparent 60%),
+				radial-gradient(90% 30rem at 0% 8rem, rgba(240, 171, 252, 0.12), transparent 60%),
+				#0b0a1a;
+			color: #fff;
+			padding-bottom: env(safe-area-inset-bottom);
+		}
+	}
+	.ph-hero {
+		padding: 6.5rem 1.25rem 1.75rem;
+	}
+	.ph-eyebrow,
+	.ph-kicker {
+		font-size: 0.66rem;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		font-weight: 700;
+		color: #fcd34d;
+	}
+	.ph-kicker {
+		color: var(--accent);
+	}
+	.ph-hero h1 {
+		margin-top: 0.75rem;
+		font-family: 'Sora Variable', 'Sora', sans-serif;
+		font-size: clamp(2.3rem, 11vw, 3rem);
+		font-weight: 800;
+		line-height: 0.98;
+		letter-spacing: -0.035em;
+	}
+	.ph-hero h1 span {
+		color: #f0abfc;
+	}
+	.ph-lede {
+		margin-top: 1rem;
+		color: #d4d4d8;
+		font-size: 0.98rem;
+		line-height: 1.55;
+	}
+
+	/* The lobby letter board. */
+	.ph-board {
+		margin: 0 1.25rem;
+		padding: 1.1rem 1rem 0.9rem;
+		border-radius: 0.6rem;
+		border: 6px solid #2a2433;
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+			0 20px 40px rgba(0, 0, 0, 0.45);
+		background: repeating-linear-gradient(to bottom, #141218 0 9px, #0b0a0e 9px 10px);
+		font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+		text-transform: uppercase;
+		color: #f4f4f5;
+	}
+	.ph-board-title {
+		text-align: center;
+		font-size: 0.8rem;
+		letter-spacing: 0.4em;
+		color: #fcd34d;
+		margin-bottom: 0.7rem;
+	}
+	.ph-board a {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		padding: 0.45rem 0.1rem;
+		font-size: 0.82rem;
+		letter-spacing: 0.08em;
+	}
+	.ph-board a:active {
+		background: rgba(255, 255, 255, 0.06);
+	}
+	.ph-dept::before {
+		content: '';
+		display: inline-block;
+		width: 0.45rem;
+		height: 0.45rem;
+		margin-right: 0.5rem;
+		border-radius: 999px;
+		background: var(--accent);
+		vertical-align: 0.1em;
+	}
+	.ph-leader {
+		flex: 1;
+		border-bottom: 2px dotted rgba(255, 255, 255, 0.22);
+		translate: 0 -0.2em;
+	}
+	.ph-room {
+		color: #e4e4e7;
+	}
+	.ph-board-note {
+		margin-top: 0.6rem;
+		padding-top: 0.6rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+		font-size: 0.62rem;
+		letter-spacing: 0.08em;
+		color: #a1a1aa;
+		text-align: center;
+	}
+
+	/* Department tabs, pinned while you scroll. */
+	.ph-tabs {
+		position: sticky;
+		top: 0;
+		z-index: 40;
+		margin-top: 2rem;
+		background: rgba(11, 10, 26, 0.86);
+		backdrop-filter: blur(12px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	}
+	.ph-tabs ol {
+		display: flex;
+		gap: 0.4rem;
+		overflow-x: auto;
+		padding: 0.6rem 1.25rem;
+		scrollbar-width: none;
+	}
+	.ph-tabs ol::-webkit-scrollbar {
+		display: none;
+	}
+	.ph-tabs a {
+		display: block;
+		padding: 0.4rem 0.85rem;
+		border-radius: 999px;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: #d4d4d8;
+		white-space: nowrap;
+		transition: background 0.2s, color 0.2s, border-color 0.2s;
+	}
+	.ph-tabs a[aria-current] {
+		background: var(--accent);
+		border-color: var(--accent);
+		color: #000;
+	}
+
+	/* Departments. */
+	.ph-section {
+		padding: 2.5rem 1.25rem 0.5rem;
+		scroll-margin-top: 3.5rem;
+	}
+	.ph-section h2 {
+		margin-top: 0.5rem;
+		font-family: 'Sora Variable', 'Sora', sans-serif;
+		font-size: 1.85rem;
+		font-weight: 800;
+		line-height: 1.05;
+		letter-spacing: -0.025em;
+	}
+	.ph-sub {
+		margin-top: 0.6rem;
+		color: #a1a1aa;
+		font-size: 0.93rem;
+		line-height: 1.55;
+	}
+
+	.ph-games {
+		display: flex;
+		gap: 0.85rem;
+		margin: 1.25rem -1.25rem 0;
+		padding: 0 1.25rem 0.5rem;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scroll-padding-inline: 1.25rem;
+		scrollbar-width: none;
+	}
+	.ph-games::-webkit-scrollbar {
+		display: none;
+	}
+	.ph-game {
+		flex: none;
+		width: min(80vw, 20rem);
+		scroll-snap-align: start;
+		display: flex;
+		flex-direction: column;
+		border-radius: 1rem;
+		overflow: hidden;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+	}
+	.ph-game img,
+	.ph-shot-empty {
+		width: 100%;
+		aspect-ratio: 16 / 10;
+		object-fit: cover;
+		background: #18181b;
+	}
+	.ph-shot-empty {
+		display: grid;
+		place-items: center;
+		font-family: 'Sora Variable', 'Sora', sans-serif;
+		font-weight: 800;
+		font-size: 1.3rem;
+		color: var(--accent);
+		background: color-mix(in srgb, var(--accent) 14%, #0b0a1a);
+	}
+	.ph-game-body {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		padding: 0.9rem 1rem 1rem;
+	}
+	.ph-game-body p {
+		flex: 1;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.ph-list {
+		margin-top: 1.25rem;
+		display: grid;
+		gap: 0.75rem;
+	}
+	.ph-list li {
+		display: grid;
+		grid-template-columns: 5.75rem 1fr;
+		gap: 0.9rem;
+		padding: 0.85rem;
+		border-radius: 1rem;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+	}
+	.ph-list img,
+	.ph-thumb-empty {
+		width: 5.75rem;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+		border-radius: 0.55rem;
+		background: color-mix(in srgb, var(--accent) 16%, #18181b);
+	}
+
+	.ph-section h3 {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-weight: 700;
+		font-size: 1rem;
+	}
+	.ph-game-body p,
+	.ph-list p {
+		margin: 0.3rem 0 0.75rem;
+		font-size: 0.84rem;
+		line-height: 1.45;
+		color: #a1a1aa;
+	}
+	.ph-wip {
+		font-size: 0.58rem;
+		letter-spacing: 0.15em;
+		text-transform: uppercase;
+		padding: 0.1rem 0.4rem;
+		border-radius: 999px;
+		border: 1px solid #52525b;
+		color: #a1a1aa;
+		font-weight: 600;
+	}
+	.ph-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+	}
+	.ph-section > .ph-actions {
+		margin-top: 1.25rem;
+	}
+	.ph-btn {
+		display: inline-flex;
+		align-items: center;
+		min-height: 2.5rem;
+		padding: 0 1rem;
+		border-radius: 0.6rem;
+		border: 1px solid #3f3f46;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: #e4e4e7;
+	}
+	.ph-btn:active {
+		background: #27272a;
+	}
+	.ph-btn.is-primary {
+		background: var(--accent);
+		border-color: var(--accent);
+		color: #000;
+	}
+
+	.ph-roles {
+		margin-top: 1.25rem;
+		display: grid;
+		gap: 0.5rem;
+	}
+	.ph-roles li {
+		padding: 0.8rem 0.95rem;
+		border-radius: 0.75rem;
+		background: rgba(255, 255, 255, 0.05);
+		font-size: 0.9rem;
+		line-height: 1.45;
+		color: #d4d4d8;
+	}
+	.ph-roles b {
+		color: var(--accent);
+	}
+
+	.ph-section.ph-cta {
+		margin: 2.5rem 1.25rem 0;
+		padding: 1.75rem 1.4rem 1.6rem;
+		border-radius: 1.25rem;
+		background:
+			radial-gradient(120% 100% at 100% 0%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 70%),
+			rgba(255, 255, 255, 0.04);
+		border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+	}
+	.ph-cta .ph-sub {
+		color: #d4d4d8;
+	}
+	.ph-foot {
+		padding: 2rem 1.25rem 2.5rem;
+		text-align: center;
+		font-size: 0.88rem;
+		color: #a1a1aa;
 	}
 </style>

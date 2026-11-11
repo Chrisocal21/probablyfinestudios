@@ -22,7 +22,7 @@ const isActive = (href: string) => {
 		: 'sticky top-0 z-50 border-b border-zinc-800/80 bg-black/80 backdrop-blur-md print:hidden'}
 >
 	<nav aria-label="Main" class={`${overlay ? 'px-4 sm:px-8 lg:px-12' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'} h-16 flex items-center justify-between gap-4`}>
-		<a href="/" class="flex items-center gap-2.5 shrink-0">
+		<a href="/" class="flex items-center gap-2 min-[380px]:gap-2.5 shrink-0">
 			<Image src={logoMark} alt="" width={196} class="h-7 md:h-8 w-auto" loading="eager" />
 			<span class="leading-none font-display">
 				<span class="block text-white font-bold text-base md:text-lg tracking-tight">Probably Fine</span>
@@ -49,8 +49,8 @@ const isActive = (href: string) => {
 			<a
 				href={site.contactHref}
 				class={overlay
-					? 'bg-[#fcd34d] text-black px-4 py-2 rounded-full hover:bg-[#fde68a] transition text-sm font-semibold whitespace-nowrap shadow-[0_0_24px_rgba(252,211,77,0.35)]'
-					: 'bg-white text-black px-4 py-2 rounded-lg hover:bg-zinc-200 transition text-sm font-semibold whitespace-nowrap'}
+					? 'bg-[#fcd34d] text-black px-3 min-[380px]:px-4 py-2 rounded-full hover:bg-[#fde68a] transition text-sm font-semibold whitespace-nowrap shadow-[0_0_24px_rgba(252,211,77,0.35)]'
+					: 'bg-white text-black px-3 min-[380px]:px-4 py-2 rounded-lg hover:bg-zinc-200 transition text-sm font-semibold whitespace-nowrap'}
 			>
 				<span class="sm:hidden">Contact</span>
 				<span class="hidden sm:inline">Work with me</span>

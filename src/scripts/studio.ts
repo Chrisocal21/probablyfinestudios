@@ -13,6 +13,7 @@ import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
+import { stops, services, type StopId } from '../data/studio';
 
 interface Item {
 	id: string;
@@ -30,10 +31,9 @@ interface StudioData {
 	apps: Item[];
 	tools: Item[];
 	links: { hire: string; collab: string; hello: string; about: string; work: string };
-	portrait: string;
 }
 
-type StationId = 'arcade' | 'desk' | 'bench' | 'board' | 'coffee' | 'hiring';
+type StationId = StopId;
 type Vec3 = [number, number, number];
 interface Station {
 	id: StationId;
@@ -49,6 +49,8 @@ interface Station {
 
 // Home sits a little left so the room clears the headline; the intro starts high and wide, outside.
 const HOME = { cam: new THREE.Vector3(-0.4, 4.3, 9.8), look: new THREE.Vector3(-0.6, 0.55, -0.8) };
+// On a tall, narrow screen (a tablet held upright) the room is framed from higher and further back so it fits.
+const HOME_PORTRAIT = { cam: new THREE.Vector3(6.6, 8.6, 13.4), look: new THREE.Vector3(-0.2, 0.7, -0.7) };
 const INTRO = { cam: new THREE.Vector3(7.5, 9.5, 17), look: new THREE.Vector3(0, 1.5, -1.5) };
 const WALL_TOP = 4.2;
 
@@ -118,11 +120,13 @@ export function startStudio() {
 	scene.environmentIntensity = 0.32;
 
 	const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 80);
+	const isPortrait = () => canvas.clientWidth / Math.max(canvas.clientHeight, 1) < 0.9;
+	const home = () => (isPortrait() ? HOME_PORTRAIT : HOME);
 	const look = new THREE.Vector3();
-	const deepLink = ['arcade', 'desk', 'bench', 'board', 'coffee', 'hiring'].includes(location.hash.slice(1));
+	const deepLink = ['arcade', 'desk', 'bench', 'board', 'coffee', 'services'].includes(location.hash.slice(1));
 	const playIntro = !reducedMotion && !deepLink;
-	camera.position.copy(playIntro ? INTRO.cam : HOME.cam);
-	look.copy(playIntro ? INTRO.look : HOME.look);
+	camera.position.copy(playIntro ? INTRO.cam : home().cam);
+	look.copy(playIntro ? INTRO.look : home().look);
 	camera.lookAt(look);
 
 	// ---------- post-processing ----------
@@ -368,20 +372,27 @@ export function startStudio() {
 	neonLight.position.set(-0.6, 3.3, -4.1);
 	scene.add(neonLight);
 
-	// Employee of the month. Every month.
-	const eotm = new THREE.Group();
-	eotm.position.set(-2.9, 2.55, -4.73);
-	room.add(eotm);
-	box(eotm, 0.95, 1.2, 0.05, glossy(0xe0b100), 0, 0, 0, 0.015);
-	sign(eotm, 0.75, 0.75, loadTexture(data.portrait), 0, 0.1, 0.03);
-	sign(eotm, 0.85, 0.22, paint(512, 128, (ctx, w) => {
+	// The QA department's only poster, and its entire process.
+	const qa = new THREE.Group();
+	qa.position.set(-2.9, 2.55, -4.73);
+	room.add(qa);
+	box(qa, 0.95, 1.2, 0.05, glossy(0xe0b100), 0, 0, 0, 0.015);
+	sign(qa, 0.85, 1.1, paint(384, 512, (ctx, w, h) => {
 		ctx.fillStyle = '#111';
+		ctx.fillRect(0, 0, w, h);
 		ctx.textAlign = 'center';
-		ctx.font = font(800, 40);
-		ctx.fillText('EMPLOYEE OF THE MONTH', w / 2, 52);
-		ctx.font = font(500, 30);
-		ctx.fillText('Chris · every month since forever', w / 2, 98);
-	}), 0, -0.42, 0.03);
+		ctx.fillStyle = '#fcd34d';
+		ctx.font = font(700, 26);
+		ctx.fillText('QUALITY ASSURANCE', w / 2, 62);
+		ctx.fillStyle = '#fff';
+		ctx.font = font(800, 76);
+		ctx.fillText("IT'S", w / 2, 190);
+		ctx.fillText('PROBABLY', w / 2, 272);
+		ctx.fillText('FINE.', w / 2, 354);
+		ctx.fillStyle = '#a1a1aa';
+		ctx.font = font(500, 24);
+		ctx.fillText('signed off, as always', w / 2, 452);
+	}), 0, 0, 0.03);
 
 	prop('wall_clock', 0.42, room, [-4.3, 3.35, -4.72], 0, 'center');
 	prop('dartboard', 0.55, room, [-5.98, 1.75, -2.7], Math.PI / 2, 'center');
@@ -495,9 +506,9 @@ export function startStudio() {
 		panelLight(g, 0x9f7aea, 6, 0.82, 0.55, [0, 1.5, 0.2], [0, 1.2, 2]);
 	}
 
-	// The main desk: apps. Chris's desk, the only occupied one.
+	// The main desk: apps.
 	{
-		const g = station('desk', 'Chris · every department', '#93c5fd', [0.95, 1.7, -1.1], [0.95, 1.25, -3.8], [0.3, 2.35, -3.7]);
+		const g = station('desk', 'Apps (things people use)', '#93c5fd', [0.95, 1.7, -1.1], [0.95, 1.25, -3.8], [0.3, 2.35, -3.7]);
 		g.position.set(0.3, 0, -3.7);
 		g.updateMatrixWorld(true);
 		box(g, 2.4, 0.06, 0.95, deskWood, 0, 0.76, 0, 0.02);
@@ -675,17 +686,17 @@ export function startStudio() {
 		lamp(5.1, 2.8, 0xffc78a, 14);
 	}
 
-	// The empty desks: collaborators wanted.
+	// The project desks: one for each kind of work the studio takes on.
 	{
-		const g = station('hiring', 'Your desk here?', '#f0abfc', [-1.4, 3.2, 7.4], [-0.45, 0.7, 1.2], [-1.7, 2.1, 1.4]);
-		const roles = ['ART DIRECTOR\n(vacant)', '3D ARTIST\n(please)', 'SOMEONE WHO\nLIKES SPREADSHEETS'];
-		roles.forEach((role, i) => {
+		const g = station('services', 'Services (pull up a chair)', '#f0abfc', [-1.4, 3.2, 7.4], [-0.45, 0.7, 1.2], [-1.7, 2.1, 1.4]);
+		const desks = ['SITES & APPS\nopen for projects', 'GAMES\nopen for projects', 'TOOLS\nopen for projects'];
+		desks.forEach((label, i) => {
 			const d = new THREE.Group();
 			d.position.set(-3.4 + i * 1.75, 0, 1.4);
 			g.add(d);
 			box(d, 1.4, 0.05, 0.75, deskWood, 0, 0.74, 0, 0.015);
 			for (const [x, z] of [[-0.62, -0.3], [0.62, -0.3], [-0.62, 0.3], [0.62, 0.3]]) box(d, 0.04, 0.72, 0.04, metal(C.black, 0.5), x, 0.36, z, 0.008);
-			// The chair, empty, facing the room. Waiting.
+			// The chair, pulled out and facing the room, for whoever has a project.
 			box(d, 0.5, 0.07, 0.45, C.black, 0, 0.48, 0.65, 0.03);
 			box(d, 0.5, 0.55, 0.06, C.black, 0, 0.78, 0.86, 0.03);
 			cylinder(d, 0.02, 0.02, 0.45, metal(0xa1a1aa), 0, 0.24, 0.65, 12);
@@ -698,16 +709,16 @@ export function startStudio() {
 				ctx.strokeRect(7, 7, w - 14, h - 14);
 				ctx.fillStyle = '#111';
 				ctx.textAlign = 'center';
-				const parts = role.split('\n');
+				const parts = label.split('\n');
 				ctx.font = font(800, parts[0].length > 12 ? 40 : 54);
 				ctx.fillText(parts[0], w / 2, h * 0.42);
 				ctx.font = font(500, 40);
 				ctx.fillText(parts[1], w / 2, h * 0.72);
 			});
-			// Taped to the chair back, facing the room, so the joke lands from across it.
+			// Taped to the chair back, facing the room, so it reads from across it.
 			sign(d, 0.5, 0.25, card, 0, 0.82, 0.895);
 		});
-		// Interim staff.
+		// Desk ornaments.
 		prop('garden_gnome', 0.5, g, [-3.4, 0.515, 1.98], 0.15);
 		prop('rubber_duck_toy', 0.16, g, [-1.65, 0.765, 1.35], 0.5);
 		lamp(-1.7, 1.4, 0xf5d0fe, 16);
@@ -744,9 +755,36 @@ export function startStudio() {
 		parallax.copy(pointer);
 	});
 	canvas.addEventListener('pointerleave', () => pointer.set(9, 9));
-	canvas.addEventListener('click', () => {
-		if (hovered) go(stations.indexOf(hovered));
+	canvas.addEventListener('click', event => {
+		if (performance.now() < swipedUntil) return;
+		// Raycast at the tap itself, so a touch screen does not need a hover first.
+		let target = hovered;
+		if (!target && current === -1 && !introPlaying) {
+			const rect = canvas.getBoundingClientRect();
+			raycaster.setFromCamera(new THREE.Vector2(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1), camera);
+			target = stationFor(raycaster.intersectObjects(stations.map(s => s.group), true)[0]?.object ?? null);
+		}
+		if (target) go(stations.indexOf(target));
 		else if (current !== -1) go(-1);
+	});
+
+	// On a touch screen, a sideways swipe across the room moves to the next or previous stop.
+	let swipeStart: { x: number; y: number; t: number } | null = null;
+	let swipedUntil = 0;
+	canvas.addEventListener('pointerdown', event => {
+		if (event.pointerType !== 'mouse') swipeStart = { x: event.clientX, y: event.clientY, t: performance.now() };
+	});
+	canvas.addEventListener('pointerup', event => {
+		if (!swipeStart) return;
+		const dx = event.clientX - swipeStart.x;
+		const dy = event.clientY - swipeStart.y;
+		const quick = performance.now() - swipeStart.t < 700;
+		swipeStart = null;
+		pointer.set(9, 9);
+		if (quick && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+			swipedUntil = performance.now() + 400;
+			go(current + (dx < 0 ? 1 : -1));
+		}
 	});
 
 	// ---------- camera tour ----------
@@ -758,8 +796,8 @@ export function startStudio() {
 	let introPlaying = playIntro;
 	const fromCam = camera.position.clone();
 	const fromLook = look.clone();
-	const toCam = HOME.cam.clone();
-	const toLook = HOME.look.clone();
+	const toCam = home().cam.clone();
+	const toLook = home().look.clone();
 	let flight = 1;
 	let flightSeconds = 1.4;
 	let arc = 0.6;
@@ -794,8 +832,14 @@ export function startStudio() {
 		if (index < -1) index = stations.length - 1;
 		if (index >= stations.length) index = -1;
 		current = index;
-		if (index === -1) flyTo(HOME.cam, HOME.look, 1.4, 0.6);
-		else flyTo(new THREE.Vector3(...stations[index].cam), new THREE.Vector3(...stations[index].look), 1.4, 0.6);
+		if (index === -1) flyTo(home().cam, home().look, 1.4, 0.6);
+		else {
+			const target = new THREE.Vector3(...stations[index].look);
+			const cam = new THREE.Vector3(...stations[index].cam);
+			// A tall, narrow screen crops the sides and the panel covers the bottom, so step back to keep the object in frame.
+			if (isPortrait()) cam.sub(target).multiplyScalar(1.7).add(target);
+			flyTo(cam, target, 1.4, 0.6);
+		}
 		intro.classList.toggle('is-hidden', index !== -1);
 		tags.forEach(tag => tag.classList.toggle('is-hidden', index !== -1));
 		syncDots();
@@ -804,9 +848,10 @@ export function startStudio() {
 		history.replaceState(null, '', index === -1 ? location.pathname : `#${stations[index].id}`);
 	}
 
-	document.querySelector('[data-tour="prev"]')?.addEventListener('click', () => go(current - 1));
-	document.querySelector('[data-tour="next"]')?.addEventListener('click', () => go(current + 1));
+	document.querySelectorAll('[data-tour="prev"]').forEach(button => button.addEventListener('click', () => go(current - 1)));
+	document.querySelectorAll('[data-tour="next"]').forEach(button => button.addEventListener('click', () => go(current + 1)));
 	document.getElementById('studio-close')?.addEventListener('click', () => go(-1));
+
 	window.addEventListener('keydown', event => {
 		if (!play.hidden) {
 			if (event.key === 'Escape') closePlay();
@@ -846,13 +891,15 @@ export function startStudio() {
 			})
 			.join('');
 
+	const head = (id: StationId, count = '') =>
+		`<p class="panel-eyebrow">${escape(stops[id].place)}${count ? ` · ${count}` : ''}</p><h2 class="panel-title">${escape(stops[id].title)}</h2><p class="panel-lede">${escape(stops[id].lede)}</p>`;
 	const content: Record<StationId, () => string> = {
-		arcade: () => `<p class="panel-eyebrow">The arcade · ${data.games.length} games</p><h2 class="panel-title">Press start.</h2><p class="panel-lede">Games that run in your browser. No launcher, no account. Some are finished, most are "finished".</p>${itemList(data.games, 'game')}`,
-		desk: () => `<p class="panel-eyebrow">The main desk · ${data.apps.length} apps</p><h2 class="panel-title">Things real people use.</h2><p class="panel-lede">Sites and apps, designed and built at this desk by the head of every department.</p>${itemList(data.apps, 'app')}`,
-		bench: () => `<p class="panel-eyebrow">The workbench · ${data.tools.length} tools</p><h2 class="panel-title">Built because I needed them.</h2><p class="panel-lede">Small tools for annoying problems. Most started as "there has to be a better way" at 1am.</p>${itemList(data.tools, 'tool')}`,
-		board: () => `<p class="panel-eyebrow">The plan</p><h2 class="panel-title">The story goes here.</h2><p class="panel-lede">A photographer turned developer, one room, and a lot of side projects that got out of hand. The full story is being written. Probably.</p><div class="panel-actions"><a class="panel-btn is-primary" href="${data.links.about}">Read the about page</a><a class="panel-btn" href="${data.links.work}">All the work</a></div>`,
-		coffee: () => `<p class="panel-eyebrow">The coffee machine</p><h2 class="panel-title">Need something built?</h2><p class="panel-lede">Sites, apps, games, tools. Tell me what you are working on and I will tell you honestly if I am the right person for it.</p><div class="panel-actions"><a class="panel-btn is-primary" href="${data.links.hire}">Start a project</a><a class="panel-btn" href="${data.links.hello}">Just say hi</a></div>`,
-		hiring: () => `<p class="panel-eyebrow">Now hiring (kind of)</p><h2 class="panel-title">These desks are empty.</h2><p class="panel-lede">That is the bit. The studio started solo and is not planning to stay that way. The gnome and the duck are interim staff and doing their best.</p><ul class="panel-roles"><li><b>Art director.</b> Someone with taste, to tell me no. Currently a gnome.</li><li><b>3D artist.</b> Most of this room was built in code. Please.</li><li><b>Someone who likes spreadsheets.</b> You know who you are.</li></ul><div class="panel-actions"><a class="panel-btn is-primary" href="${data.links.collab}">Pull up a chair</a></div>`,
+		arcade: () => `${head('arcade', `${data.games.length} games`)}${itemList(data.games, 'game')}`,
+		desk: () => `${head('desk', `${data.apps.length} apps`)}${itemList(data.apps, 'app')}`,
+		bench: () => `${head('bench', `${data.tools.length} tools`)}${itemList(data.tools, 'tool')}`,
+		board: () => `${head('board')}<div class="panel-actions"><a class="panel-btn is-primary" href="${data.links.about}">Read the about page</a><a class="panel-btn" href="${data.links.work}">All the work</a></div>`,
+		coffee: () => `${head('coffee')}<div class="panel-actions"><a class="panel-btn is-primary" href="${data.links.hire}">Start a project</a><a class="panel-btn" href="${data.links.hello}">Just say hi</a></div>`,
+		services: () => `${head('services')}<ul class="panel-roles">${services.map(r => `<li><b>${escape(r.name)}</b> ${escape(r.note)}</li>`).join('')}</ul><div class="panel-actions"><a class="panel-btn is-primary" href="${data.links.hire}">Start a project</a><a class="panel-btn" href="${data.links.work}">See the work</a></div>`,
 	};
 
 	function openPanel(s: Station) {
@@ -892,17 +939,33 @@ export function startStudio() {
 	document.getElementById('studio-play-close')?.addEventListener('click', closePlay);
 
 	// ---------- size ----------
+	// On a tall screen the picture is lifted so the room clears the headline, and lifted further while a panel covers the bottom.
+	let lift = 0;
+	const liftTarget = () => (isPortrait() ? (current === -1 ? 0.12 : 0.22) : 0);
+	const applyLift = () => {
+		const { clientWidth: w, clientHeight: h } = canvas;
+		if (lift > 0.001) camera.setViewOffset(w, h, 0, h * lift, w, h);
+		else camera.clearViewOffset();
+		camera.updateProjectionMatrix();
+	};
+	lift = liftTarget();
 	const resize = () => {
-		const { clientWidth: w, clientHeight: h } = root;
+		const { clientWidth: w, clientHeight: h } = canvas;
 		renderer.setPixelRatio(pixelRatio);
 		renderer.setSize(w, h, false);
 		composer.setPixelRatio(pixelRatio);
 		composer.setSize(w, h);
 		camera.aspect = w / h;
-		camera.fov = w / h < 0.9 ? 60 : 42;
-		camera.updateProjectionMatrix();
+		const portrait = w / h < 0.9;
+		camera.fov = portrait ? 62 : 42;
+		applyLift();
+		// Turning the screen at the room view swaps to the framing for the new shape.
+		if (current === -1 && !introPlaying && flight === 1) {
+			toCam.copy(home().cam);
+			toLook.copy(home().look);
+		}
 	};
-	new ResizeObserver(resize).observe(root);
+	new ResizeObserver(resize).observe(canvas);
 	resize();
 
 	// ---------- quality ----------
@@ -961,6 +1024,11 @@ export function startStudio() {
 			look.lerp(toLook, 0.08);
 		}
 		camera.lookAt(look);
+		const wantLift = liftTarget();
+		if (Math.abs(wantLift - lift) > 0.0005) {
+			lift += (wantLift - lift) * Math.min(1, dt * 4);
+			applyLift();
+		}
 		bokeh.uniforms.focus.value = camera.position.distanceTo(look);
 		// Shallower focus up close, deeper from across the room.
 		bokeh.uniforms.aperture.value = current === -1 ? 0.0011 : 0.0045;
@@ -991,15 +1059,30 @@ export function startStudio() {
 			s.group.scale.lerp(scaleTarget.setScalar(target), 0.2);
 		}
 
-		const { clientWidth: w, clientHeight: h } = root;
-		for (const s of stations) {
-			projected.set(...s.tagAt).project(camera);
-			// Keep every tag fully on screen, and below the floating header.
-			const tag = tags.get(s.id)!;
-			const half = tag.offsetWidth / 2 + 12;
-			const x = Math.min(Math.max(((projected.x + 1) / 2) * w, half), w - half);
-			const y = Math.max(((1 - projected.y) / 2) * h, 104);
-			tag.style.translate = `${x}px ${y}px`;
+		const { clientWidth: w, clientHeight: h } = canvas;
+		// Keep every tag fully on screen and below the floating header, then nudge apart any that overlap.
+		const placed = stations
+			.map(s => {
+				projected.set(...s.tagAt).project(camera);
+				const tag = tags.get(s.id)!;
+				const half = tag.offsetWidth / 2 + 8;
+				return {
+					tag,
+					half,
+					height: tag.offsetHeight,
+					x: Math.min(Math.max(((projected.x + 1) / 2) * w, half), w - half),
+					y: Math.max(((1 - projected.y) / 2) * h, 104),
+				};
+			})
+			.sort((a, b) => a.y - b.y);
+		for (let i = 0; i < placed.length; i++) {
+			const a = placed[i];
+			for (let pass = 0; pass < placed.length; pass++) {
+				const clash = placed.slice(0, i).find(b => Math.abs(a.x - b.x) < a.half + b.half && Math.abs(a.y - b.y) < (a.height + b.height) / 2 + 6);
+				if (!clash) break;
+				a.y = clash.y + (a.height + clash.height) / 2 + 6;
+			}
+			a.tag.style.translate = `${a.x}px ${a.y}px`;
 		}
 
 		if (!reducedMotion) {
@@ -1047,7 +1130,7 @@ export function startStudio() {
 			camera.position.copy(toCam);
 			look.copy(toLook);
 		} else if (introPlaying) {
-			flyTo(HOME.cam, HOME.look, 3.6, 1.2);
+			flyTo(home().cam, home().look, 3.6, 1.2);
 		}
 	};
 	manager.onLoad = begin;

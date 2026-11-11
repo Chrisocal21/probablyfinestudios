@@ -16,6 +16,8 @@ export const profile = {
 	photo: '/images/compressed-Chris.jpg',
 	headline: "I'm Chris. I build things until they work.",
 	hook: "Photographer turned developer, running laser engraving production by day, and currently the entire staff of this studio. I ship real products, and I'm looking for people to build the next ones with.",
+	/** The founder blurb on the homepage. Keeps to the studio; the solo-and-growing story stays on the about page. */
+	teaser: 'Photographer turned developer. Founded Probably Fine Studios and still runs laser engraving production by day. The whole story is on the about page.',
 	bio: [
 		"I started with a camera. Building my own photography site pulled me into code, and I never really came back out. Since then it's been a recipe platform, software for service businesses, a weather app, a trucking sim on a 3D globe, and a platformer about an egg. Whatever idea wouldn't leave me alone.",
 		"Probably Fine Studios is the name on all of it. Yes, I named the studio after my quality-assurance process. Nothing here claims to be perfect. It ships, it works, and it's probably fine.",
@@ -24,8 +26,8 @@ export const profile = {
 	/** Shown as the status pill on the homepage and in the footer. Set open to false to hide the pill. */
 	availability: {
 		open: true,
-		label: 'Looking for collaborators and partners. Yes, you.',
-		note: 'Started solo, looking to grow. Open to collaborators, business partners, eager learners, and the occasional weirdly specific project.',
+		label: 'Taking on new projects. Yes, yours.',
+		note: 'Sites, apps, games, tools, and the occasional weirdly specific job. Say what you are building.',
 	},
 	githubSince: 2023,
 	publicRepos: '45+',
