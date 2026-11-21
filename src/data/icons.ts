@@ -25,7 +25,7 @@ export const projectIcons: Record<string, string> = {
 	chat: '<path d="M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.2-3.6A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01" stroke-width="2.2"/>',
 	// SplitNote: a receipt split down the middle
 	receipt: '<path d="M6 3h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 21V3z"/><path d="M12 6v10.5" stroke-dasharray="1.5 1.8"/><path d="M8.3 8.5h1.7M14 8.5h1.7M8.3 12.5h1.7M14 12.5h1.7"/>',
-	// Games Collection: a puzzle grid
+	// A grid (Castle Builder)
 	grid: '<rect x="4" y="4" width="7" height="7" rx="1.2"/><rect x="13" y="4" width="7" height="7" rx="1.2"/><rect x="4" y="13" width="7" height="7" rx="1.2"/><rect x="13" y="13" width="7" height="7" rx="1.2"/>',
 	// Burrow: the 3D globe
 	globe: '<circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/>',

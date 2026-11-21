@@ -39,6 +39,8 @@ const recipes = {
 	// Get past the photosensitivity warning to the title menu.
 	'zombie-siege': { steps: [{ key: 'Enter' }, { wait: 3500 }] },
 	// Without a location the app only shows its welcome screen.
+	// Wait out the six-second walk down the stairs so the shot lands in the room.
+	backintheday: { wait: 13000 },
 	wx: { geo: [32.7157, -117.1611], wait: 7000 },
 };
 

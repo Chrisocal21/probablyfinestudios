@@ -12,7 +12,7 @@ for (const project of projects) {
 // Grouped by type, shipped work first; each card carries its own status tag.
 const byType = (type: Project['type']) => projects.filter(project => project.type === type).sort((a, b) => Number(a.wip ?? false) - Number(b.wip ?? false));
 const groups = [
-	{ id: 'games', title: 'Games', subtitle: 'Browser games and sims. The curated shelf lives on the Games page.', projects: byType('game') },
+	{ id: 'games', title: 'Games', subtitle: 'Browser games and sims, plus the fun side projects. The curated shelf lives on the Games page.', projects: byType('game') },
 	{ id: 'apps', title: 'Apps & Sites', subtitle: "Real products, up and running. Go click around. I'll wait.", projects: byType('app') },
 	{ id: 'tools', title: 'Tools', subtitle: 'Small things that scratch a specific itch (usually mine).', projects: byType('tool') },
 ];

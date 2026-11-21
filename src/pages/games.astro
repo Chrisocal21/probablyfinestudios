@@ -6,12 +6,15 @@ import ProjectSection from '../components/ProjectSection.astro';
 import { projects, liveLabel } from '../data/projects';
 import { site, contactLink } from '../data/site';
 
-// The shelf is curated by hand, in this order. Other game-typed projects stay on /portfolio.
-const shelfIds = ['zombie-siege', 'supplyline', 'trvlplay', 'salvage-road', 'project-baja'];
+// The studio's main games, curated by hand, in this order.
+const shelfIds = ['zombie-siege', 'supplyline', 'salvage-road', 'project-baja'];
 const games = shelfIds.flatMap(id => projects.filter(project => project.id === id && project.type === 'game'));
 
-// Every other game still gets a home, below the shelf.
-const moreGames = projects.filter(project => project.type === 'game' && !shelfIds.includes(project.id));
+// Fun side projects: made for the joy of it, kept apart from the main games.
+const sideGames = projects.filter(project => project.type === 'game' && project.side);
+
+// Any other game still gets a home, below the shelf.
+const moreGames = projects.filter(project => project.type === 'game' && !project.side && !shelfIds.includes(project.id));
 
 // Screenshots made by `npm run screens`; older ones live in public/ and are named in `image`.
 const screens = import.meta.glob<ImageMetadata>('../assets/screens/*.webp', { eager: true, import: 'default' });
@@ -23,7 +26,7 @@ const jsonLd = {
 	url: `${site.url}/games/`,
 	mainEntity: {
 		'@type': 'ItemList',
-		itemListElement: games.map((game, index) => ({
+		itemListElement: [...games, ...sideGames].map((game, index) => ({
 			'@type': 'ListItem',
 			position: index + 1,
 			name: game.title,
@@ -107,6 +110,12 @@ const jsonLd = {
 					);
 				})}
 			</div>
+
+			{sideGames.length > 0 && (
+				<div class="mt-20">
+					<ProjectSection id="side-projects" title="Fun side projects" subtitle="Not the main event. Smaller games, toys, and experiments built because they sounded fun, with no roadmap and no pressure." projects={sideGames} variant="mixed" />
+				</div>
+			)}
 
 			{moreGames.length > 0 && (
 				<div class="mt-20">

@@ -17,7 +17,8 @@ const flagshipUrl = flagship.playUrl ?? flagship.liveUrl;
 // Shipped work first, then what's still cooking.
 const row = (type: Project['type']) =>
 	projects.filter(project => project.type === type).sort((a, b) => Number(a.wip ?? false) - Number(b.wip ?? false));
-const gameRow = row('game');
+// The homepage row is the studio's main games; the fun side projects live on the Games page.
+const gameRow = row('game').filter(project => !project.side);
 const appRow = row('app');
 const toolRow = row('tool');
 

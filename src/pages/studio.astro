@@ -9,7 +9,7 @@ const screens = import.meta.glob<ImageMetadata>('../assets/screens/*.webp', { ea
 const screenFor = (id: string, fallback: string) => screens[`../assets/screens/${id}.webp`]?.src ?? (fallback || null);
 
 // The arcade shows games in this order; anything not listed follows.
-const gameOrder = ['zombie-siege', 'supplyline', 'salvage-road', 'project-baja', 'scramble', 'trvlplay', 'hang', 'games-collection'];
+const gameOrder = ['zombie-siege', 'supplyline', 'salvage-road', 'project-baja', 'scramble', 'trvlplay', 'hang', 'backintheday', 'castle'];
 const rank = (id: string) => {
 	const index = gameOrder.indexOf(id);
 	return index === -1 ? gameOrder.length : index;
