@@ -12,7 +12,7 @@ import { getContributions } from '../data/github';
 const contributions = await getContributions();
 
 // The hero's flagship. It also stays in its genre row, so every project has a home.
-const flagship = projects.find(project => project.id === 'supplyline')!;
+const flagship = projects.find(project => project.id === 'zombie-siege')!;
 const flagshipUrl = flagship.playUrl ?? flagship.liveUrl;
 // Shipped work first, then what's still cooking.
 const row = (type: Project['type']) =>
@@ -103,13 +103,13 @@ const jsonLd = [
 						<img src={flagship.image} alt={`${flagship.title} screenshot`} class="absolute inset-0 w-full h-full object-cover" />
 					</div>
 					<div class="p-6 md:p-10 flex flex-col gap-4 justify-center">
-						<p class="text-[11px] uppercase tracking-[0.2em] font-semibold" style={`color: ${flagship.theme?.accent}`}>Start here · Free tester build</p>
+						<p class="text-[11px] uppercase tracking-[0.2em] font-semibold" style={`color: ${flagship.theme?.accent}`}>Start here · {flagship.playLabel ? 'Free tester build' : 'Play in your browser'}</p>
 						<h2 id="flagship-heading" class="text-3xl md:text-4xl font-bold text-white leading-tight">{flagship.title}</h2>
 						<p class="text-zinc-300 leading-relaxed">{flagship.description}</p>
 						<div class="flex flex-wrap gap-2 pt-2">
 							{flagshipUrl && (
 								<a href={flagshipUrl} target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-lg font-semibold text-sm transition hover:opacity-90" style={`background: ${flagship.theme?.accent}; color: #000`}>
-									{flagship.playLabel ?? 'Play the demo'}<span class="sr-only"> (opens in a new tab)</span>
+									{flagship.playLabel ?? 'Play now'}<span class="sr-only"> (opens in a new tab)</span>
 								</a>
 							)}
 							<a href={`/portfolio/${flagship.id}/`} class="px-5 py-2.5 rounded-lg text-sm border border-zinc-700 text-zinc-200 hover:bg-zinc-800 transition">About the game</a>

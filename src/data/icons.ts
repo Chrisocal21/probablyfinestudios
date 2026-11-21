@@ -23,8 +23,6 @@ export const projectIcons: Record<string, string> = {
 	cube: '<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M4 7.5l8 4.5 8-4.5"/><path d="M12 12v9"/>',
 	// Ping: a chat bubble mid-reply
 	chat: '<path d="M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.2-3.6A7.93 7.93 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01" stroke-width="2.2"/>',
-	// SplitNote: a receipt split down the middle
-	receipt: '<path d="M6 3h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 21V3z"/><path d="M12 6v10.5" stroke-dasharray="1.5 1.8"/><path d="M8.3 8.5h1.7M14 8.5h1.7M8.3 12.5h1.7M14 12.5h1.7"/>',
 	// A grid (Castle Builder)
 	grid: '<rect x="4" y="4" width="7" height="7" rx="1.2"/><rect x="13" y="4" width="7" height="7" rx="1.2"/><rect x="4" y="13" width="7" height="7" rx="1.2"/><rect x="13" y="13" width="7" height="7" rx="1.2"/>',
 	// Burrow: the 3D globe
@@ -33,8 +31,6 @@ export const projectIcons: Record<string, string> = {
 	map: '<path d="M9 4L3 6.5V20l6-2.5 6 2.5 6-2.5V4l-6 2.5L9 4z"/><path d="M9 4v13.5M15 6.5V20"/>',
 	// Not A Cable: a plug, crossed out
 	cable: '<path d="M9 7V3M15 7V3"/><path d="M6.5 7h11v4a5.5 5.5 0 01-11 0V7z"/><path d="M12 16.5V21"/><path d="M3.5 20.5l17-17" stroke-width="1.8"/>',
-	// ctrII: a command prompt, for the ask bar
-	prompt: '<rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M7.5 9.5l3 2.5-3 2.5M13 14.5h3.5"/>',
 	// SupplyLine: a delivery truck
 	truck: '<path d="M3 7h10v9H3V7z"/><path d="M13 10.5h3.5L19 13.5V16h-6v-5.5z"/><circle cx="7" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/>',
 };
